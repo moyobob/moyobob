@@ -45,22 +45,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 
 ## User Stories
 
-## Creating Group
-
-- As a User, I want to create a new Group, so that I can invite people to my group.
-1. Given that I'm a registered user
-1. When I open the Groups page
-1. Then the system shows the list of groups I joined
-1. And the system shows Create Group button
-1. When I click the Create Group button
-1. Then the system leads me to Create Group page
-1. When I fill in the group information such as group name, brief information, etc
-1. And I click the Create button
-1. Then the system create a new group with the submitted information
-1. And the system leads me to Groups page
-1. Then I can see the created group on the group list
-
-## Starting a new Party
+### Starting a new Party
 
 - As a CSE student, I want gather people in CSE room, so that I can eat dinner with them.
 1. Given I am already in CSE room
@@ -79,7 +64,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the other people open Moyobob
 1. And they join the Party
 
-## Choosing Restaurant
+### Choosing Restaurant
 
 - As a Party Leader, I want to gather Restaurant preference of other Users in Party, so that I can confirm what Restaurant to order.
 1. Given that I'm a Party Leader already participating in Party
@@ -95,7 +80,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the system fixes the Restaurant to our Party
 1. And the system leads the Party's state to Choosing Menu
 
-## Choosing Menus
+### Choosing Menus
 
 - As a Party member, I want to select a Menu for myself
 1. Given that I'm a Party member already participating in Party
@@ -111,7 +96,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. When all member finish to choose menu, the Party Leader ends the state by clicking next state button
 1. And the system leads the Party's state to ordering
 
-## After the delivery arrived
+### After the delivery arrived
 
 - As a Party Leader, I want to inform to the system that the meal has arrived and designate a User who paid for the meal.
 1. Given that I am a Party Leader already participating in Party
@@ -123,7 +108,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. When I select a User who paid
 1. Then the system requests every User except the designated user to send respective amount of money
 
-## Payment and Collection
+### Payment and Collection
 
 - As a user who paid for the meal, I want to request a money retrieval.
 1. Given that I am a user already participating in Party
@@ -137,6 +122,8 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 
 ## User Interface Requirements
 
-![Storyboard 1](storyboard-0.png)
+Refer to Figure 1 and 2.
 
-![Storyboard 2](storyboard-1.png)
+![Storyboard](storyboard-0.png)
+
+![Storyboard (continued)](storyboard-1.png)
