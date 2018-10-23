@@ -31,7 +31,7 @@ Version 1.0
 
 - Docker and docker-compose for deploying
   - Easy to deploy
-- Bjoern for WSGI
+- Gunicorn for WSGI
   - Zero configuration
   - Small and fast
 - Caddy for Web Server
@@ -156,7 +156,7 @@ Provides the main features such as choosing menus. Different infos are shown wit
 - Payment Complete : `<button>`
 
 ##### Payment Component
-    
+
 Shows the required amount of money to pay.
 
 - how much one should pay : `<h2>`
