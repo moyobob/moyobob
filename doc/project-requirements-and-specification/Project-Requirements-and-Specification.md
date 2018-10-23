@@ -1,15 +1,32 @@
 ---
 title: Moyobob
+subtitle: Project Requirements and Specification
 author: Team 5
 papersize: a4
+pandoc-latex-color:
+  - classes: [important]
+    color: blue
+header-includes:
+  - |
+    ```{=latex}
+    \providecommand{\subtitle}[1]{%
+    \usepackage{titling}
+    \posttitle{%
+      \par\large#1\end{center}}
+    }
+    ```
 ---
 
-Requirements and Specification Document  
-2018-10-08, version 1.0
+2018-10-23,
+version 2.0
 
 ## Revisions
 
 - 1.0 2018-10-08 - initial document :tada:
+- 2.0 2018-10-23 - Sprint 2
+  - User Interface Requirements has been updated
+  - User Stories has been updated
+  - Chagned parts are marked as [blue header]{.important}
 
 ## Project Abstract
 
@@ -30,20 +47,61 @@ Students who spend most of the time in the CSE club room usually do not go to th
 Web service __Moyobob__ aims to offer services that ease the procedure of gathering people, choosing the restaurant and the menus, ordering foods, and collecting the bill, when people gather to eat delivery foods at the student room, the club room, the lab etc.
 
 ## Customer
-- __Moyobob__ is a service for people who eat delivery foods everyday in SNU CSE student room. 
+
+- __Moyobob__ is a service for people who eat delivery foods everyday in SNU CSE student room.
 - But we also concern about scalability to other groups like other departments or circles. __Moyobob__ aims to be a service for everyone who would like to eat delivery foods together.
 
 ## Competitive Landscape
+
 - SimpleRemittanceApp (e.g.Toss, KakaoPay)
   - differentiated by giving functions for organizing people and decision making(choosing restaurant, menu).
-
 - DeliveryApp (e.g.Yogiyo, Baemin)
   - differentiated by giving functions for organizing people and collecting a bill.
-
 - MessengerApp (e.g.KakaoTalk, Slack)
   - differentiated by giving functions for decision making and collecting a bill.
 
 ## User Stories
+
+### [Sign Up]{.important}
+
+- As an unregistered person, I want to sign up, so that I can use the service.
+1. Given that I'm an unregistered person
+1. When I open the Lobby page
+1. Then the system shows Sign Up button
+1. When I click the Sign Up button
+1. Then the system leads me to Sign Up page
+1. When I fill in the user information such as id, name, and password
+1. Then the system creates a User with the submitted information
+1. And I am registered with the corresponding information
+
+### [Sign In]{.important}
+
+- As a registered User, I want to sign in, so that I can use the service.
+1. Given that I'm a registered User
+1. And not signed in
+1. When I open the Lobby page
+1. Then the system shows Sign In button
+1. When I click the Sign In button
+1. Then the system leads me to Sign In page
+1. When I fill in the correct id and password
+1. Then the system approves the request to sign in
+1. And leads me to Lobby page
+1. And I am signed in
+
+### [Creating Group]{.important}
+
+- As a User, I want to create a new Group, so that I can invite people to my group.
+1. Given that I'm a registered user
+1. When I open the Groups page
+1. Then the system shows the list of groups I joined
+1. And the system shows Create Group button
+1. When I click the Create Group button
+1. Then the system leads me to Create Group page
+1. When I fill in the group information such as group name, brief information, etc
+1. And I click the Create button
+1. Then the system creates a new group with the submitted information
+1. And the system leads me to Groups page
+1. Then I can see the created group on the group list
 
 ### Starting a new Party
 
@@ -92,7 +150,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the system shows me assign pop-up
 1. I can assign the menu for myself or friend or all members in the Party
 1. When I assign the menu for myself and click OK button
-1. Then the system shows me the present situation which tells me what I choose and how much I have to pay, what other members choose and total amount. 
+1. Then the system shows me the present situation which tells me what I choose and how much I have to pay, what other members choose and total amount.
 1. When all member finish to choose menu, the Party Leader ends the state by clicking next state button
 1. And the system leads the Party's state to ordering
 
@@ -120,10 +178,6 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the system hides the request for that User
 1. And the system shows for me and that User a Payment Complete message
 
-## User Interface Requirements
+## [User Interface Requirements]{.important}
 
-Refer to Figure 1 and 2.
-
-![Storyboard](storyboard-0.png)
-
-![Storyboard (continued)](storyboard-1.png)
+![View Design](view-design.png)
