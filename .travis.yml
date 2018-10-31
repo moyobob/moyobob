@@ -1,5 +1,8 @@
 sudo: required
 
+notifications:
+  slack: swpp2018:zzsvvG3AgBnU9RiByZ6JdU5m
+
 matrix:
   include:
     - language: node_js
