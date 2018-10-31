@@ -19,7 +19,8 @@ matrix:
       cache:
         pip: true
 
+before_install: ./util/ci.sh before_install
 install: ./util/ci.sh install
-before_script: ./util/ci.sh before
-script: ./util/ci.sh test
-after_success: ./util/ci.sh after
+before_script: ./util/ci.sh before_script
+script: ./util/ci.sh script
+after_success: ./util/ci.sh after_success
