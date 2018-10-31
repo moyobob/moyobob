@@ -60,3 +60,7 @@ class UserTestCase(TestCaseWithHttp):
         self.assertEqual(self.post('/api/signout/', {}).status_code, 405)
         self.assertEqual(self.put('/api/signout/', {}).status_code, 405)
         self.assertEqual(self.delete('/api/signout/').status_code, 405)
+
+    def test_bad_request(self):
+        self.assertEqual(self.post('/api/signup/', {}).status_code, 400)
+        self.assertEqual(self.post('/api/signin/', {}).status_code, 400)
