@@ -10,4 +10,6 @@
 [![김영현](https://badgen.net/badge/김영현/kipa00/cyan)](https://github.com/kipa00)
 [![이강욱](https://badgen.net/badge/이강욱/pbzweihander/cyan)](https://github.com/pbzweihander)
 
+[![Coverage Status](https://coveralls.io/repos/github/swsnu/swpp18-team5/badge.svg?branch=master)](https://coveralls.io/github/swsnu/swpp18-team5?branch=master)
+
 __Coming Soon!__
