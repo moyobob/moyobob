@@ -1,0 +1,29 @@
+sudo: required
+
+notifications:
+  slack: swpp2018:zzsvvG3AgBnU9RiByZ6JdU5m
+
+matrix:
+  include:
+    - language: node_js
+      node_js: 10.13
+      env: TEST=FRONTEND
+      addons:
+        apt:
+          sources:
+            - google-chrome
+          packages:
+            - google-chrome-stable
+      cache:
+        directories:
+          - frontend/node_modules
+    - language: python
+      python: 3.5
+      env: TEST=BACKEND
+      cache:
+        pip: true
+
+install: ./util/ci.sh install
+before_script: ./util/ci.sh before
+script: ./util/ci.sh test
+after_success: ./util/ci.sh after
