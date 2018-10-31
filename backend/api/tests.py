@@ -4,38 +4,45 @@ import json
 
 
 class TestCaseWithHttp(TestCase):
+    def setUp(self):
+        self.client = Client()
+
     def get(self, url):
-        client = Client(enforce_csrf_checks=True)
-        return client.get(url)
+        return self.client.get(url)
 
     def post(self, url, obj):
-        client = Client(enforce_csrf_checks=True)
-        return client.post(url, json.dumps(obj), content_type='application/json')
+        return self.client.post(url, json.dumps(obj), content_type='application/json')
 
     def put(self, url, obj):
-        client = Client(enforce_csrf_checks=True)
-        return client.put(url, json.dumps(obj), content_type='application/json')
+        return self.client.put(url, json.dumps(obj), content_type='application/json')
 
     def delete(self, url):
-        client = Client(enforce_csrf_checks=True)
-        return client.delete(url)
+        return self.client.delete(url)
 
 
 class UserTestCase(TestCaseWithHttp):
     def test_sign_up_in_and_out(self):
-        resp = self.post('/api/signup/',
-                         {'username': 'rustacean', 'password': 'iluvrust'})
+        resp = self.post('/api/signup/', {
+            'username': 'rustacean',
+            'password': 'iluvrust',
+            'first_name': 'ferris',
+            'email': 'ferris@rustacean.org'
+        })
         self.assertEqual(resp.status_code, 201)
 
-        resp = self.post('/api/signin/',
-                         {'username': 'rustacean', 'password': 'iluvrust'})
+        resp = self.post('/api/signin/', {
+            'username': 'rustacean',
+            'password': 'iluvrust'
+        })
         self.assertEqual(resp.status_code, 204)
 
         resp = self.get('/api/signout/')
         self.assertEqual(resp.status_code, 204)
 
-        resp = self.post('/api/signin/',
-                         {'username': 'rustacean', 'password': 'ihaterust'})
+        resp = self.post('/api/signin/', {
+            'username': 'rustacean',
+            'password': 'ihaterust'
+        })
         self.assertEqual(resp.status_code, 401)
 
         resp = self.get('/api/signout/')
