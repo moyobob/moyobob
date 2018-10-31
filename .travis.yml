@@ -9,11 +9,7 @@ matrix:
       node_js: 10.13
       env: TEST=FRONTEND
       addons:
-        apt:
-          sources:
-            - google-chrome
-          packages:
-            - google-chrome-stable
+        chrome: stable
       cache:
         directories:
           - frontend/node_modules
