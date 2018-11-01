@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from enum import Enum
 
 
@@ -15,8 +16,11 @@ class PartyType(Enum):
 
 class Party(models.Model):
     name = models.CharField(max_length=120)
-    state = models.IntegerField()
     type = models.SmallIntegerField(choices=enum_to_choice(PartyType))
     location = models.CharField(max_length=120)
     leader = models.ForeignKey(User, on_delete=models.CASCADE)
     since = models.DateTimeField(auto_now=True)
+
+    def member_count(self):
+        state = cache.get('party:{}'.format(self.id))
+        return len(state['members'])
