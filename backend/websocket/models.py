@@ -1,4 +1,6 @@
+from django.core.cache import cache
 from enum import Enum
+import json
 
 
 class PartyPhase(Enum):
@@ -16,3 +18,10 @@ class PartyState:
         self.restaurant = None
         self.members = []
         self.menus = {}
+
+    def save(self):
+        cache.set(self.key, json.dumps(self))
+
+    @classmethod
+    def get(party_id: int):
+        return cache.get('party:{}'.format(party_id))
