@@ -23,16 +23,15 @@ class TestCaseWithHttp(TestCase):
 class UserTestCase(TestCaseWithHttp):
     def test_sign_up_in_and_out(self):
         resp = self.post('/api/signup/', {
-            'username': 'rustacean',
+            'username': 'ferris',
             'password': 'iluvrust',
-            'first_name': 'ferris',
-            'email': 'ferris@rustacean.org'
+            'email': 'ferris@rustacean.org',
         })
         self.assertEqual(resp.status_code, 201)
 
         resp = self.post('/api/signin/', {
-            'username': 'rustacean',
-            'password': 'iluvrust'
+            'email': 'ferris@rustacean.org',
+            'password': 'iluvrust',
         })
         self.assertEqual(resp.status_code, 204)
 
@@ -40,8 +39,8 @@ class UserTestCase(TestCaseWithHttp):
         self.assertEqual(resp.status_code, 204)
 
         resp = self.post('/api/signin/', {
-            'username': 'rustacean',
-            'password': 'ihaterust'
+            'email': 'ferris@rustacean.org',
+            'password': 'ihaterust',
         })
         self.assertEqual(resp.status_code, 401)
 
