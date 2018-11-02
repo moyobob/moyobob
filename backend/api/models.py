@@ -1,4 +1,5 @@
 from django.db import models
+from django.forms.models import model_to_dict
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from enum import IntEnum
@@ -24,3 +25,14 @@ class Party(models.Model):
     def member_count(self):
         state = cache.get('party:{}'.format(self.id))
         return len(state['members'])
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'type': self.type,
+            'location': self.location,
+            'leader_id': self.leader.id,
+            'members': [user.id for user in self.members.all()],
+            'since': str(self.since),
+        }
