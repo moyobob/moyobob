@@ -9,9 +9,8 @@ def enum_to_choice(enum: Enum):
 
 
 class PartyType(Enum):
-    PublicParty = 0
-    GroupOpenedParty = 1
-    ClosedParty = 2
+    InGroup = 0
+    Private = 1
 
 
 class Party(models.Model):
