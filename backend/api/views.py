@@ -1,10 +1,11 @@
-from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed, HttpResponseNotFound
 from django.contrib.auth.models import User
 import json
 from json.decoder import JSONDecodeError
+
+from .models import Party, PartyType
 
 
 def HttpResponseOk(*args, **kwargs):
@@ -59,4 +60,32 @@ def signout(request: HttpRequest):
         return HttpResponseForbidden()
 
     logout(request)
+
     return HttpResponseOk()
+
+
+def party(request: HttpRequest):
+    if request.method not in ['GET', 'POST']:
+        return HttpResponseNotAllowed(['GET', 'POST'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    if request.method == 'GET':
+        party_list = [party.as_dict() for party in Party.objects.all()]
+        return JsonResponse(party_list, safe=False)
+    else:  # POST
+        try:
+            req_data = json.loads(request.body.decode())
+            name = req_data['name']
+            type = req_data['type']
+            location = req_data['location']
+            leader = request.user
+        except (JSONDecodeError, KeyError, ValueError):
+            return HttpResponseBadRequest()
+
+        party = Party(name=name, type=type, location=location, leader=leader)
+        party.save()
+        party.members.add(request.user)
+        party.save()
+
+        return JsonResponse(party.as_dict(), safe=False)
