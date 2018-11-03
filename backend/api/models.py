@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from enum import IntEnum
 
+from websocket.models import PartyState
+
 
 def enum_to_choice(enum: IntEnum):
     return [(tag, tag.value) for tag in enum]
@@ -36,3 +38,13 @@ class Party(models.Model):
             'members': [user.id for user in self.members.all()],
             'since': str(self.since),
         }
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        state = PartyState(self.id)
+        state.save()
+
+    def delete(self, *args, **kwargs):
+        state = PartyState.get(self.id)
+        state.delete()
+        super().delete(*args, **kwargs)
