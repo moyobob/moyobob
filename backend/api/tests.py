@@ -193,3 +193,14 @@ class PartyTestCase(TestCaseWithHttp):
         party.delete()
 
         self.assertIsNone(cache.get('party:{}'.format(id)))
+
+        party = Party(
+            name="new party name",
+            type=int(PartyType.Private),
+            location="new party location",
+            leader=self.user,
+        )
+        party.save()
+        state = party.state
+        state.delete()
+        party.delete()
