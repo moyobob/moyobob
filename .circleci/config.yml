@@ -12,7 +12,7 @@ jobs:
             sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - restore_cache:
           keys:
-            - backend-deps-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+            - backend-deps-{{ .Branch }}-{{ checksum "backend/requirements.txt" }}-{{ checksum "backend/requirements.dev.txt" }}
             - backend-deps-{{ .Branch }}-
             - backend-deps-
       - run:
@@ -20,7 +20,7 @@ jobs:
           command: sudo pip install -r requirements.txt -r requirements.dev.txt
           working_directory: backend
       - save_cache:
-          key: backend-deps-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+          key: backend-deps-{{ .Branch }}-{{ checksum "backend/requirements.txt" }}-{{ checksum "backend/requirements.dev.txt" }}
           paths:
             - "/usr/local/bin"
             - "/usr/local/lib/python3.6/site-packages"
@@ -34,13 +34,12 @@ jobs:
           working_directory: backend
       - run:
           name: Running unit tests
-          command: coverage run --branch --source=".api" manage.py test
+          command: coverage run --branch --source="./api" manage.py test
           working_directory: backend
       - run:
           name: Report coverage
-          command: |
-            cp backend/.coverage ./
-            codecov
+          command: codecov
+          working_directory: backend
 
   frontend_test:
     docker:
@@ -49,7 +48,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - frontend-deps-{{ .Branch }}-{{ checksum "package-lock.json" }}
+            - frontend-deps-{{ .Branch }}-{{ checksum "frontend/package-lock.json" }}
             - frontend-deps-{{ .Branch }}-
             - frontend-deps-
       - run:
@@ -57,7 +56,7 @@ jobs:
           command: npm install
           working_directory: frontend
       - save_cache:
-          key: frontend-deps-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          key: frontend-deps-{{ .Branch }}-{{ checksum "frontend/package-lock.json" }}
           paths:
             - frontend/node_modules
       - run:
