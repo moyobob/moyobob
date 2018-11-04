@@ -18,7 +18,6 @@ class TestCaseWithCache(TestCase):
 class TestCaseWithHttp(TestCaseWithCache):
     def setUp(self):
         super().setUp()
-        self.client = Client()
 
     def get(self, url):
         return self.client.get(url)
