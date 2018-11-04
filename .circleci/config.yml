@@ -4,6 +4,7 @@ jobs:
   backend_test:
     docker:
       - image: circleci/python:3.6-stretch
+      - image: circleci/redis:4-alpine
     steps:
       - checkout
       - run:
