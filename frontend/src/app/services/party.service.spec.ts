@@ -73,7 +73,7 @@ describe('PartyService', () => {
       location: 'Location 0',
       leaderId: 0,
       since: 'Since 0',
-    }
+    };
     partyService.addParty(newParty).then( party => expect(party).toEqual(mockParty));
     const req = httpTestingController.expectOne(partyApi);
     expect(req.request.method).toEqual('POST');
