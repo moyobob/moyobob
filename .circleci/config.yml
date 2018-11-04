@@ -35,7 +35,7 @@ jobs:
           working_directory: backend
       - run:
           name: Running unit tests
-          command: coverage run --branch --source="./api" manage.py test
+          command: coverage run --branch --source="./api,./websocket" manage.py test
           working_directory: backend
       - run:
           name: Report coverage
