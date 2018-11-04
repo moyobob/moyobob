@@ -33,13 +33,10 @@ class TestCaseWithHttp(TestCaseWithCache):
         return self.client.delete(url)
 
     def login(self, email, password):
-        self.post('/api/signin/', {
-            'email': email,
-            'password': password,
-        })
+        self.client.login(email=email, password=password)
 
     def logout(self):
-        self.get('/api/signout/')
+        self.client.logout()
 
 
 class UserTestCase(TestCaseWithHttp):
