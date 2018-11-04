@@ -80,3 +80,28 @@ class WebsocketTestCase(TestCaseWithCache):
         self.assertEqual(resp['error'], 'Invalid command')
 
         await communicator.disconnect()
+
+    @async_test
+    async def test_invalid_data(self):
+        user = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        self.client.login(email=user.email, password='iluvrust')
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = user
+
+        await communicator.connect()
+        await communicator.receive_from()
+
+        await communicator.send_json_to({
+            'command': 'party.join',
+            'foo': 'bar',
+        })
+        resp = await communicator.receive_json_from(1)
+        self.assertEqual(resp['type'], 'error')
+        self.assertEqual(resp['error'], 'Invalid data')
+
+        await communicator.disconnect()
