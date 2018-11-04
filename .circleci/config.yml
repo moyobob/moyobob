@@ -2,11 +2,6 @@ version: 2
 
 jobs:
   backend_test:
-    branches:
-      only:
-        - master
-        - backend
-        - /^backend-.*/
     docker:
       - image: circleci/python:3.6-stretch
     steps:
@@ -47,11 +42,6 @@ jobs:
           working_directory: backend
 
   frontend_test:
-    branches:
-      only:
-        - master
-        - frontend
-        - /^frontend-.*/
     docker:
       - image: circleci/node:10-stretch-browsers
     steps:
@@ -85,5 +75,17 @@ workflows:
   version: 2
   flow:
     jobs:
-      - frontend_test
-      - backend_test
+      - frontend_test:
+          filters:
+            branches:
+              only:
+                - master
+                - frontend
+                - /^frontend-.*/
+      - backend_test:
+          filters:
+            branches:
+              only:
+                - master
+                - backend
+                - /^backend-.*/
