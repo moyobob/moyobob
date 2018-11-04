@@ -27,7 +27,7 @@ export class SignInComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private router: Router
+//    private router: Router
   ) { }
 
   ngOnInit() {
@@ -45,7 +45,7 @@ export class SignInComponent implements OnInit {
         this.userService.requestSignIn(this.emailInput, this.passwordInput)
         .then(success => {
           if (success) {
-            this.router.navigateByUrl('/party');
+//            this.router.navigateByUrl('/party');
           } else {
             this.logInStatus = InputStatus.EmailOrPasswordWrong;
           }
