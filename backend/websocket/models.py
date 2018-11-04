@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from enum import Enum
+from enum import IntEnum
 import json
 
 
@@ -19,13 +19,13 @@ class CacheModel():
         return o
 
     def save(self):
-        cache.set(type(self).key(self.id), json.dumps(self))
+        cache.set(type(self).key(self.id), json.dumps(self.as_dict()))
 
     def delete(self):
         cache.delete(type(self).key(self.id))
 
 
-class PartyPhase(Enum):
+class PartyPhase(IntEnum):
     ChoosingRestaurant = 0
     ChoosingMenu = 1
     Ordering = 2
@@ -42,3 +42,12 @@ class PartyState(CacheModel):
         self.restaurant = None
         self.members = []
         self.menus = {}
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'phase': self.phase,
+            'restaurant': self.restaurant,
+            'self.members': self.members,
+            'self.menus': self.menus
+        }

@@ -85,7 +85,5 @@ def party(request: HttpRequest):
 
         party = Party(name=name, type=type, location=location, leader=leader)
         party.save()
-        party.members.add(request.user)
-        party.save()
 
         return JsonResponse(party.as_dict(), safe=False)

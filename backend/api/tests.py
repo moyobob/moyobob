@@ -144,7 +144,6 @@ class PartyTestCase(TestCaseWithHttp):
         self.assertEqual(resp_json['type'], new_party['type'])
         self.assertEqual(resp_json['location'], new_party['location'])
         self.assertEqual(resp_json['leader_id'], self.user.id)
-        self.assertListEqual(resp_json['members'], [self.user.id])
 
         id = resp_json['id']
         party = Party.objects.get(id=id)
@@ -152,7 +151,6 @@ class PartyTestCase(TestCaseWithHttp):
         self.assertEqual(party.type, new_party['type'])
         self.assertEqual(party.location, new_party['location'])
         self.assertEqual(party.leader.id, self.user.id)
-        self.assertListEqual(list(party.members.all()), [self.user])
 
     def test_post_party_bad_request(self):
         self.login()
