@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { UserService } from '../services/user.service';
 
 enum InputStatus {
   HaveNotTriedSignIn,
   EmailNoInput,
   PasswordNoInput,
   TriedSignIn,
+  EmailOrPasswordWrong,
 }
 
 @Component({
@@ -22,7 +25,10 @@ export class SignInComponent implements OnInit {
 
   inputStatus = InputStatus;
 
-  constructor() { }
+  constructor(
+    private userService: UserService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
     this.logInStatus = InputStatus.HaveNotTriedSignIn;
@@ -36,6 +42,14 @@ export class SignInComponent implements OnInit {
         this.logInStatus = InputStatus.PasswordNoInput;
       } else {
         this.logInStatus = InputStatus.TriedSignIn;
+        this.userService.requestSignIn(this.emailInput, this.passwordInput)
+        .then(success => {
+          if (success) {
+            this.router.navigateByUrl('/party');
+          } else {
+            this.logInStatus = InputStatus.EmailOrPasswordWrong;
+          }
+        });
       }
     }
   }
