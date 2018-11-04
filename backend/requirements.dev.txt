@@ -2,7 +2,6 @@ aioredis==1.2.0
 astroid==2.0.4
 autopep8==1.4.2
 certifi==2018.10.15
-channels-redis==2.3.1
 chardet==3.0.4
 codecov==2.0.15
 coverage==4.5.1
