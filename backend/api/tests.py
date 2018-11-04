@@ -1,12 +1,23 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
+from django.core.cache import cache
 import json
 
 from .models import Party, PartyType
 
 
-class TestCaseWithHttp(TestCase):
+class TestCaseWithCache(TestCase):
     def setUp(self):
+        cache.clear()
+
+    def tearDown(self):
+        from django_redis import get_redis_connection
+        get_redis_connection('default').flushdb()
+
+
+class TestCaseWithHttp(TestCaseWithCache):
+    def setUp(self):
+        super().setUp()
         self.client = Client()
 
     def get(self, url):
