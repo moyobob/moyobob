@@ -21,7 +21,6 @@ class Party(models.Model):
     type = models.SmallIntegerField(choices=enum_to_choice(PartyType))
     location = models.CharField(max_length=120)
     leader = models.ForeignKey(User, on_delete=models.CASCADE)
-    members = models.ManyToManyField(User, related_name='parties')
     since = models.DateTimeField(auto_now=True)
 
     def member_count(self):
@@ -35,7 +34,6 @@ class Party(models.Model):
             'type': self.type,
             'location': self.location,
             'leader_id': self.leader.id,
-            'members': [user.id for user in self.members.all()],
             'since': str(self.since),
         }
 
