@@ -1,4 +1,4 @@
-enum PartyType {
+export enum PartyType {
   InGroup = 0,
   Private = 1,
 }
