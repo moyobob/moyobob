@@ -34,6 +34,10 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             return
 
         await self.accept()
+        await self.send_json({
+            'type': 'success',
+            'event': 'connect',
+        })
 
     async def receive_json(self, msg):
         if not self.scope['user'].is_authenticated:
@@ -82,7 +86,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             self.channel_name,
         )
         await self.send_json({
-            'type': 'connected',
+            'type': 'success',
+            'event': 'party.join',
         })
         await self.channel_layer.group_send(
             party_id,
@@ -132,6 +137,11 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             )
         else:
             party.delete()
+
+        await self.send_json({
+            'type': 'success',
+            'event': 'party.leave',
+        })
 
     async def party_join(self, data):
         user_id = data['user_id']

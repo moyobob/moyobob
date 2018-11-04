@@ -3,9 +3,10 @@ from django.core.cache import cache
 from django.contrib.auth.models import User
 from channels.testing import WebsocketCommunicator
 import asyncio
-from django.contrib.auth import login
+import json
 
 from backend.routings import application
+from .consumer import WebsocketConsumer
 
 
 def async_test(f):
@@ -42,15 +43,16 @@ class WebsocketTestCase(TestCaseWithCache):
         )
         self.client.login(email=user.email, password='iluvrust')
 
-        headers = [
-            (b'cookie', self.client.cookies.output(header='', sep='; ').encode())
-        ]
-        print(headers)
-        communicator = WebsocketCommunicator(
-            application, '/ws/party/', headers)
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = user
 
-        connected, code = await communicator.connect()
+        connected, _ = await communicator.connect()
         self.assertTrue(connected)
         self.assertEqual(communicator.instance.scope['user'], user)
+
+        resp = await communicator.receive_from()
+        resp_json = json.loads(resp)
+        self.assertEqual(resp_json['type'], 'success')
+        self.assertEqual(resp_json['event'], 'connect')
 
         await communicator.disconnect()
