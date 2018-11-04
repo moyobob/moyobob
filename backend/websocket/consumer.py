@@ -78,24 +78,25 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         state.members.append(user_id)
         party.member_count += 1
+        state.save()
         party.save()
         cache.set('user-party:{}'.format(user_id), party_id)
 
+        await self.channel_layer.group_send(
+            'party-{}'.format(party_id),
+            {
+                'type': 'party.join',
+                'user_id': user_id,
+            }
+        )
         await self.channel_layer.group_add(
-            party_id,
+            'party-{}'.format(party_id),
             self.channel_name,
         )
         await self.send_json({
             'type': 'success',
             'event': 'party.join',
         })
-        await self.channel_layer.group_send(
-            party_id,
-            {
-                'type': 'party.join',
-                'user_id': user_id,
-            }
-        )
 
     async def command_party_leave(self, msg):
         user = self.scope['user']
@@ -116,27 +117,27 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         if state is None:
             party.delete()
-            return
-
-        state.members.remove(user_id)
-        party.member_count -= 1
-        party.save()
-
-        await self.channel_layer.group_discard(
-            party_id,
-            self.channel_name,
-        )
-
-        if party.member_count > 0:
-            await self.channel_layer.group_send(
-                'party-{}'.format(party_id),
-                {
-                    'type': 'party.leave',
-                    'user_id': user_id,
-                }
-            )
         else:
-            party.delete()
+            state.members.remove(user_id)
+            party.member_count -= 1
+            state.save()
+            party.save()
+
+            await self.channel_layer.group_discard(
+                'party-{}'.format(party_id),
+                self.channel_name,
+            )
+
+            if party.member_count > 0:
+                await self.channel_layer.group_send(
+                    'party-{}'.format(party_id),
+                    {
+                        'type': 'party.leave',
+                        'user_id': user_id,
+                    }
+                )
+            else:
+                party.delete()
 
         await self.send_json({
             'type': 'success',
