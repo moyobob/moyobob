@@ -25,6 +25,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         self.commands = {
             'party.join': self.command_party_join,
+            'party.leave': self.command_party_leave,
         }
 
     async def connect(self):
@@ -122,6 +123,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             party.member_count -= 1
             state.save()
             party.save()
+            cache.delete('user-party:{}'.format(user_id))
 
             await self.channel_layer.group_discard(
                 'party-{}'.format(party_id),
