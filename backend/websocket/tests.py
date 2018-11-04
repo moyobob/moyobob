@@ -7,6 +7,7 @@ import json
 
 from backend.routings import application
 from .consumer import WebsocketConsumer
+from api.models import Party, PartyType
 
 
 def async_test(f):
@@ -84,7 +85,7 @@ class WebsocketTestCase(TestCaseWithCache):
         self.assertEqual(resp['type'], 'websocket.close')
         self.assertEqual(resp['code'], 4010)
 
-        self.assertTrue(await communicator.receive_nothing())
+        await communicator.disconnect()
 
     @async_test
     async def test_invalid_command(self):
@@ -133,5 +134,42 @@ class WebsocketTestCase(TestCaseWithCache):
         resp = await communicator.receive_json_from(1)
         self.assertEqual(resp['type'], 'error')
         self.assertEqual(resp['error'], 'Invalid data')
+
+        await communicator.disconnect()
+
+    @async_test
+    async def test_party_join(self):
+        user = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        party = Party(
+            name="party 1 name",
+            type=int(PartyType.Private),
+            location="party 1 location",
+            leader=user,
+        )
+        party.save()
+        self.client.login(email=user.email, password='iluvrust')
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = user
+
+        await communicator.connect()
+        await communicator.receive_from()
+
+        await communicator.send_json_to({
+            'command': 'party.join',
+            'party_id': party.id,
+        })
+        resp = await communicator.receive_json_from(1)
+        self.assertEqual(resp['type'], 'success')
+        self.assertEqual(resp['event'], 'party.join')
+
+        party.refresh_from_db()
+        self.assertEqual(party.state.members[0], user.id)
+        self.assertEqual(party.member_count, 1)
+        self.assertEqual(cache.get('user-party:{}'.format(user.id)), party.id)
 
         await communicator.disconnect()
