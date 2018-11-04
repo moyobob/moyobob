@@ -1,21 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/http';
+import { HttpClient } from '@angular/common/http';
+import { User } from '../types/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  signedInUser: User;
-
   constructor(private http: HttpClient) { }
 
-  requestSignIn(email: string, password: string) {
-    this.http.post('/api/signin/', {
-      'email': email,
+  signedInUsername: String;
+
+  requestSignIn(username: string, password: string) {
+    return this.http.post<User>('/api/signin/', {
+      'username': username,
       'password': password,
     }).toPromise().then(user => {
-      this.signedInUser = user;
+      this.signedInUsername = user.username;
       return true;
     }, error => {
       return false;
