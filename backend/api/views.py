@@ -7,20 +7,8 @@ import json
 from json.decoder import JSONDecodeError
 
 
-def HttpResponseOk():
-    return HttpResponse(status=200)
-
-
-def HttpResponseCreated():
-    return HttpResponse(status=201)
-
-
-def HttpResponseNoContent():
-    return HttpResponse(status=204)
-
-
-def HttpResponseUnauthorized():
-    return HttpResponse(status=401)
+def HttpResponseOk(*args, **kwargs):
+    return HttpResponse(status=200, *args, **kwargs)
 
 
 def signup(request: HttpRequest):
@@ -37,7 +25,7 @@ def signup(request: HttpRequest):
 
     User.objects.create_user(username=username, password=password, email=email)
 
-    return HttpResponseCreated()
+    return HttpResponseOk()
 
 
 def signin(request: HttpRequest):
@@ -56,10 +44,10 @@ def signin(request: HttpRequest):
     user = authenticate(request, email=email, password=password)
 
     if user is None:
-        return HttpResponseUnauthorized()
+        return HttpResponseForbidden()
 
     login(request, user)
-    return HttpResponseNoContent()
+    return HttpResponseOk()
 
 
 def signout(request: HttpRequest):
@@ -68,7 +56,7 @@ def signout(request: HttpRequest):
     if request.method != 'GET':
         return HttpResponseNotAllowed(['GET'])
     if not request.user.is_authenticated:
-        return HttpResponseUnauthorized()
+        return HttpResponseForbidden()
 
     logout(request)
-    return HttpResponseNoContent()
+    return HttpResponseOk()

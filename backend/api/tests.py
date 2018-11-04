@@ -27,25 +27,25 @@ class UserTestCase(TestCaseWithHttp):
             'password': 'iluvrust',
             'email': 'ferris@rustacean.org',
         })
-        self.assertEqual(resp.status_code, 201)
+        self.assertEqual(resp.status_code, 200)
 
         resp = self.post('/api/signin/', {
             'email': 'ferris@rustacean.org',
             'password': 'iluvrust',
         })
-        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(resp.status_code, 200)
 
         resp = self.get('/api/signout/')
-        self.assertEqual(resp.status_code, 204)
+        self.assertEqual(resp.status_code, 200)
 
         resp = self.post('/api/signin/', {
             'email': 'ferris@rustacean.org',
             'password': 'ihaterust',
         })
-        self.assertEqual(resp.status_code, 401)
+        self.assertEqual(resp.status_code, 403)
 
         resp = self.get('/api/signout/')
-        self.assertEqual(resp.status_code, 401)
+        self.assertEqual(resp.status_code, 403)
 
     def test_invalid_method(self):
         self.assertEqual(self.get('/api/signup/').status_code, 405)
