@@ -28,7 +28,7 @@ describe('UserService', () => {
       expect(service.signedInUsername).toEqual('kipa00');
     });
 
-    let request = httpTestingController.expectOne('/api/signin/');
+    const request = httpTestingController.expectOne('/api/signin/');
     expect(request.request.method).toEqual('POST');
     expect(request.request.body).toEqual({
       'username': 'kipa00',
@@ -48,11 +48,11 @@ describe('UserService', () => {
       expect(success).toBeFalsy();
     });
 
-    let request = httpTestingController.expectOne('/api/signin/');
+    const request = httpTestingController.expectOne('/api/signin/');
     expect(request.request.method).toEqual('POST');
     request.flush({}, {
       status: 403,
-      statusText: "Forbidden"
+      statusText: 'Forbidden'
     });
   }));
 
