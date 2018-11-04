@@ -4,7 +4,7 @@ from django.core.cache import cache
 import json
 
 from .models import PartyState
-
+from api.models import Party
 
 WEBSOCKET_REJECT_UNAUTHORIZED = 4000
 WEBSOCKET_REJECT_DUPLICATE = 4001
@@ -12,12 +12,19 @@ WEBSOCKET_DISCONNECT_UNAUTHORIZED = 4010
 WEBSOCKET_DISCONNECT_DUPLICATE = 4011
 
 
+def error(cause):
+    return {
+        'type': 'error',
+        'error': cause,
+    }
+
+
 class WebsocketConsumer(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.actions = {
-            'party.join': self.party_join,
+        self.commands = {
+            'party.join': self.command_party_join,
         }
 
     async def connect(self):
@@ -26,41 +33,115 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             await self.close(WEBSOCKET_REJECT_UNAUTHORIZED)
             return
 
-        cache_key = 'session:{}'.format(user.id)
-        session = cache.get(cache_key)
-        if session is None:
-            cache.set(cache_key, self.channel_name)
-        else:
-            if session != self.channel_name:
-                await self.channel_layer.send(session, {'type': 'close', 'code': WEBSOCKET_DISCONNECT_DUPLICATE})
-                cache.set(cache_key, self.channel_name)
-
         await self.accept()
 
-    async def disconnect(self):
-        user = self.scope['user']
-        if user.is_authenticated:
-            session_cache_key = 'session:{}'.format(user.id)
-            session = cache.get(session_cache_key)
-            if session is not None and session == self.channel_name:
-                cache.delete(session_cache_key)
-
-            user_party_cache_key = 'user-party:{}'.format(user.id)
-            party_id = cache.get(user_party_cache_key)
-            if party_id is not None:
-                self.channel_layer.group_send(
-                    'party-{}'.format(party_id),
-                    {
-                        'type': 'party.leave',
-                        'user_id': user.id,
-                    }
-                )
-
     async def receive_json(self, msg):
-        action = self.actions.get(msg.get('action', None), None)
+        if not self.scope['user'].is_authenticated:
+            await self.close(WEBSOCKET_DISCONNECT_UNAUTHORIZED)
+            return
 
-        if action is not None:
-            await action(msg)
+        command = self.commands.get(msg.get('command', None), None)
 
-    async def party_join(self, msg):
-        print('party join!: {}'.format(msg))
+        if command is not None:
+            await command(msg)
+        else:
+            await self.send_json(error('Invalid command'))
+
+    async def command_party_join(self, msg):
+        user = self.scope['user']
+        user_id = user.id
+
+        try:
+            party_id = msg['party_id']
+        except KeyError:
+            await self.send_json(error('Invalid data'))
+            return
+
+        try:
+            party = Party.objects.get(id=party_id)
+        except Party.DoesNotExist:
+            await self.send_json(error('Party does not exist'))
+            return
+
+        # TODO: Check party permission
+
+        state = party.state()
+
+        if state is None:
+            party.delete()
+            await self.send_json(error('Party does not exist'))
+            return
+
+        state.members.append(user_id)
+        party.member_count += 1
+        party.save()
+        cache.set('user-party:{}'.format(user_id), party_id)
+
+        await self.channel_layer.group_add(
+            party_id,
+            self.channel_name,
+        )
+        await self.channel_layer.group_send(
+            party_id,
+            {
+                'type': 'party.join',
+                'user_id': user_id,
+            }
+        )
+
+    async def command_party_leave(self, msg):
+        user = self.scope['user']
+        user_id = user.id
+
+        party_id = cache.get('user-party:{}'.format(user_id))
+
+        if party_id is None:
+            await self.send_json(error('You are currently not in the room'))
+            return
+
+        try:
+            party = Party.objects.get(id=party_id)
+        except Party.DoesNotExist:
+            return
+
+        state = party.state()
+
+        if state is None:
+            party.delete()
+            return
+
+        state.members.remove(user_id)
+        party.member_count -= 1
+        party.save()
+
+        await self.channel_layer.group_discard(
+            party_id,
+            self.channel_name,
+        )
+
+        if party.member_count > 0:
+            await self.channel_layer.group_send(
+                'party-{}'.format(party_id),
+                {
+                    'type': 'party.leave',
+                    'user_id': user_id,
+                }
+            )
+        else:
+            party.delete()
+
+    async def party_join(self, data):
+        user_id = data['user_id']
+
+        await self.send_json({
+            'type': 'party.join',
+            'user_id': user_id,
+        })
+
+    async def party_leave(self, data):
+        user_id = data['user_id']
+
+        await self.send_json({
+            'type': 'party.leave',
+            'user_id': user_id,
+        })

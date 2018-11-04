@@ -13,13 +13,12 @@ class CacheModel():
     @classmethod
     def get(cls, id: int):
         j = cache.get(cls.key(id))
-
         o = cls(j['id'])
-        o.__dict__ = json.loads(j)
+        o.__dict__ = j
         return o
 
     def save(self):
-        cache.set(type(self).key(self.id), json.dumps(self.as_dict()))
+        cache.set(type(self).key(self.id), self.as_dict())
 
     def delete(self):
         cache.delete(type(self).key(self.id))
@@ -48,6 +47,6 @@ class PartyState(CacheModel):
             'id': self.id,
             'phase': self.phase,
             'restaurant': self.restaurant,
-            'self.members': self.members,
-            'self.menus': self.menus
+            'members': self.members,
+            'menus': self.menus
         }
