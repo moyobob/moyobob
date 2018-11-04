@@ -6,11 +6,11 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 const mockLobbyListItem: Party = {
   id: 1,
-  name: 'Name1',
+  name: 'Name 1',
   type: PartyType.Private,
-  location: 'Location1',
+  location: 'Location 1',
   leader_id: 1,
-  since: 'Since1'
+  since: 'Since 1'
 };
 
 describe('LobbyListItemComponent', () => {
@@ -34,5 +34,13 @@ describe('LobbyListItemComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should have as id 1', () => {
+    expect(fixture.nativeElement.querySelector('span').textContent).toEqual(String(component.party.id));
+  });
+
+  it(`should have as name 'Name 1'`, () => {
+    expect(fixture.nativeElement.querySelector('h1').textContent).toEqual(component.party.name);
   });
 });
