@@ -113,7 +113,7 @@ class PartyTestCase(TestCaseWithHttp):
         self.assertEqual(self.put('/api/party/', {}).status_code, 405)
         self.assertEqual(self.delete('/api/party/').status_code, 405)
 
-    def test_unauthorized(self):
+    def test_unauthenticated(self):
         self.assertEqual(self.get('/api/party/').status_code, 403)
         self.assertEqual(self.post('/api/party/', {}).status_code, 403)
 
