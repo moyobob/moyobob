@@ -31,6 +31,6 @@ export class PartyService {
   }
 
   async deleteParty(id: number): Promise<void> {
-    await this.http.delete(`api/partu/${id}`, httpOptions).toPromise();
+    await this.http.delete(`api/party/${id}`, httpOptions).toPromise();
   }
 }
