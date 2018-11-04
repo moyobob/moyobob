@@ -1,9 +1,9 @@
 <div>
   <div>
     <label>
-      <input type="text" [(ngModel)]="emailInput" (keypress)="trySignIn($event);"
+      <input type="text" [(ngModel)]="usernameInput" (keypress)="trySignIn($event);"
         placeholder="username" autofocus />
-      <span *ngIf="logInStatus === inputStatus.EmailNoInput">
+      <span *ngIf="logInStatus === inputStatus.UsernameNoInput">
         please enter your username here.
       </span>
     </label>
