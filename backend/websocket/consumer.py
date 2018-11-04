@@ -65,7 +65,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         # TODO: Check party permission
 
-        state = party.state()
+        state = party.state
 
         if state is None:
             party.delete()
@@ -104,7 +104,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         except Party.DoesNotExist:
             return
 
-        state = party.state()
+        state = party.state
 
         if state is None:
             party.delete()

@@ -45,5 +45,6 @@ class Party(models.Model):
         state.delete()
         super().delete(*args, **kwargs)
 
+    @property
     def state(self):
         return PartyState.get(self.id)
