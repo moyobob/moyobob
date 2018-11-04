@@ -288,6 +288,70 @@ class WebsocketTestCase(TestCaseWithCache):
         await communicator.disconnect()
 
     @async_test
+    async def test_party_leave(self):
+        user1 = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        user2 = User.objects.create_user(
+            email='pbzweihander@rustacean.org',
+            password='iluvrusttoo',
+            username='pbzweihander',
+        )
+        party = Party(
+            name="party 1 name",
+            type=int(PartyType.Private),
+            location="party 1 location",
+            leader=user1,
+        )
+        party.save()
+
+        self.client.login(email=user1.email, password='iluvrust')
+        client2 = Client()
+        client2.login(email=user2.email, password='iluvrusttoo')
+
+        communicator1 = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator1.scope['user'] = user1
+        communicator2 = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator2.scope['user'] = user2
+
+        await communicator1.connect()
+        await communicator1.receive_from()
+
+        await communicator1.send_json_to({
+            'command': 'party.join',
+            'party_id': party.id,
+        })
+        await communicator1.receive_json_from(1)
+        await communicator2.send_json_to({
+            'command': 'party.join',
+            'party_id': party.id,
+        })
+        await communicator2.receive_json_from(1)
+        await communicator1.receive_json_from(1)
+
+        await communicator1.send_json_to({
+            'command': 'party.leave',
+            'party_id': party.id,
+        })
+        resp = await communicator1.receive_json_from(1)
+        self.assertEqual(resp['type'], 'success')
+        self.assertEqual(resp['event'], 'party.leave')
+
+        resp = await communicator2.receive_json_from(1)
+        self.assertEqual(resp['type'], 'party.leave')
+        self.assertEqual(resp['user_id'], user1.id)
+
+        party.refresh_from_db()
+        self.assertEqual(len(party.state.members), 1)
+        self.assertEqual(party.state.members[0], user2.id)
+        self.assertEqual(party.member_count, 1)
+        self.assertIsNone(cache.get('user-party:{}'.format(user1.id)))
+
+        await communicator1.disconnect()
+
+    @async_test
     async def test_party_leave_and_deleted(self):
         user = User.objects.create_user(
             email='ferris@rustacean.org',
