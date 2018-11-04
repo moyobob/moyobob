@@ -9,6 +9,7 @@ import { LobbyListItemComponent } from './lobby-list-item/lobby-list-item.compon
 import { SignInComponent } from './sign-in/sign-in.component';
 import { LobbyComponent } from './lobby/lobby.component';
 import { PartyCreateComponent } from './party-create/party-create.component';
+import { PartyComponent } from './party/party.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { PartyCreateComponent } from './party-create/party-create.component';
     SignInComponent,
     LobbyComponent,
     PartyCreateComponent,
+    PartyComponent,
   ],
   imports: [
     AppRoutingModule,
