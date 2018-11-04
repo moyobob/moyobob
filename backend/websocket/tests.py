@@ -175,6 +175,60 @@ class WebsocketTestCase(TestCaseWithCache):
         await communicator.disconnect()
 
     @async_test
+    async def test_party_join_and_broadcast(self):
+        user1 = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        user2 = User.objects.create_user(
+            email='pbzweihander@rustacean.org',
+            password='iluvrusttoo',
+            username='pbzweihander',
+        )
+        party = Party(
+            name="party 1 name",
+            type=int(PartyType.Private),
+            location="party 1 location",
+            leader=user1,
+        )
+        party.save()
+        self.client.login(email=user1.email, password='iluvrust')
+        client2 = Client()
+        client2.login(email=user2.email, password='iluvrusttoo')
+
+        communicator1 = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator1.scope['user'] = user1
+
+        await communicator1.connect()
+        await communicator1.receive_from()
+
+        await communicator1.send_json_to({
+            'command': 'party.join',
+            'party_id': party.id,
+        })
+        await communicator1.receive_json_from(1)
+
+        communicator2 = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator2.scope['user'] = user2
+
+        await communicator2.connect()
+        await communicator2.receive_from()
+
+        await communicator2.send_json_to({
+            'command': 'party.join',
+            'party_id': party.id,
+        })
+        await communicator2.receive_from(1)
+
+        resp = await communicator1.receive_json_from(1)
+        self.assertEqual(resp['type'], 'party.join')
+        self.assertEqual(resp['user_id'], user2.id)
+
+        await communicator1.disconnect()
+        await communicator2.disconnect()
+
+    @async_test
     async def test_party_does_not_exist(self):
         user = User.objects.create_user(
             email='ferris@rustacean.org',
