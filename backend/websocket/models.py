@@ -18,10 +18,10 @@ class CacheModel():
         return o
 
     def save(self):
-        cache.set(type(self).key(self.id), self.as_dict())
+        cache.set(self.key(self.id), self.as_dict())
 
     def delete(self):
-        cache.delete(type(self).key(self.id))
+        cache.delete(self.key(self.id))
 
 
 class PartyPhase(IntEnum):
