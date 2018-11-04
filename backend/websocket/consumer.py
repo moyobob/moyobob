@@ -81,6 +81,9 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             party_id,
             self.channel_name,
         )
+        await self.send_json({
+            'type': 'connected',
+        })
         await self.channel_layer.group_send(
             party_id,
             {
