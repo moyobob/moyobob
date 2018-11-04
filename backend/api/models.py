@@ -37,12 +37,13 @@ class Party(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        state = PartyState(self.id)
-        state.save()
+
+        if self.state is None:
+            PartyState(self.id).save()
 
     def delete(self, *args, **kwargs):
-        state = PartyState.get(self.id)
-        state.delete()
+        if self.state is not None:
+            self.state.delete()
         super().delete(*args, **kwargs)
 
     @property

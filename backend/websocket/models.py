@@ -13,6 +13,9 @@ class CacheModel():
     @classmethod
     def get(cls, id: int):
         j = cache.get(cls.key(id))
+        if j is None:
+            return None
+
         o = cls(j['id'])
         o.__dict__ = j
         return o
