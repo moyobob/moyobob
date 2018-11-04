@@ -37,10 +37,10 @@ describe('LobbyListItemComponent', () => {
   });
 
   it('should have as id 1', () => {
-    expect(fixture.nativeElement.querySelector('span').textContent).toEqual(String(component.party.id));
+    expect(fixture.nativeElement.querySelector('#party-id').textContent).toEqual(String(component.party.id));
   });
 
   it(`should have as name 'Name 1'`, () => {
-    expect(fixture.nativeElement.querySelector('h1').textContent).toEqual(component.party.name);
+    expect(fixture.nativeElement.querySelector('#party-name').textContent).toEqual(component.party.name);
   });
 });
