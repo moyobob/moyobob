@@ -106,7 +106,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         party_id = cache.get('user-party:{}'.format(user_id))
 
         if party_id is None:
-            await self.send_json(error('You are currently not in the room'))
+            await self.send_json(error('You are currently not in the party'))
             return
 
         try:

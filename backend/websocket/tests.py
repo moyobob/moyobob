@@ -333,7 +333,6 @@ class WebsocketTestCase(TestCaseWithCache):
 
         await communicator1.send_json_to({
             'command': 'party.leave',
-            'party_id': party.id,
         })
         resp = await communicator1.receive_json_from(1)
         self.assertEqual(resp['type'], 'success')
@@ -382,7 +381,6 @@ class WebsocketTestCase(TestCaseWithCache):
 
         await communicator.send_json_to({
             'command': 'party.leave',
-            'party_id': party_id,
         })
         resp = await communicator.receive_json_from(1)
         self.assertEqual(resp['type'], 'success')
@@ -391,6 +389,38 @@ class WebsocketTestCase(TestCaseWithCache):
         self.assertIsNone(cache.get('user-party:{}'.format(user.id)))
         self.assertIsNone(cache.get('party:{}'.format(party_id)))
         self.assertFalse(Party.objects.filter(id=party_id).exists())
+
+        await communicator.disconnect()
+
+    @async_test
+    async def test_party_leave_not_in_party(self):
+        user = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        party = Party(
+            name="party 1 name",
+            type=int(PartyType.Private),
+            location="party 1 location",
+            leader=user,
+        )
+        party.save()
+        party_id = party.id
+        self.client.login(email=user.email, password='iluvrust')
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = user
+
+        await communicator.connect()
+        await communicator.receive_from()
+
+        await communicator.send_json_to({
+            'command': 'party.leave',
+        })
+        resp = await communicator.receive_json_from(1)
+        self.assertEqual(resp['type'], 'error')
+        self.assertEqual(resp['error'], 'You are currently not in the party')
 
         await communicator.disconnect()
 
@@ -427,7 +457,6 @@ class WebsocketTestCase(TestCaseWithCache):
 
         await communicator.send_json_to({
             'command': 'party.leave',
-            'party_id': party_id,
         })
         resp = await communicator.receive_json_from(1)
         self.assertEqual(resp['type'], 'error')
