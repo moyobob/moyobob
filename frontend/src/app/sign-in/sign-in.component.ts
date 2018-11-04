@@ -29,7 +29,7 @@ export class SignInComponent implements OnInit {
   }
 
   trySignIn(event) {
-    if (!event || event.key === "Enter") {
+    if (!event || event.key === 'Enter') {
       if (!this.idInput) {
         this.logInStatus = InputStatus.IdNoInput;
       } else if (!this.passwordInput) {
