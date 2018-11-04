@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 enum InputStatus {
   HaveNotTriedSignIn,
-  IdNoInput,
+  EmailNoInput,
   PasswordNoInput,
   TriedSignIn,
 }
@@ -15,7 +15,7 @@ enum InputStatus {
 
 export class SignInComponent implements OnInit {
 
-  idInput: string;
+  emailInput: string;
   passwordInput: string;
 
   logInStatus: InputStatus;
@@ -30,8 +30,8 @@ export class SignInComponent implements OnInit {
 
   trySignIn(event) {
     if (!event || event.key === 'Enter') {
-      if (!this.idInput) {
-        this.logInStatus = InputStatus.IdNoInput;
+      if (!this.emailInput) {
+        this.logInStatus = InputStatus.EmailNoInput;
       } else if (!this.passwordInput) {
         this.logInStatus = InputStatus.PasswordNoInput;
       } else {
