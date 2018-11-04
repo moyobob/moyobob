@@ -112,6 +112,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         try:
             party = Party.objects.get(id=party_id)
         except Party.DoesNotExist:
+            await self.send_json(error('Party does not exist'))
             return
 
         state = party.state
