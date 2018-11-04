@@ -1,0 +1,17 @@
+<div>
+  <div>
+    <label>
+      <input type="text" [(ngModel)]="idInput" (keypress)="trySignIn($event);"
+        placeholder="id" autofocus />
+      <span *ngIf="logInStatus === inputStatus.IdNoInput">please enter your id here.</span>
+    </label>
+  </div>
+  <div>
+    <input type="password" [(ngModel)]="passwordInput" (keypress)="trySignIn($event);"
+      placeholder="password" />
+    <span *ngIf="logInStatus === inputStatus.PasswordNoInput">please enter your password here.</span>
+  </div>
+  <div>
+    <button (click)="trySignIn();">Sign In</button>
+  </div>
+</div>
