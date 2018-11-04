@@ -10,8 +10,8 @@ import { SignInComponent } from './sign-in/sign-in.component';
 @NgModule({
   declarations: [
     AppComponent,
-    SignInComponent,
     LobbyListItemComponent
+    SignInComponent,
   ],
   imports: [
     AppRoutingModule
