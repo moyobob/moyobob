@@ -11,7 +11,7 @@ import { SignInComponent } from './sign-in/sign-in.component';
 @NgModule({
   declarations: [
     AppComponent,
-    LobbyListItemComponent
+    LobbyListItemComponent,
     SignInComponent,
   ],
   imports: [
