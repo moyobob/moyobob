@@ -406,7 +406,7 @@ class WebsocketTestCase(TestCaseWithCache):
             leader=user,
         )
         party.save()
-        party_id = party.id
+
         self.client.login(email=user.email, password='iluvrust')
 
         communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
