@@ -1,11 +1,7 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { Component } from '@angular/core';
 import { AppComponent } from './app.component';
-
-@Component({ selector: 'router-outlet', template: '' })
-class MockRouterOutlet {
-}
-
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -13,9 +9,11 @@ describe('AppComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [
+        RouterTestingModule,
+      ],
       declarations: [
         AppComponent,
-        MockRouterOutlet,
       ],
     }).compileComponents();
   }));
