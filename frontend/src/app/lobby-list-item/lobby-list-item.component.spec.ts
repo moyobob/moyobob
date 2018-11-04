@@ -9,7 +9,7 @@ const mockLobbyListItem: Party = {
   name: 'Name 1',
   type: PartyType.Private,
   location: 'Location 1',
-  leader_id: 1,
+  leaderId: 1,
   since: 'Since 1'
 };
 
@@ -19,10 +19,10 @@ describe('LobbyListItemComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ RouterTestingModule ],
-      declarations: [ LobbyListItemComponent ]
+      imports: [RouterTestingModule],
+      declarations: [LobbyListItemComponent],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
