@@ -463,3 +463,43 @@ class WebsocketTestCase(TestCaseWithCache):
         self.assertEqual(resp['error'], 'Party does not exist')
 
         await communicator.disconnect()
+
+    @async_test
+    async def test_party_leave_deleted_state(self):
+        user = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        party = Party(
+            name="party 1 name",
+            type=int(PartyType.Private),
+            location="party 1 location",
+            leader=user,
+        )
+        party.save()
+        party_id = party.id
+        self.client.login(email=user.email, password='iluvrust')
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = user
+
+        await communicator.connect()
+        await communicator.receive_from()
+
+        await communicator.send_json_to({
+            'command': 'party.join',
+            'party_id': party_id,
+        })
+        await communicator.receive_json_from(1)
+
+        party.state.delete()
+
+        await communicator.send_json_to({
+            'command': 'party.leave',
+        })
+        resp = await communicator.receive_json_from(1)
+        self.assertEqual(resp['type'], 'success')
+        self.assertEqual(resp['event'], 'party.leave')
+
+        await communicator.disconnect()
