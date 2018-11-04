@@ -50,9 +50,33 @@ class WebsocketTestCase(TestCaseWithCache):
         self.assertTrue(connected)
         self.assertEqual(communicator.instance.scope['user'], user)
 
-        resp = await communicator.receive_from()
-        resp_json = json.loads(resp)
-        self.assertEqual(resp_json['type'], 'success')
-        self.assertEqual(resp_json['event'], 'connect')
+        resp = await communicator.receive_json_from()
+        self.assertEqual(resp['type'], 'success')
+        self.assertEqual(resp['event'], 'connect')
+
+        await communicator.disconnect()
+
+    @async_test
+    async def test_invalid_command(self):
+        user = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        self.client.login(email=user.email, password='iluvrust')
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = user
+
+        await communicator.connect()
+        await communicator.receive_from()
+
+        await communicator.send_json_to({
+            'command': 'foo',
+            'data': 'bar',
+        })
+        resp = await communicator.receive_json_from(1)
+        self.assertEqual(resp['type'], 'error')
+        self.assertEqual(resp['error'], 'Invalid command')
 
         await communicator.disconnect()
