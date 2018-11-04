@@ -1,0 +1,76 @@
+version: 2
+
+jobs:
+  backend_test:
+    working_directory: ~/project
+    docker:
+      - image: circleci/python:3.6-stretch
+    steps:
+      - checkout
+      - run: cd backend
+      - run:
+        command: |
+          sudo chown -R circleci:circleci /usr/local/bin
+          sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - restore_cache:
+          keys:
+            - backend-deps-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+            - backend-deps-{{ .Branch }}-
+            - backend-deps-
+      - run:
+          name: Installing dependencies
+          command: sudo pip install -r requirements.txt -r requirements.dev.txt
+      - save_cache:
+          key: backend-deps-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements.dev.txt" }}
+          paths:
+            - "/usr/local/bin"
+            - "/usr/local/lib/python3.6/site-packages"
+      - run:
+          name: Migrating DB
+          command: python manage.py migrate
+      - run:
+          name: Running linter
+          command: flake8 --config ./flake8
+      - run:
+          name: Running unit tests
+          command: coverage run --branch --source=".api" manage.py test
+      - run:
+          name: Report coverage
+          command: codecov
+
+  frontend_test:
+    working_directory: ~/project
+    docker:
+      - image: circleci/10-stretch-browsers
+    steps:
+      - checkout
+      - run: cd frontend
+      - restore_cache:
+          keys:
+            - frontend-deps-{{ .Branch }}-{{ checksum "package-lock.json" }}
+            - frontend-deps-{{ .Branch }}-
+            - frontend-deps-
+      - run:
+          name: Installing dependencies
+          command: npm install
+      - save_cache:
+          key: frontend-deps-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+      - run:
+          name: Running linter
+          command: npm run lint
+      - run:
+          name: Running unit tests
+          command: npm run test -- \
+                    --watch false \
+                    --browsers ChromeHeadless
+      - run:
+          name: Report coverage
+          command: ./node_modules/codecov/bin/codecov .. < ./coverage/lcov.info
+
+workflows:
+  flow:
+    jobs:
+      - frontend_test
+      - backend_test
