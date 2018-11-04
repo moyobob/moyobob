@@ -173,3 +173,28 @@ class WebsocketTestCase(TestCaseWithCache):
         self.assertEqual(cache.get('user-party:{}'.format(user.id)), party.id)
 
         await communicator.disconnect()
+
+    @async_test
+    async def test_party_does_not_exist(self):
+        user = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        self.client.login(email=user.email, password='iluvrust')
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = user
+
+        await communicator.connect()
+        await communicator.receive_from()
+
+        await communicator.send_json_to({
+            'command': 'party.join',
+            'party_id': 0,
+        })
+        resp = await communicator.receive_json_from(1)
+        self.assertEqual(resp['type'], 'error')
+        self.assertEqual(resp['error'], 'Party does not exist')
+
+        await communicator.disconnect()
