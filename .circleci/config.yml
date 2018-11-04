@@ -2,6 +2,11 @@ version: 2
 
 jobs:
   backend_test:
+    branches:
+      only:
+        - master
+        - backend
+        - /^backend-.*/
     docker:
       - image: circleci/python:3.6-stretch
     steps:
@@ -42,6 +47,11 @@ jobs:
           working_directory: backend
 
   frontend_test:
+    branches:
+      only:
+        - master
+        - frontend
+        - /^frontend-.*/
     docker:
       - image: circleci/node:10-stretch-browsers
     steps:
