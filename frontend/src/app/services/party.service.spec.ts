@@ -12,6 +12,7 @@ const mockParties: Party[] = [
     location: 'Location 1',
     leaderId: 1,
     since: 'Since 1',
+    memberCount: 1,
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ const mockParties: Party[] = [
     location: 'Location 2',
     leaderId: 2,
     since: 'Since 2',
+    memberCount: 2,
   },
 ];
 
@@ -30,6 +32,7 @@ const mockParty: Party = {
   location: 'Location 3',
   leaderId: 3,
   since: 'Since 3',
+  memberCount: 3,
 };
 
 describe('PartyService', () => {
@@ -73,6 +76,7 @@ describe('PartyService', () => {
       location: 'Location 0',
       leaderId: 0,
       since: 'Since 0',
+      memberCount: 1,
     };
     partyService.addParty(newParty).then( party => expect(party).toEqual(mockParty));
     const req = httpTestingController.expectOne(partyApi);
