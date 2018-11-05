@@ -23,4 +23,8 @@ export class UserService {
     });
   }
 
+  getSignedInUsername() {
+    return this.signedInUsername;
+  }
+
 }
