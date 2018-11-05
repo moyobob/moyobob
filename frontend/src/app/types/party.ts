@@ -10,6 +10,7 @@ export class Party {
   location: string;
   leaderId: number;
   since: string;
+  memberCount: number;
 }
 
 export enum PartyPhase {

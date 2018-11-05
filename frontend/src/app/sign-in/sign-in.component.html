@@ -1,0 +1,21 @@
+<div>
+  <div>
+    <label>
+      <input type="text" [(ngModel)]="usernameInput" (keypress)="trySignIn($event);"
+        placeholder="username" autofocus />
+      <span *ngIf="logInStatus === inputStatus.UsernameNoInput">
+        please enter your username here.
+      </span>
+    </label>
+  </div>
+  <div>
+    <input type="password" [(ngModel)]="passwordInput" (keypress)="trySignIn($event);"
+      placeholder="password" />
+    <span *ngIf="logInStatus === inputStatus.PasswordNoInput">
+      please enter your password here.
+    </span>
+  </div>
+  <div>
+    <button (click)="trySignIn();">Sign In</button>
+  </div>
+</div>

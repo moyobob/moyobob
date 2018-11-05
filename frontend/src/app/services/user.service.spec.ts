@@ -6,6 +6,10 @@ import { UserService } from './user.service';
 describe('UserService', () => {
   let httpTestingController: HttpTestingController;
 
+  const mockEmail = 'k2pa00@gmail.com';
+  const mockUsername = 'kipa00';
+  const mockPassword = 'aSimpleYetStrongMockP@ssw0rd';
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -22,28 +26,28 @@ describe('UserService', () => {
 
   it('should send request when approved sign in', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.requestSignIn('kipa00', 'aSimpleYetStrongMockP@ssw0rd')
+    service.requestSignIn(mockUsername, mockPassword)
     .then(success => {
       expect(success).toBeTruthy();
-      expect(service.signedInUsername).toEqual('kipa00');
+      expect(service.signedInUsername).toEqual(mockUsername);
     });
 
     const request = httpTestingController.expectOne('/api/signin/');
     expect(request.request.method).toEqual('POST');
     expect(request.request.body).toEqual({
-      'username': 'kipa00',
-      'password': 'aSimpleYetStrongMockP@ssw0rd'
+      'username': mockUsername,
+      'password': mockPassword
     });
     request.flush({
       id: 1,
-      email: 'k2pa00@gmail.com',
-      username: 'kipa00'
+      email: mockEmail,
+      username: mockUsername
     });
   }));
 
   it('should not react when denied sign in', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.requestSignIn('kipa00', 'aSimpleYetStrongMockP@ssw0rd')
+    service.requestSignIn(mockUsername, mockPassword)
     .then(success => {
       expect(success).toBeFalsy();
     });
@@ -54,6 +58,12 @@ describe('UserService', () => {
       status: 403,
       statusText: 'Forbidden'
     });
+  }));
+
+  it('should return signed in username', async(() => {
+    const service: UserService = TestBed.get(UserService);
+    service.signedInUsername = mockUsername;
+    expect(service.getSignedInUsername()).toEqual(mockUsername);
   }));
 
 });
