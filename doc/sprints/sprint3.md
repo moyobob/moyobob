@@ -3,9 +3,7 @@
 ## Revision
 
 * Updated Design & Planning 
-
   * Model Design
-
   * View Design
 
 ## Progress
@@ -19,9 +17,7 @@
 #### Contributions
 
 * Backend: Kangwook Lee
-
   * Party model
-
   * PartyState model
   * Party view
   * User authentication(signup, signin, signout view)
@@ -30,22 +26,17 @@
   * Dependency update(django_redis, django_channels)
 
 * Frontend
-
-* * Service
-
-  * * UserService implementation: Yeonghyeon Kim 
-
+  * Service
+    * UserService implementation: Yeonghyeon Kim 
     * PartyService implementation: Hyunsuk Choo
 
   * Component  
-
-  * * SignInComponent: Yeonghyeon Kim
-
-  * *  LobbyComponent(in progress): Hyunsuk Choo 
+    * SignInComponent: Yeonghyeon Kim
+    *  LobbyComponent(in progress): Hyunsuk Choo 
     *  LobbyListItemComponent: Hyunsuk Choo
     *  PartyComponent(in progress) : Hyemin Kim
 
-    ![image-20181105163428103](/Users/hyeminkim/Library/Application Support/typora-user-images/image-20181105163428103.png)
+    ![img](sprint3_component_dependency.png)
 
 
 
@@ -56,11 +47,11 @@
 * Tool: CircleCI, Codecov
 * view of the test progress using CircleCI 
 
-![img](/Users/hyeminkim/Library/Application Support/typora-user-images/image-20181105162858084.tiff)
+![img](sprint3_circleCI.png)
 
 * The overall coverage metric
 
-![img](/Users/hyeminkim/Library/Application Support/typora-user-images/image-20181105170223393.tiff)
+![img](sprint3_codecov.png)
 
 * The list of classes with lowest coverage: No class. The coverage of every class is 100%.
 
