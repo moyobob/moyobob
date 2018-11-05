@@ -24,7 +24,7 @@ export class UserService {
   }
 
   getSignedInUsername() {
-    return signedInUsername;
+    return this.signedInUsername;
   }
 
 }
