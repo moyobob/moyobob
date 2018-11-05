@@ -36,7 +36,7 @@
     *  LobbyListItemComponent: Hyunsuk Choo
     *  PartyComponent(in progress) : Hyemin Kim
 
-    ![image-20181105163428103](/Users/hyeminkim/Library/Application Support/typora-user-images/image-20181105163428103.png)
+    ![img](sprint3_component_dependency.png)
 
 
 
@@ -47,11 +47,11 @@
 * Tool: CircleCI, Codecov
 * view of the test progress using CircleCI 
 
-![img](/Users/hyeminkim/Library/Application Support/typora-user-images/image-20181105162858084.tiff)
+![img](sprint3_circleCI.png)
 
 * The overall coverage metric
 
-![img](/Users/hyeminkim/Library/Application Support/typora-user-images/image-20181105170223393.tiff)
+![img](sprint3_codecov.png)
 
 * The list of classes with lowest coverage: No class. The coverage of every class is 100%.
 
