@@ -17,16 +17,15 @@ header-includes:
     ```
 ---
 
-2018-10-23,
-version 2.0
+2018-11-05,
+version 3.0
 
 ## Revisions
 
 - 1.0 2018-10-08 - initial document :tada:
 - 2.0 2018-10-23 - Sprint 2
-  - User Interface Requirements has been updated
-  - User Stories has been updated
-  - Chagned parts are marked as [blue header]{.important}
+- 3.0 2018-11-05 - Sprint 3
+  - Nothing have been changed
 
 ## Project Abstract
 
@@ -62,7 +61,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 
 ## User Stories
 
-### [Sign Up]{.important}
+### Sign Up
 
 - As an unregistered person, I want to sign up, so that I can use the service.
 1. Given that I'm an unregistered person
@@ -74,7 +73,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the system creates a User with the submitted information
 1. And I am registered with the corresponding information
 
-### [Sign In]{.important}
+### Sign In
 
 - As a registered User, I want to sign in, so that I can use the service.
 1. Given that I'm a registered User
@@ -88,7 +87,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. And leads me to Lobby page
 1. And I am signed in
 
-### [Creating Group]{.important}
+### Creating Group
 
 - As a User, I want to create a new Group, so that I can invite people to my group.
 1. Given that I'm a registered user
@@ -178,6 +177,6 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the system hides the request for that User
 1. And the system shows for me and that User a Payment Complete message
 
-## [User Interface Requirements]{.important}
+## User Interface Requirements
 
 ![View Design](view-design.png)
