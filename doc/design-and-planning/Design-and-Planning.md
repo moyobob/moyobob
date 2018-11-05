@@ -5,6 +5,9 @@ author: Team 5
 papersize: a4
 margin-left: 1in
 margin-right: 1in
+pandoc-latex-color:
+  - classes: [important]
+    color: blue
 header-includes:
   - |
     ```{=latex}
@@ -16,12 +19,16 @@ header-includes:
     ```
 ---
 
-2018/10/22,
-Version 1.0
+2018-11-05,
+version 2.0
 
 ## Revision
 
 - 1.0 2018-10-22 - initial document :tada:
+- 2.0 2018-11-05 - Sprint 3
+  - Model Design has been updated
+  - View Design has been updated
+  - Chagned parts are marked as [blue]{.important}
 
 ## System Architecture
 
@@ -54,9 +61,9 @@ We decided to show information like party status, which needs to interact and be
 - Websocket with rxjs
 - Angular's Service-Component system
 
-## Design Detail
+## [Design Detail]{.important}
 
-### Frontend Design Detail
+### [Frontend Design Detail]{.important}
 
 ![View Design](view-design.png)\
 
@@ -79,21 +86,25 @@ Shown when pressing Side Bar Button in Top Bar Component.
 - Restaurant List Button : `<button>`
 - Payment List Button : `<button>`
 
-#### Lobby (`/party`)
+#### [Lobby Component]{.important} (`/party`)
 
 The Main Page.
 
 - Party List : `<ul>`
-  - Party Info : `<div>`
-    - Party Name : `<span>`
-    - Group Name : `<span>`
-    - Number of Participants : `<span>`
-    - Current State : `<span>`
+  - LobbyListItemComponent
 - Make Party Button : `<button>`
 
-##### Create Party (`/party/create`)
+##### [LobbyListItemComponent]{.important}
 
-Can create Party.
+- Party Info : `<div>`
+  - Party Name : `<span>`
+  - Group Name : `<span>`
+  - Number of Participants : `<span>`
+  - Current State : `<span>`
+
+##### [PartyCreate Component]{.important} (`/party/create`)
+
+Can create [Party].
 
 - Party Name : `<input>`
 - Party Characteristic : `<select>`
@@ -105,7 +116,7 @@ Can create Party.
 - Restaurant : `<input>`
 - Submit Button : `<button>`
 
-#### Party (`/party/:id`)
+#### [PartyComponent]{.important} (`/party/:id`)
 
 Provides the main features such as choosing menus. Different infos are shown with respect to participation status and party status.
 
@@ -268,211 +279,161 @@ Shows every payment one made, either should pay or should be paid.
 - Should Pay : `<ul>`
 - Should be Paid : `<ul>`
 
-## Backend Design Detail
+## [Backend Design Detail]{.important}
 
-### In DB
+### [In DB]{.important}
 
 Models stored in SQL Database
 
-#### Party
+#### [User]{.important}
+
+User object is provided by Django for authentication.
+
+Use email and password for authentication and username as nickname.
+
+- email
+- password
+- username
+
+#### [Party]{.important}
 
 - name: string
-- state: id of PartyState
-- type: PartyType
+- type: SmallIntegerField with choces of PartyType
 - location: string
 - leader: ForeignKey of User
 - since: datetime
 
-##### PartyType
+##### [PartyType]{.important}
 
-extends SmallIntegerField, and works like enum
+extends Enum
 
 - values
-  - `0`: Public Party
-  - `1`: Group-Opened Party
-  - `2`: Closed Party
+  - `0`: InGroup
+  - `1`: Private
 
-#### Group
+#### [Group]{.important}
 
 - name: string
 - description: string
-- type: GroupType
-- publicity: GroupPublicity
+- type: SmallIntegerField with choices of GroupType
+- publicity: SmallIntegerField with choices of GroupPublicity
 - leader: ForeignKey of User
-- members: ForeignKey of User (ManyToMany)
+- members: ManyToManyField of User
 
-##### GroupType
+##### [GroupType]{.important}
 
-extends SmallIntegerField, and works like enum
+extends Enum
 
 - values
   - `0`: Public
   - `1`: Private
 
-##### GroupPublicity
+##### [GroupPublicity]{.important}
 
-extends SmallIntegerField, and works like enum
+extends Enum
 
 - values
   - `0`: Free
-  - `1`: Admission Needed
+  - `1`: AdmissionRequired
 
-#### User
-
-- id: string
-- username: string
-- email: string
-- phone: string (Nullable)
-- accounts: Account
-
-##### Account
-
-custom field
-
-- name: string
-- bank: string
-- account: string
-
-#### Restaurant
+#### [Restaurant]{.important}
 
 - name: string
 - category: Category
 - phone: string
 - service_time_from: time
 - service_time_to: time
-- menus: ForeignKey of Menu (ManyToMany)
+- menus: ManyToManyField of [Menu]
 
 #### Menu
 
 - name: string
 - price: integer
 
-### In Cache
+#### [PaymentInformation]{.important}
+
+- user: OneToOneField of User
+- phone_number: string (Nullable)
+- bank: string (Nullable)
+- account: string (Nullable)
+
+### [In Cache]{.important}
 
 Models stored in Redis Cache
 
-#### PartyState
+#### [PartyState]{.important}
 
 PartyState is stored in Cache, not DB
 
-- _key_: id of Party
+cache key: `party:{id}`
+
+- id: integer, same as Party's id
 - phase: PartyPhase
 - restaurant: id of Restaurant (Nullable)
 - members: list of User's id
-- member_count: integer
-- menus: map of User's id and Menu's id
+- menus: list of tuple of User's id and Menu's id
 
-##### PartyPhase
+##### [PartyPhase]{.important}
 
 extends integer, and works like enum
 
 - values
-  - `0`: Choosing Restaurant
-  - `1`: Choosing Menu
+  - `0`: ChoosingRestaurant
+  - `1`: ChoosingMenu
   - `2`: Ordering
   - `3`: Ordered
-  - `4`: Payment and Collection
+  - `4`: PaymentAndCollection
 
-### API
+### [API]{.important}
 
-#### RESTful API
+#### [RESTful API]{.important}
 
-|                   | GET                        | POST                    | PUT                  | DELETE            |
-| ----------------- | -------------------------- | ----------------------- | -------------------- | ----------------- |
-| `/party`          | Get list of parties        | Create a new party      | X                    | X                 |
-| `/party/:id`      | Get Websocket URL of party | X                       | X                    | End the party     |
-| `/group`          | Get list of groups         | Create a new group      | X                    | X                 |
-| `/group/:id`      | Get detail of group        | X                       | Edit detail of group | Delete group      |
-| `/signin`         | X                          | Sign in                 | X                    | X                 |
-| `/signup`         | X                          | Sign up                 | X                    | X                 |
-| `/user/:id`       | Get detail of user         | X                       | Edit detail of user  | X                 |
-| `/restaurant`     | Get list of restaurant     | Create a new restaurant | X                    | X                 |
-| `/restaurant/:id` | Get detail of restaurant   | X                       | Edit restaurant      | Delete restaurant |
+| API Endpoint       | GET                        | POST                    | PUT                  | DELETE            |
+| ------------------ | -------------------------- | ----------------------- | -------------------- | ----------------- |
+| `/party/`          | Get list of parties        | Create a new party      | X                    | X                 |
+| `/party/:id/`      | Get detail of party        | X                       | X                    | End the party     |
+| `/group/`          | Get list of groups         | Create a new group      | X                    | X                 |
+| `/group/:id/`      | Get detail of group        | X                       | Edit detail of group | Delete group      |
+| `/signin/`         | X                          | Sign in                 | X                    | X                 |
+| `/signup/`         | X                          | Sign up                 | X                    | X                 |
+| `/user/`           | Get detail of current user | X                       | Edit current user    | X                 |
+| `/user/:id/`       | Get detail of user         | X                       | X                    | X                 |
+| `/restaurant/`     | Get list of restaurant     | Create a new restaurant | X                    | X                 |
+| `/restaurant/:id/` | Get detail of restaurant   | X                       | Edit restaurant      | Delete restaurant |
 
-#### Websocket API
+#### [Websocket API]{.important}
 
 JSON formatted protocol
 
-##### Data
+Endpoint: `/ws/party/`
 
-###### UserData
+##### [Command]{.important}
 
-- id: integer
-- username: string
+Command is an action from frontend to backend
 
-###### PartyPhaseData
+- PartyJoin
+  - `command`: `"party.join"`
+  - `party_id`: integer
+- PartyLeave
+  - `command`: `"party.leave"`
+  - `party_id`: integer
 
-- phase: integer
-  - `0`: Choosing Restaurant
-  - `1`: Choosing Menu
-  - `2`: Ordering
-  - `3`: Ordered
-  - `4`: Payment and Collection
+##### [Event]{.important}
 
-###### RestaurantData
+Event is an reply from backend to frontend and a communication in-between backend
 
-- id: integer
-- name: string
-
-###### RestaurantVoteData
-
-- user: UserData
-- restaurant: RestaurantData
-
-###### MenuData
-
-- id: integer
-- name: string
-
-###### MenuAssignData
-
-- menu: MenuData
-- users: list of UserData
-
-###### PartyData
-
-- id: integer
-- name: string
-- phase: PartyPhaseData
-- restaurant: RestaurantData
-- members: list of UserData
-- member_count: integer
-- menus: MenuAssignData
-
-##### Event
-
-- event: string
-- data: Data
-
-###### PartyJoined
-
-- event: `"party-joined"`
-- data : UserData
-
-###### PartyLeft
-
-- event: `"party-left"`
-- data: UserData
-
-###### PartyStateUpdated
-
-- event: `"party-state-updated"`
-- data: PartyData
-
-###### RestaurantVoted
-
-- event: `"restaurant-voted"`
-- data: RestaurantVoteData
-
-###### MenuProposed
-
-- event: `"menu-proposed"`
-- data: MenuData
-
-###### MenuAssigned
-
-- event: `"menu-assigned"`
-- data: MenuAssignData
+- Success
+  - `type`: `"success"`
+  - `event`: string
+- Error
+  - `type`: `"error"`
+  - `error`: string
+- PartyJoin
+  - `type`: `"party.join"`
+  - `user_id`: integer
+- PartyLeave
+  - `type`: `"party.leave"`
+  - `user_id`: integer
 
 ## Implementation Plan
 
