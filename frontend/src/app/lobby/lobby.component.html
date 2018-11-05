@@ -1,3 +1,5 @@
-<p>
-  lobby works!
-</p>
+<li *ngFor="let party of parties">
+  <app-lobby-list-item>
+    [party]="party"
+  </app-lobby-list-item>
+</li>
