@@ -10,7 +10,8 @@ const mockLobbyListItem: Party = {
   type: PartyType.Private,
   location: 'Location 1',
   leaderId: 1,
-  since: 'Since 1'
+  since: 'Since 1',
+  memberCount: 1,
 };
 
 describe('LobbyListItemComponent', () => {
