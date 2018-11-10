@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Party } from '../types/party';
+
+import { Observable, of } from 'rxjs';
+import { WebSocketSubject, webSocket } from 'rxjs/websocket';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -10,6 +13,8 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class PartyService {
+
+  webSocket$: WebSocketSubject<any>;
 
   constructor(private http: HttpClient) { }
 
@@ -32,5 +37,28 @@ export class PartyService {
 
   async deleteParty(id: number): Promise<void> {
     await this.http.delete(`api/party/${id}`, httpOptions).toPromise();
+  }
+
+  joinParty(id: number): Observable<any> {
+    if (this.webSocket$ != undefined) {
+      this.webSocket$ = WebSocketSubject.create('/ws/party/');
+    }
+    this.webSocket$.next({
+      'command': 'party.join',
+      'party_id': id
+    });
+    return this.webSocket$;
+  }
+
+  leaveParty(id: number): Observable<any> {
+    this.webSocket$.next({
+      'command': 'party.leave',
+      'party_id': id
+    });
+
+    // please, please handle memory leak.
+    let returnValue = this.webSocket$;
+    this.webSocket$ = undefined;
+    return returnValue;
   }
 }
