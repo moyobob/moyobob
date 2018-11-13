@@ -14,6 +14,7 @@ import { PartyService } from '../services/party.service';
 export class PartyComponent implements OnInit {
   party: Party;
   state: PartyState;
+  id: number;
   // group: Group;
   // user: User;
 
@@ -26,13 +27,13 @@ export class PartyComponent implements OnInit {
 
   ngOnInit() {
     // this.user = this.userService.getCurrentUser();
+    this.id = +this.activatedRoute.snapshot.paramMap.get('id');
     this.getParty();
     // this.getGroup();
   }
 
   getParty(): void {
-    const id = +this.activatedRoute.snapshot.paramMap.get('id');
-    this.partyService.getParty(id)
+    this.partyService.getParty(this.id)
       .then(party => {
         this.party = party;
       });
@@ -45,9 +46,12 @@ export class PartyComponent implements OnInit {
   }
   //*/
 
+  joinParty(): void {
+    this.partyService.joinParty(this.id);
+  }
+
   leaveParty(): void {
-    const id = +this.activatedRoute.snapshot.paramMap.get('id');
-    this.partyService.leaveParty(id);
+    this.partyService.leaveParty(this.id);
     this.router.navigate(['/party']);
   }
 }

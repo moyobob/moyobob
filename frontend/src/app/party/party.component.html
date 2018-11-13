@@ -1,10 +1,16 @@
-<div *ngIf="party && state && group">
-  <h2>{{party.name}}</h2>
-  <!--<h3>{{group.name}}</h3>-->
-  <span>{{party.location}}</span>
-  <span>{{party.members_count}}</span>
-  <!--restaurant-id-to-restaurant.pipe.ts-->
-  <span></span>
-  <button routerLink="/party">Lobby</button>
-  <button (click)="leaveParty()">Leave</button>
+<div *ngIf="party">
+  <div>
+    <h2>{{party.name}}</h2>
+    <!--<h3>{{group.name}}</h3>-->
+    <span>{{party.location}}</span>
+    <span>{{party.members_count}}</span>
+    <!--restaurant-id-to-restaurant.pipe.ts-->
+  </div>
+  <div>
+  </div>
+  <div>
+    <button routerLink="/party">Lobby</button>
+    <button *ngIf="joined" (click)="joinParty()">Join</button>
+    <button *ngIf="!joined" (click)="leaveParty()">Leave</button>
+  </div>
 </div>
