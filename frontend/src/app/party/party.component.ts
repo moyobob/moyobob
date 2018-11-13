@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import {Party,PartyState} from "../types/party";
-import {UserService} from "../services/user.service";
-import {PartyService} from "../services/party.service";
-import { ActivatedRoute,Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+
+import { User } from "../types/user";
+import { Party, PartyState } from "../types/party";
+import { UserService } from "../services/user.service";
+import { PartyService } from "../services/party.service";
 
 @Component({
   selector: 'app-party',
@@ -24,27 +26,28 @@ export class PartyComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.userService.getCurrentUser();
-    this.getParty()
-    this.getGroup()
+    this.getParty();
+    // this.getGroup();
   }
 
-  getParty(): void{
+  getParty(): void {
     const id = +this.activatedRoute.snapshot.paramMap.get('id');
     this.partyService.getParty(id)
       .then(party=>{
         this.party = party;
-      })
+      });
   }
 
+  /*
   getGroup(): void{
     // const id = this.userService.getGroupId();
 
   }
+  //*/
 
-  leaveParty(): void{
-    this.partyService.updateMembersCount();
+  leaveParty(): void {
     const id = +this.activatedRoute.snapshot.paramMap.get('id');
-    this.partyService.updateMembers(id);
+    this.partyService.leaveParty(id);
     this.router.navigate(["/party"]);
   }
 }
