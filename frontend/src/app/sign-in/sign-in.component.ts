@@ -4,10 +4,10 @@ import { UserService } from '../services/user.service';
 
 enum InputStatus {
   HaveNotTriedSignIn,
-  UsernameNoInput,
+  EmailNoInput,
   PasswordNoInput,
   TriedSignIn,
-  usernameOrPasswordWrong,
+  EmailOrPasswordWrong,
 }
 
 @Component({
@@ -18,7 +18,7 @@ enum InputStatus {
 
 export class SignInComponent implements OnInit {
 
-  usernameInput: string;
+  emailInput: string;
   passwordInput: string;
 
   logInStatus: InputStatus;
@@ -39,18 +39,18 @@ export class SignInComponent implements OnInit {
       this.logInStatus !== InputStatus.TriedSignIn
       && (!event || event.key === 'Enter')
     ) {
-      if (!this.usernameInput) {
-        this.logInStatus = InputStatus.UsernameNoInput;
+      if (!this.emailInput) {
+        this.logInStatus = InputStatus.EmailNoInput;
       } else if (!this.passwordInput) {
         this.logInStatus = InputStatus.PasswordNoInput;
       } else {
         this.logInStatus = InputStatus.TriedSignIn;
-        this.userService.requestSignIn(this.usernameInput, this.passwordInput)
+        this.userService.requestSignIn(this.emailInput, this.passwordInput)
         .then(success => {
           if (success) {
             this.router.navigateByUrl('/party');
           } else {
-            this.logInStatus = InputStatus.usernameOrPasswordWrong;
+            this.logInStatus = InputStatus.EmailOrPasswordWrong;
           }
         });
       }
