@@ -1,6 +1,9 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import { Injectable, Output, EventEmitter } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Party } from '../types/party';
+
+import { Observable, of, Subscription } from 'rxjs';
+import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -10,6 +13,13 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class PartyService {
+
+  webSocket$: WebSocketSubject<any>;
+  subscription: Subscription;
+
+  @Output()
+  partyJoin: EventEmitter<number> = new EventEmitter();
+  partyLeave: EventEmitter<number> = new EventEmitter();
 
   constructor(private http: HttpClient) { }
 
@@ -32,5 +42,34 @@ export class PartyService {
 
   async deleteParty(id: number): Promise<void> {
     await this.http.delete(`api/party/${id}`, httpOptions).toPromise();
+  }
+
+  handle(json: any): void {
+    if (json['type'] === 'party.join') {
+      this.partyJoin.emit(json['user_id']);
+    } else if (json['type'] === 'party.leave') {
+      this.partyLeave.emit(json['user_id']);
+    }
+  }
+
+  joinParty(id: number): void {
+    if (this.webSocket$ !== undefined) {
+      this.webSocket$ = WebSocketSubject.create('/ws/party/');
+    }
+    this.subscription = this.webSocket$.subscribe(this.handle);
+    this.webSocket$.next({
+      'command': 'party.join',
+      'party_id': id
+    });
+  }
+
+  leaveParty(id: number): void {
+    this.webSocket$.next({
+      'command': 'party.leave',
+      'party_id': id
+    });
+
+    this.subscription.unsubscribe();
+    this.webSocket$ = undefined;
   }
 }
