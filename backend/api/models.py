@@ -50,3 +50,27 @@ class Party(models.Model):
     @property
     def state(self):
         return PartyState.get(self.id)
+
+
+class Menu(models.Model):
+    name = models.CharField(max_length=120)
+    price = models.IntegerField(default=0)
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'price': self.price,
+        }
+
+
+class Restaurant(models.Model):
+    name = models.CharField(max_length=120)
+    menus = models.ManyToManyField(Menu)
+
+    def as_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'menus': [menu.id for menu in self.menus.all()],
+        }
