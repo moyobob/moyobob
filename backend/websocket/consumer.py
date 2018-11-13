@@ -138,8 +138,10 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        if (user_id, menu_id) not in state.menus:
-            state.menus.append((user_id, menu_id))
+        if (user_id, menu_id) in state.menus:
+            return
+
+        state.menus.append((user_id, menu_id))
         state.save()
 
         await self.channel_layer.group_send(
@@ -153,8 +155,10 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        if (user_id, menu_id) in state.menus:
-            state.menus.remove((user_id, menu_id))
+        if (user_id, menu_id) not in state.menus:
+            return
+
+        state.menus.remove((user_id, menu_id))
         state.save()
 
         await self.channel_layer.group_send(

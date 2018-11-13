@@ -541,6 +541,14 @@ class WebsocketTestCase(TestCaseWithCache):
         self.assertDictEqual(resp, event.menu_assign(user2.id, 22))
         self.assertListEqual(state.menus, [(user1.id, 11), (user2.id, 22)])
 
+        await communicator2.send_json_to({
+            'command': 'menu.assign',
+            'user_id': user2.id,
+            'menu_id': 22,
+        })
+        await communicator1.receive_nothing()
+        await communicator2.receive_nothing()
+
         await communicator1.disconnect()
         await communicator2.disconnect()
 
@@ -615,6 +623,14 @@ class WebsocketTestCase(TestCaseWithCache):
         state.refresh_from_db()
         self.assertDictEqual(resp, event.menu_unassign(user2.id, 22))
         self.assertListEqual(state.menus, [])
+
+        await communicator2.send_json_to({
+            'command': 'menu.unassign',
+            'user_id': user2.id,
+            'menu_id': 22,
+        })
+        await communicator1.receive_nothing()
+        await communicator2.receive_nothing()
 
         await communicator1.disconnect()
         await communicator2.disconnect()
