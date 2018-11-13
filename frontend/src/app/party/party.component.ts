@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { User } from "../types/user";
-import { Party, PartyState } from "../types/party";
-import { UserService } from "../services/user.service";
-import { PartyService } from "../services/party.service";
+import { User } from '../types/user';
+import { Party, PartyState } from '../types/party';
+import { UserService } from '../services/user.service';
+import { PartyService } from '../services/party.service';
 
 @Component({
   selector: 'app-party',
@@ -33,7 +33,7 @@ export class PartyComponent implements OnInit {
   getParty(): void {
     const id = +this.activatedRoute.snapshot.paramMap.get('id');
     this.partyService.getParty(id)
-      .then(party=>{
+      .then(party => {
         this.party = party;
       });
   }
@@ -48,6 +48,6 @@ export class PartyComponent implements OnInit {
   leaveParty(): void {
     const id = +this.activatedRoute.snapshot.paramMap.get('id');
     this.partyService.leaveParty(id);
-    this.router.navigate(["/party"]);
+    this.router.navigate(['/party']);
   }
 }
