@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { UserService } from './services/user.service';
@@ -8,7 +8,7 @@ import { UserService } from './services/user.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'frontend';
 
   constructor(private userService: UserService, private router: Router) {}
@@ -16,7 +16,7 @@ export class AppComponent {
   ngOnInit() {
     this.userService.verifyUser().then(success => {
       if (!success) {
-        this.router.navigateByUrl("/sign-in");
+        this.router.navigateByUrl('/sign-in');
       }
     });
   }
