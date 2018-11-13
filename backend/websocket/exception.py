@@ -1,0 +1,2 @@
+class NotInPartyError(Exception):
+    pass

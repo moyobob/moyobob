@@ -6,11 +6,38 @@ import json
 from .models import PartyState
 from api.models import Party
 from websocket import event
+from .exception import NotInPartyError
 
 WEBSOCKET_REJECT_UNAUTHORIZED = 4000
 WEBSOCKET_REJECT_DUPLICATE = 4001
 WEBSOCKET_DISCONNECT_UNAUTHORIZED = 4010
 WEBSOCKET_DISCONNECT_DUPLICATE = 4011
+
+
+def get_party(party_id: int):
+    party = Party.objects.get(id=party_id)
+    state = party.state
+
+    if state is None:
+        party.delete()
+        raise Party.DoesNotExist
+
+    return (party, state)
+
+
+def get_party_of_user(user_id: int):
+    party_id = cache.get('user-party:{}'.format(user_id))
+
+    if party_id is None:
+        raise NotInPartyError
+
+    try:
+        (party, state) = get_party(party_id)
+    except Party.DoesNotExist:
+        cache.delete('user-party:{}'.format(user_id))
+        raise
+
+    return (party, state)
 
 
 class WebsocketConsumer(AsyncJsonWebsocketConsumer):
@@ -44,6 +71,10 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 await command(msg)
             except KeyError:
                 await self.send_json(event.error('Invalid data'))
+            except Party.DoesNotExist:
+                await self.send_json(event.error('Party does not exist'))
+            except NotInPartyError:
+                await self.send_json(event.error('You are currently not in the party'))
         else:
             await self.send_json(event.error('Invalid command'))
 
@@ -53,20 +84,9 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         party_id = msg['party_id']
 
-        try:
-            party = Party.objects.get(id=party_id)
-        except Party.DoesNotExist:
-            await self.send_json(event.error('Party does not exist'))
-            return
+        (party, state) = get_party(party_id)
 
         # TODO: Check party permission
-
-        state = party.state
-
-        if state is None:
-            party.delete()
-            await self.send_json(event.error('Party does not exist'))
-            return
 
         state.members.append(user_id)
         party.member_count += 1
@@ -90,24 +110,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         user = self.scope['user']
         user_id = user.id
 
-        party_id = cache.get('user-party:{}'.format(user_id))
-
-        if party_id is None:
-            await self.send_json(event.error('You are currently not in the party'))
-            return
-
-        try:
-            party = Party.objects.get(id=party_id)
-        except Party.DoesNotExist:
-            cache.delete('user-party:{}'.format(user_id))
-            await self.send_json(event.error('Party does not exist'))
-            return
-
-        state = party.state
-
-        if state is None:
-            party.delete()
-            return
+        (party, state) = get_party_of_user(user_id)
+        party_id = party.id
 
         state.members.remove(user_id)
         party.member_count -= 1
@@ -132,27 +136,14 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         user_id = data['user_id']
         menu_id = data['menu_id']
 
-        party_id = cache.get('user-party:{}'.format(user_id))
-
-        if party_id is None:
-            await self.send_json(event.error('You are currently not in the party'))
-            return
-
-        try:
-            party = Party.objects.get(id=party_id)
-        except Party.DoesNotExist:
-            cache.delete('user-party:{}'.format(user_id))
-            await self.send_json(event.error('Party does not exist'))
-            return
-
-        state = party.state
+        (party, state) = get_party_of_user(self.scope['user'].id)
 
         if (user_id, menu_id) not in state.menus:
             state.menus.append((user_id, menu_id))
         state.save()
 
         await self.channel_layer.group_send(
-            'party-{}'.format(party_id),
+            'party-{}'.format(party.id),
             event.menu_assign(user_id, menu_id)
         )
 
@@ -160,28 +151,14 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         user_id = data['user_id']
         menu_id = data['menu_id']
 
-        party_id = cache.get('user-party:{}'.format(user_id))
-
-        if party_id is None:
-            await self.send_json(event.error('You are currently not in the party'))
-            return
-
-        try:
-            party = Party.objects.get(id=party_id)
-        except Party.DoesNotExist:
-            cache.delete('user-party:{}'.format(user_id))
-            await self.send_json(event.error('Party does not exist'))
-            return
-
-        state = party.state
+        (party, state) = get_party_of_user(self.scope['user'].id)
 
         if (user_id, menu_id) in state.menus:
             state.menus.remove((user_id, menu_id))
-
         state.save()
 
         await self.channel_layer.group_send(
-            'party-{}'.format(party_id),
+            'party-{}'.format(party.id),
             event.menu_unassign(user_id, menu_id)
         )
 
