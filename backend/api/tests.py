@@ -52,6 +52,9 @@ class UserTestCase(TestCaseWithHttp):
             'password': 'iluvrust',
         })
         self.assertEqual(resp.status_code, 200)
+        resp_json = resp.json()
+        self.assertEqual(resp_json['username'], 'ferris')
+        self.assertEqual(resp_json['email'], 'ferris@rustacean.org')
 
         resp = self.get('/api/signout/')
         self.assertEqual(resp.status_code, 200)

@@ -8,6 +8,14 @@ from json.decoder import JSONDecodeError
 from .models import Party, PartyType
 
 
+def user_as_dict(user: User):
+    return {
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+    }
+
+
 def HttpResponseOk(*args, **kwargs):
     return HttpResponse(status=200, *args, **kwargs)
 
@@ -48,7 +56,7 @@ def signin(request: HttpRequest):
         return HttpResponseForbidden()
 
     login(request, user)
-    return HttpResponseOk()
+    return JsonResponse(user_as_dict(user))
 
 
 def signout(request: HttpRequest):
