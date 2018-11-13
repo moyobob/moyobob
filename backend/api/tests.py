@@ -68,6 +68,25 @@ class UserTestCase(TestCaseWithHttp):
         resp = self.get('/api/signout/')
         self.assertEqual(resp.status_code, 403)
 
+    def test_verify_session(self):
+        user = User.objects.create_user(
+            username='ferris', email='ferris@rustacean.org', password='iluvrust')
+        self.login("ferris@rustacean.org", "iluvrust")
+
+        resp = self.get('/api/verify_session/')
+        self.assertEqual(resp.status_code, 200)
+        resp_json = resp.json()
+        self.assertDictEqual(resp_json, {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+        })
+
+        self.logout()
+
+        resp = self.get('/api/verify_session/')
+        self.assertEqual(resp.status_code, 403)
+
     def test_invalid_method(self):
         self.assertEqual(self.get('/api/signup/').status_code, 405)
         self.assertEqual(self.put('/api/signup/', {}).status_code, 405)
@@ -80,6 +99,11 @@ class UserTestCase(TestCaseWithHttp):
         self.assertEqual(self.post('/api/signout/', {}).status_code, 405)
         self.assertEqual(self.put('/api/signout/', {}).status_code, 405)
         self.assertEqual(self.delete('/api/signout/').status_code, 405)
+
+        self.assertEqual(
+            self.post('/api/verify_session/', {}).status_code, 405)
+        self.assertEqual(self.put('/api/verify_session/', {}).status_code, 405)
+        self.assertEqual(self.delete('/api/verify_session/').status_code, 405)
 
     def test_bad_request(self):
         self.assertEqual(self.post('/api/signup/', {}).status_code, 400)
