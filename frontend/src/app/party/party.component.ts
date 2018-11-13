@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
-import { User } from '../types/user';
 import { Party, PartyState } from '../types/party';
 import { UserService } from '../services/user.service';
 import { PartyService } from '../services/party.service';
@@ -20,16 +19,13 @@ export class PartyComponent implements OnInit {
 
   constructor(
     private partyService: PartyService,
-    private userService: UserService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
   ) { }
 
   ngOnInit() {
-    // this.user = this.userService.getCurrentUser();
     this.id = +this.activatedRoute.snapshot.paramMap.get('id');
     this.getParty();
-    // this.getGroup();
   }
 
   getParty(): void {
@@ -38,13 +34,6 @@ export class PartyComponent implements OnInit {
         this.party = party;
       });
   }
-
-  /*
-  getGroup(): void{
-    // const id = this.userService.getGroupId();
-
-  }
-  //*/
 
   joinParty(): void {
     this.partyService.joinParty(this.id);
