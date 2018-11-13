@@ -136,7 +136,7 @@ class PartyTestCase(TestCaseWithHttp):
     def login(self):
         super().login(email='ferris@rustacean.org', password='iluvrust')
 
-    def test_not_allowd(self):
+    def test_not_allowed(self):
         self.assertEqual(self.put('/api/party/', {}).status_code, 405)
         self.assertEqual(self.delete('/api/party/').status_code, 405)
 
@@ -273,7 +273,7 @@ class RestaurantTestCase(TestCaseWithHttp):
     def login(self):
         super().login(email='ferris@rustacean.org', password='iluvrust')
 
-    def test_not_allowd(self):
+    def test_not_allowed(self):
         self.assertEqual(self.post('/api/restaurant/0/', {}).status_code, 405)
         self.assertEqual(self.put('/api/restaurant/0/', {}).status_code, 405)
         self.assertEqual(self.delete('/api/restaurant/0/').status_code, 405)
@@ -311,7 +311,7 @@ class MenuTestCase(TestCaseWithHttp):
     def login(self):
         super().login(email='ferris@rustacean.org', password='iluvrust')
 
-    def test_not_allowd(self):
+    def test_not_allowed(self):
         self.assertEqual(
             self.post('/api/restaurant/0/menu/', {}).status_code, 405)
         self.assertEqual(
