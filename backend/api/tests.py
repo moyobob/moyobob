@@ -1,9 +1,9 @@
 from django.test import TestCase, Client
-from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.db import transaction
 import json
 
-from .models import Party, PartyType, Restaurant, Menu
+from .models import User, Party, PartyType, Restaurant, Menu
 
 
 class TestCaseWithCache(TestCase):
@@ -67,6 +67,31 @@ class UserTestCase(TestCaseWithHttp):
 
         resp = self.get('/api/signout/')
         self.assertEqual(resp.status_code, 403)
+
+    def test_sign_up_unique(self):
+        with transaction.atomic():
+            resp = self.post('/api/signup/', {
+                'username': 'ferris',
+                'password': 'iluvrust',
+                'email': 'ferris@rustacean.org',
+            })
+            self.assertEqual(resp.status_code, 200)
+
+        with transaction.atomic():
+            resp = self.post('/api/signup/', {
+                'username': 'ferris2',
+                'password': 'iluvrusttoo',
+                'email': 'ferris@rustacean.org',
+            })
+            self.assertEqual(resp.status_code, 400)
+
+        with transaction.atomic():
+            resp = self.post('/api/signup/', {
+                'username': 'ferris',
+                'password': 'iluvrusttoo',
+                'email': 'ferris2@rustacean.org',
+            })
+            self.assertEqual(resp.status_code, 400)
 
     def test_verify_session(self):
         user = User.objects.create_user(
