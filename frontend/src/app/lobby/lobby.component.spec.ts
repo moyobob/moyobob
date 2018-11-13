@@ -4,6 +4,15 @@ import { Party, PartyType } from '../types/party';
 import { PartyService } from '../services/party.service';
 import { FormsModule } from '@angular/forms';
 import { Component, Input } from '@angular/core';
+import { User } from '../types/user';
+import { UserService } from '../services/user.service';
+import { Router } from '@angular/router';
+
+const mockUser: User = {
+  id: 1,
+  email: 'user1@mail.com',
+  username: 'User 1',
+}
 
 const mockParties: Party[] = [
   {
@@ -35,24 +44,34 @@ describe('LobbyComponent', () => {
   let component: LobbyComponent;
   let fixture: ComponentFixture<LobbyComponent>;
   let partyService: jasmine.SpyObj<PartyService>;
+  let userService: jasmine.SpyObj<UserService>;
+  let router: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
     const partySpy = jasmine.createSpyObj('PartyService', ['getParties']);
+    const userSpy = jasmine.createSpyObj('UserService', ['getSignedInUsername']);
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
       ],
       declarations: [
         LobbyComponent,
-        MockLobbyListItemComponent
+        MockLobbyListItemComponent,
       ],
       providers: [
-        { provide: PartyService, useValue: partySpy }
+        { provide: PartyService, useValue: partySpy },
+        { provide: UserService, useValue: userSpy },
+        { provice: Router, useValue: routerSpy },
       ]
     }).compileComponents();
 
     partyService = TestBed.get(PartyService);
     partyService.getParties.and.returnValue(new Promise(resolve => resolve(mockParties)));
+    userService = TestBed.get(UserService);
+    userService.getSignedInUsername.and.returnValue(mockUser.username);
+    router = TestBed.get(Router);
   }));
 
   beforeEach(() => {
@@ -64,6 +83,12 @@ describe('LobbyComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should redirect to signin when not signed in', async( () => {
+    userService.getSignedInUsername.and.returnValue(null);
+    component.ngOnInit();
+    expect(router.navigate).toHaveBeenCalledWith(['sign-in']);
+  }));
 
   it('should get parties', async(() => {
     component.ngOnInit();
