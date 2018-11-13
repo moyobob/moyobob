@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Output, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Party } from '../types/party';
 
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { WebSocketSubject, webSocket } from 'rxjs/websocket';
 
 const httpOptions = {
@@ -15,6 +15,11 @@ const httpOptions = {
 export class PartyService {
 
   webSocket$: WebSocketSubject<any>;
+  subscription: Subscription;
+
+  @Output()
+  partyJoin: EventEmitter<number> = new EventEmitter();
+  partyLeave: EventEmitter<number> = new EventEmitter();
 
   constructor(private http: HttpClient) { }
 
@@ -39,26 +44,32 @@ export class PartyService {
     await this.http.delete(`api/party/${id}`, httpOptions).toPromise();
   }
 
-  joinParty(id: number): Observable<any> {
-    if (this.webSocket$ != undefined) {
+  handle(json: any): void {
+    if (json['type'] === 'party.join') {
+      this.partyJoin.emit(json['user_id']);
+    } else if (json['type'] === 'party.leave') {
+      this.partyLeave.emit(json['user_id']);
+    }
+  }
+
+  joinParty(id: number): void {
+    if (this.webSocket$ !== undefined) {
       this.webSocket$ = WebSocketSubject.create('/ws/party/');
     }
+    this.subscription = this.webSocket$.subscribe(this.handle);
     this.webSocket$.next({
       'command': 'party.join',
       'party_id': id
     });
-    return this.webSocket$;
   }
 
-  leaveParty(id: number): Observable<any> {
+  leaveParty(id: number): void {
     this.webSocket$.next({
       'command': 'party.leave',
       'party_id': id
     });
 
-    // please, please handle memory leak.
-    let returnValue = this.webSocket$;
+    this.subscription.unsubscribe();
     this.webSocket$ = undefined;
-    return returnValue;
   }
 }
