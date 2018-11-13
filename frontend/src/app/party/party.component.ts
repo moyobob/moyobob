@@ -15,7 +15,7 @@ export class PartyComponent implements OnInit {
   party: Party;
   state: PartyState;
   // group: Group;
-  user: User;
+  // user: User;
 
   constructor(
     private partyService: PartyService,
@@ -25,7 +25,7 @@ export class PartyComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.user = this.userService.getCurrentUser();
+    // this.user = this.userService.getCurrentUser();
     this.getParty();
     // this.getGroup();
   }
