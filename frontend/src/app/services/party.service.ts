@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Party } from '../types/party';
 
 import { Observable, of, Subscription } from 'rxjs';
-import { WebSocketSubject, webSocket } from 'rxjs/websocket';
+import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
