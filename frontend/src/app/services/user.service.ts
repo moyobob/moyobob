@@ -27,4 +27,15 @@ export class UserService {
     return this.signedInUsername;
   }
 
+  verifyUser() {
+    return this.http.get<User>('/api/verify_session/').toPromise()
+    .then(user => {
+      this.signedInUsername = user.username;
+      return true;
+    }, error => {
+      this.signedInUsername = undefined;
+      return false;
+    });
+  }
+
 }

@@ -21,7 +21,7 @@ import { SignInComponent } from './sign-in/sign-in.component';
     HttpClientModule,
     HttpClientXsrfModule.withOptions({
       cookieName: 'csrftoken',
-      headerName: 'HTTP_X_CSRFTOKEN'
+      headerName: 'X-CSRFToken'
     })
   ],
   providers: [],
