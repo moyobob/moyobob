@@ -10,7 +10,7 @@
   </div>
   <div>
     <button routerLink="/party">Lobby</button>
-    <button *ngIf="joined" (click)="joinParty()">Join</button>
-    <button *ngIf="!joined" (click)="leaveParty()">Leave</button>
+    <button *ngIf="partyService.joinedPartyId === 0" (click)="joinParty()">Join</button>
+    <button *ngIf="partyService.joinedPartyId === id" (click)="leaveParty()">Leave</button>
   </div>
 </div>

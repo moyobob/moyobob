@@ -17,11 +17,16 @@ export class PartyService {
   webSocket$: WebSocketSubject<any>;
   subscription: Subscription;
 
+  joinedPartyId: number;
+
   @Output()
   partyJoin: EventEmitter<number> = new EventEmitter();
   partyLeave: EventEmitter<number> = new EventEmitter();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.webSocket$ = undefined;
+    this.joinedPartyId = 0;
+  }
 
   async getParties(): Promise<Party[]> {
     return await this.http.get<Party[]>('api/party/', httpOptions).toPromise();
@@ -53,14 +58,15 @@ export class PartyService {
   }
 
   joinParty(id: number): void {
-    if (this.webSocket$ !== undefined) {
-      this.webSocket$ = WebSocketSubject.create('/ws/party/');
+    if (this.webSocket$ === undefined) {
+      this.webSocket$ = new WebSocketSubject('ws://localhost:8000/ws/party/');
     }
     this.subscription = this.webSocket$.subscribe(this.handle);
     this.webSocket$.next({
       'command': 'party.join',
       'party_id': id
     });
+    this.joinedPartyId = id;
   }
 
   leaveParty(id: number): void {
@@ -68,6 +74,7 @@ export class PartyService {
       'command': 'party.leave',
       'party_id': id
     });
+    this.joinedPartyId = 0;
 
     this.subscription.unsubscribe();
     this.webSocket$ = undefined;
