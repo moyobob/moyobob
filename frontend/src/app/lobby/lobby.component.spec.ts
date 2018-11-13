@@ -12,7 +12,7 @@ const mockUser: User = {
   id: 1,
   email: 'user1@mail.com',
   username: 'User 1',
-}
+};
 
 const mockParties: Party[] = [
   {
@@ -35,9 +35,9 @@ const mockParties: Party[] = [
   },
 ];
 
-@Component({selector: 'app-lobby-list-item', template: ''})
-export class MockLobbyListItemComponent {
-  @Input() party: Party;
+@Component({ selector: 'app-lobby-list-item', template: '' })
+class MockLobbyListItemComponent {
+  @Input() party;
 }
 
 describe('LobbyComponent', () => {
@@ -63,7 +63,7 @@ describe('LobbyComponent', () => {
       providers: [
         { provide: PartyService, useValue: partySpy },
         { provide: UserService, useValue: userSpy },
-        { provice: Router, useValue: routerSpy },
+        { provide: Router, useValue: routerSpy },
       ]
     }).compileComponents();
 
@@ -87,7 +87,7 @@ describe('LobbyComponent', () => {
   it('should redirect to signin when not signed in', async( () => {
     userService.getSignedInUsername.and.returnValue(null);
     component.ngOnInit();
-    expect(router.navigate).toHaveBeenCalledWith(['sign-in']);
+    expect(router.navigate).toHaveBeenCalledWith(['/sign-in']);
   }));
 
   it('should get parties', async(() => {
