@@ -1,10 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { LobbyComponent } from './lobby.component';
-import {Party, PartyType} from '../types/party';
-import {PartyService} from '../services/party.service';
-import {FormsModule} from '@angular/forms';
-import {Component, Input} from '@angular/core';
+import { Party, PartyType } from '../types/party';
+import { PartyService } from '../services/party.service';
+import { FormsModule } from '@angular/forms';
+import { Component, Input } from '@angular/core';
 
 const mockParties: Party[] = [
   {
@@ -14,6 +13,7 @@ const mockParties: Party[] = [
     location: 'Location 1',
     leaderId: 1,
     since: 'Since 1',
+    memberCount: 1,
   },
   {
     id: 2,
@@ -22,6 +22,7 @@ const mockParties: Party[] = [
     location: 'Location 2',
     leaderId: 2,
     since: 'Since 2',
+    memberCount: 2,
   },
 ];
 
@@ -38,6 +39,9 @@ describe('LobbyComponent', () => {
   beforeEach(async(() => {
     const partySpy = jasmine.createSpyObj('PartyService', ['getParties']);
     TestBed.configureTestingModule({
+      imports: [
+        FormsModule,
+      ],
       declarations: [
         LobbyComponent,
         MockLobbyListItemComponent
