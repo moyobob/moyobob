@@ -2,10 +2,19 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed, HttpResponseNotFound
 from django.contrib.auth.models import User
+from django.views.decorators.csrf import ensure_csrf_cookie
 import json
 from json.decoder import JSONDecodeError
 
 from .models import Party, PartyType
+
+
+def user_as_dict(user: User):
+    return {
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+    }
 
 
 def HttpResponseOk(*args, **kwargs):
@@ -48,7 +57,7 @@ def signin(request: HttpRequest):
         return HttpResponseForbidden()
 
     login(request, user)
-    return HttpResponseOk()
+    return JsonResponse(user_as_dict(user))
 
 
 def signout(request: HttpRequest):
@@ -62,6 +71,17 @@ def signout(request: HttpRequest):
     logout(request)
 
     return HttpResponseOk()
+
+
+@ensure_csrf_cookie
+def verify_session(request: HttpRequest):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    return JsonResponse(user_as_dict(request.user))
 
 
 def party(request: HttpRequest):
