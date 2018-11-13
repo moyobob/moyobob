@@ -107,3 +107,25 @@ def party(request: HttpRequest):
         party.save()
 
         return JsonResponse(party.as_dict(), safe=False)
+
+
+def party_detail(request: HttpRequest, party_id: int):
+    if request.method not in ['GET', 'DELETE']:
+        return HttpResponseNotAllowed(['GET', 'DELETE'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    try:
+        party = Party.objects.get(id=party_id)
+    except Party.DoesNotExist:
+        return HttpResponseNotFound()
+
+    if request.method == 'GET':
+        return JsonResponse(party.as_dict())
+    else:  # DELETE
+        if party.leader != request.user:
+            return HttpResponseForbidden()
+
+        party.delete()
+
+        return HttpResponseOk()
