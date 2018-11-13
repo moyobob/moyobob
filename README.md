@@ -11,6 +11,6 @@
 [![이강욱](https://badgen.net/badge/이강욱/pbzweihander/cyan)](https://github.com/pbzweihander)
 
 [![Build Status](https://circleci.com/gh/swsnu/swpp18-team5.svg?style=svg)](https://circleci.com/gh/swsnu/swpp18-team5)
-[![Coverage Status](https://badgen.net/codecov/c/github/swsnu/swpp18-team5)](https://codecov.io/gh/swsnu/swpp18-team5)
+[![Coverage Status](https://codecov.io/gh/swsnu/swpp18-team5/branch/master/graph/badge.svg)](https://codecov.io/gh/swsnu/swpp18-team5)
 
 __Coming Soon!__
