@@ -140,14 +140,25 @@ class PartyTestCase(TestCaseWithHttp):
         self.assertEqual(self.put('/api/party/', {}).status_code, 405)
         self.assertEqual(self.delete('/api/party/').status_code, 405)
 
+        self.assertEqual(self.post('/api/party/0/', {}).status_code, 405)
+        self.assertEqual(self.put('/api/party/0/', {}).status_code, 405)
+
     def test_unauthenticated(self):
         self.assertEqual(self.get('/api/party/').status_code, 403)
         self.assertEqual(self.post('/api/party/', {}).status_code, 403)
+
+        self.assertEqual(self.get('/api/party/0/').status_code, 403)
+        self.assertEqual(self.delete('/api/party/0/').status_code, 403)
 
         self.login()
         self.assertEqual(self.get('/api/party/').status_code, 200)
         self.logout()
         self.assertEqual(self.get('/api/party/').status_code, 403)
+
+    def test_not_found(self):
+        self.login()
+        self.assertEqual(self.get('/api/party/0/').status_code, 404)
+        self.assertEqual(self.delete('/api/party/0/').status_code, 404)
 
     def test_get_party_state(self):
         state1 = self.party1.state
@@ -217,17 +228,34 @@ class PartyTestCase(TestCaseWithHttp):
         state = party.state
         self.assertIsNotNone(state)
 
-        party.delete()
+        self.login()
 
+        resp = self.delete('/api/party/{}/'.format(id))
+        self.assertEqual(resp.status_code, 200)
+
+        party = Party.objects.filter(id=id)
+        self.assertTrue(not party.exists())
         self.assertIsNone(cache.get('party:{}'.format(id)))
 
-        party = Party(
-            name="new party name",
-            type=int(PartyType.Private),
-            location="new party location",
-            leader=self.user,
-        )
+        user = User.objects.create_user(
+            username="user", email="user@example.com", password="somepass")
+        user.save()
+        party = Party(name="party", type=int(PartyType.InGroup),
+                      location="somewhere", leader=user)
         party.save()
+
+        resp = self.delete('/api/party/{}/'.format(party.id))
+        self.assertEqual(resp.status_code, 403)
+
         state = party.state
         state.delete()
         party.delete()
+
+    def test_get_party_detail(self):
+        self.login()
+
+        resp = self.get('/api/party/{}/'.format(self.party1.id))
+        self.assertEqual(resp.status_code, 200)
+
+        resp_json = resp.json()
+        self.assertDictEqual(resp_json, self.party1.as_dict())
