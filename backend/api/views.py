@@ -6,7 +6,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 import json
 from json.decoder import JSONDecodeError
 
-from .models import Party, PartyType
+from .models import Party, PartyType, Restaurant, Menu
 
 
 def user_as_dict(user: User):
@@ -129,3 +129,46 @@ def party_detail(request: HttpRequest, party_id: int):
         party.delete()
 
         return HttpResponseOk()
+
+
+def restaurant_detail(request: HttpRequest, restaurant_id: int):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+    except Restaurant.DoesNotExist:
+        return HttpResponseNotFound()
+
+    return JsonResponse(restaurant.as_dict())
+
+
+def menu(request: HttpRequest, restaurant_id: int):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    try:
+        restaurant = Restaurant.objects.get(id=restaurant_id)
+        menus = [menu.as_dict() for menu in restaurant.menus.all()]
+    except Restaurant.DoesNotExist:
+        return HttpResponseNotFound()
+
+    return JsonResponse(menus, safe=False)
+
+
+def menu_detail(request: HttpRequest, menu_id: int):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    try:
+        menu = Menu.objects.get(id=menu_id)
+    except Menu.DoesNotExist:
+        return HttpResponseNotFound()
+
+    return JsonResponse(menu.as_dict())
