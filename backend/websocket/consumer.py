@@ -6,7 +6,7 @@ import json
 from .models import PartyState
 from api.models import Party
 from websocket import event
-from .exception import NotInPartyError
+from .exception import NotInPartyError, AlreadyJoinedError
 
 WEBSOCKET_REJECT_UNAUTHORIZED = 4000
 WEBSOCKET_REJECT_DUPLICATE = 4001
@@ -75,12 +75,17 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_json(event.error('Party does not exist'))
             except NotInPartyError:
                 await self.send_json(event.error('You are currently not in the party'))
+            except AlreadyJoinedError:
+                await self.send_json(event.error('You are already joined to a party'))
         else:
             await self.send_json(event.error('Invalid command'))
 
     async def command_party_join(self, msg):
         user = self.scope['user']
         user_id = user.id
+
+        if cache.get('user-party:{}'.format(user_id)) is not None:
+            raise AlreadyJoinedError
 
         party_id = msg['party_id']
 

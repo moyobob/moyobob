@@ -248,6 +248,18 @@ class SingleWebsocketTestCase(TestCaseWithCache):
         })
         await communicator.receive_nothing(1)
 
+    @async_test
+    async def test_already_joined(self):
+        await self.join()
+
+        await self.communicator.send_json_to({
+            'command': 'party.join',
+            'party_id': self.party.id,
+        })
+        resp = await self.communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.error(
+            'You are already joined to a party'))
+
 
 class DoubleWebsocketTestCase(TestCaseWithCache):
     async def join_both(self):
