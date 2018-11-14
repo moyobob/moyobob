@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'channels',
+    'cauth.apps.CauthConfig',
     'websocket.apps.WebsocketConfig',
     'api.apps.ApiConfig',
     'django.contrib.admin',
@@ -127,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = ['backend.auth.EmailBackend']
+AUTH_USER_MODEL = 'cauth.User'
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/

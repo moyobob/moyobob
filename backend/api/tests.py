@@ -1,9 +1,9 @@
 from django.test import TestCase, Client
-from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.db import transaction
 import json
 
-from .models import Party, PartyType
+from .models import User, Party, PartyType, Restaurant, Menu
 
 
 class TestCaseWithCache(TestCase):
@@ -52,6 +52,9 @@ class UserTestCase(TestCaseWithHttp):
             'password': 'iluvrust',
         })
         self.assertEqual(resp.status_code, 200)
+        resp_json = resp.json()
+        self.assertEqual(resp_json['username'], 'ferris')
+        self.assertEqual(resp_json['email'], 'ferris@rustacean.org')
 
         resp = self.get('/api/signout/')
         self.assertEqual(resp.status_code, 200)
@@ -63,6 +66,50 @@ class UserTestCase(TestCaseWithHttp):
         self.assertEqual(resp.status_code, 403)
 
         resp = self.get('/api/signout/')
+        self.assertEqual(resp.status_code, 403)
+
+    def test_sign_up_unique(self):
+        with transaction.atomic():
+            resp = self.post('/api/signup/', {
+                'username': 'ferris',
+                'password': 'iluvrust',
+                'email': 'ferris@rustacean.org',
+            })
+            self.assertEqual(resp.status_code, 200)
+
+        with transaction.atomic():
+            resp = self.post('/api/signup/', {
+                'username': 'ferris2',
+                'password': 'iluvrusttoo',
+                'email': 'ferris@rustacean.org',
+            })
+            self.assertEqual(resp.status_code, 400)
+
+        with transaction.atomic():
+            resp = self.post('/api/signup/', {
+                'username': 'ferris',
+                'password': 'iluvrusttoo',
+                'email': 'ferris2@rustacean.org',
+            })
+            self.assertEqual(resp.status_code, 400)
+
+    def test_verify_session(self):
+        user = User.objects.create_user(
+            username='ferris', email='ferris@rustacean.org', password='iluvrust')
+        self.login("ferris@rustacean.org", "iluvrust")
+
+        resp = self.get('/api/verify_session/')
+        self.assertEqual(resp.status_code, 200)
+        resp_json = resp.json()
+        self.assertDictEqual(resp_json, {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+        })
+
+        self.logout()
+
+        resp = self.get('/api/verify_session/')
         self.assertEqual(resp.status_code, 403)
 
     def test_invalid_method(self):
@@ -77,6 +124,11 @@ class UserTestCase(TestCaseWithHttp):
         self.assertEqual(self.post('/api/signout/', {}).status_code, 405)
         self.assertEqual(self.put('/api/signout/', {}).status_code, 405)
         self.assertEqual(self.delete('/api/signout/').status_code, 405)
+
+        self.assertEqual(
+            self.post('/api/verify_session/', {}).status_code, 405)
+        self.assertEqual(self.put('/api/verify_session/', {}).status_code, 405)
+        self.assertEqual(self.delete('/api/verify_session/').status_code, 405)
 
     def test_bad_request(self):
         self.assertEqual(self.post('/api/signup/', {}).status_code, 400)
@@ -109,18 +161,29 @@ class PartyTestCase(TestCaseWithHttp):
     def login(self):
         super().login(email='ferris@rustacean.org', password='iluvrust')
 
-    def test_not_allowd(self):
+    def test_not_allowed(self):
         self.assertEqual(self.put('/api/party/', {}).status_code, 405)
         self.assertEqual(self.delete('/api/party/').status_code, 405)
+
+        self.assertEqual(self.post('/api/party/0/', {}).status_code, 405)
+        self.assertEqual(self.put('/api/party/0/', {}).status_code, 405)
 
     def test_unauthenticated(self):
         self.assertEqual(self.get('/api/party/').status_code, 403)
         self.assertEqual(self.post('/api/party/', {}).status_code, 403)
 
+        self.assertEqual(self.get('/api/party/0/').status_code, 403)
+        self.assertEqual(self.delete('/api/party/0/').status_code, 403)
+
         self.login()
         self.assertEqual(self.get('/api/party/').status_code, 200)
         self.logout()
         self.assertEqual(self.get('/api/party/').status_code, 403)
+
+    def test_not_found(self):
+        self.login()
+        self.assertEqual(self.get('/api/party/0/').status_code, 404)
+        self.assertEqual(self.delete('/api/party/0/').status_code, 404)
 
     def test_get_party_state(self):
         state1 = self.party1.state
@@ -136,14 +199,8 @@ class PartyTestCase(TestCaseWithHttp):
 
         resp_json = resp.json()
         self.assertEqual(len(resp_json), 2)
-        self.assertEqual(resp_json[0]['name'], self.party1.name)
-        self.assertEqual(resp_json[0]['type'], self.party1.type)
-        self.assertEqual(resp_json[0]['location'], self.party1.location)
-        self.assertEqual(resp_json[0]['leader_id'], self.party1.leader.id)
-        self.assertEqual(resp_json[1]['name'], self.party2.name)
-        self.assertEqual(resp_json[1]['type'], self.party2.type)
-        self.assertEqual(resp_json[1]['location'], self.party2.location)
-        self.assertEqual(resp_json[1]['leader_id'], self.party2.leader.id)
+        self.assertListEqual(
+            resp_json, [self.party1.as_dict(), self.party2.as_dict()])
 
     def test_post_party(self):
         self.login()
@@ -190,17 +247,134 @@ class PartyTestCase(TestCaseWithHttp):
         state = party.state
         self.assertIsNotNone(state)
 
-        party.delete()
+        self.login()
 
+        resp = self.delete('/api/party/{}/'.format(id))
+        self.assertEqual(resp.status_code, 200)
+
+        party = Party.objects.filter(id=id)
+        self.assertTrue(not party.exists())
         self.assertIsNone(cache.get('party:{}'.format(id)))
 
-        party = Party(
-            name="new party name",
-            type=int(PartyType.Private),
-            location="new party location",
-            leader=self.user,
-        )
+        user = User.objects.create_user(
+            username="user", email="user@example.com", password="somepass")
+        user.save()
+        party = Party(name="party", type=int(PartyType.InGroup),
+                      location="somewhere", leader=user)
         party.save()
+
+        resp = self.delete('/api/party/{}/'.format(party.id))
+        self.assertEqual(resp.status_code, 403)
+
         state = party.state
         state.delete()
         party.delete()
+
+    def test_get_party_detail(self):
+        self.login()
+
+        resp = self.get('/api/party/{}/'.format(self.party1.id))
+        self.assertEqual(resp.status_code, 200)
+
+        resp_json = resp.json()
+        self.assertDictEqual(resp_json, self.party1.as_dict())
+
+    def test_party_restaurant_field(self):
+        self.assertEqual(self.party1.as_dict()['restaurant'], 0)
+
+        restaurant = Restaurant(name="Rustaurant")
+        restaurant.save()
+        self.party1.restaurant = restaurant
+        self.party1.save()
+
+        self.assertEqual(self.party1.as_dict()['restaurant'], restaurant.id)
+
+
+class RestaurantTestCase(TestCaseWithHttp):
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username='ferris', email='ferris@rustacean.org', password='iluvrust')
+
+        self.restaurant = Restaurant(name="Rustaurant")
+        self.restaurant.save()
+
+    def login(self):
+        super().login(email='ferris@rustacean.org', password='iluvrust')
+
+    def test_not_allowed(self):
+        self.assertEqual(self.post('/api/restaurant/0/', {}).status_code, 405)
+        self.assertEqual(self.put('/api/restaurant/0/', {}).status_code, 405)
+        self.assertEqual(self.delete('/api/restaurant/0/').status_code, 405)
+
+    def test_unauthenticated(self):
+        self.assertEqual(self.get('/api/restaurant/0/').status_code, 403)
+
+    def test_not_found(self):
+        self.login()
+        self.assertEqual(self.get('/api/restaurant/0/').status_code, 404)
+
+    def test_get_restaurant_detail(self):
+        self.login()
+
+        resp = self.get('/api/restaurant/{}/'.format(self.restaurant.id))
+        self.assertEqual(resp.status_code, 200)
+
+        resp_json = resp.json()
+        self.assertDictEqual(resp_json, self.restaurant.as_dict())
+
+
+class MenuTestCase(TestCaseWithHttp):
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(
+            username='ferris', email='ferris@rustacean.org', password='iluvrust')
+
+        self.restaurant = Restaurant(name="Rustaurant")
+        self.restaurant.save()
+        self.menu = Menu(name="Crab", price=6697)
+        self.menu.save()
+
+        self.restaurant.menus.add(self.menu)
+
+    def login(self):
+        super().login(email='ferris@rustacean.org', password='iluvrust')
+
+    def test_not_allowed(self):
+        self.assertEqual(
+            self.post('/api/restaurant/0/menu/', {}).status_code, 405)
+        self.assertEqual(
+            self.put('/api/restaurant/0/menu/', {}).status_code, 405)
+        self.assertEqual(self.delete(
+            '/api/restaurant/0/menu/').status_code, 405)
+
+        self.assertEqual(self.post('/api/menu/0/', {}).status_code, 405)
+        self.assertEqual(self.put('/api/menu/0/', {}).status_code, 405)
+        self.assertEqual(self.delete('/api/menu/0/').status_code, 405)
+
+    def test_unauthenticated(self):
+        self.assertEqual(self.get('/api/restaurant/0/menu/').status_code, 403)
+        self.assertEqual(self.get('/api/menu/0/').status_code, 403)
+
+    def test_not_found(self):
+        self.login()
+        self.assertEqual(self.get('/api/restaurant/0/menu/').status_code, 404)
+        self.assertEqual(self.get('/api/menu/0/').status_code, 404)
+
+    def test_get_menu(self):
+        self.login()
+
+        resp = self.get('/api/restaurant/{}/menu/'.format(self.restaurant.id))
+        self.assertEqual(resp.status_code, 200)
+
+        resp_json = resp.json()
+        self.assertListEqual(resp_json, [self.menu.as_dict()])
+
+    def test_get_menu_detail(self):
+        self.login()
+
+        resp = self.get('/api/menu/{}/'.format(self.menu.id))
+        self.assertEqual(resp.status_code, 200)
+
+        resp_json = resp.json()
+        self.assertDictEqual(resp_json, self.menu.as_dict())

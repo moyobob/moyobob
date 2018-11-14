@@ -26,6 +26,9 @@ class CacheModel():
     def delete(self):
         cache.delete(self.key(self.id))
 
+    def refresh_from_db(self):
+        self.__dict__ = self.get(self.id).as_dict()
+
 
 class PartyPhase(IntEnum):
     ChoosingRestaurant = 0
@@ -40,10 +43,11 @@ class PartyState(CacheModel):
 
     def __init__(self, party_id: int):
         self.id = party_id
-        self.phase = PartyPhase.ChoosingRestaurant
+        # TODO: Change to ChoosingRestaurant
+        self.phase = PartyPhase.ChoosingMenu
         self.restaurant = None
         self.members = []
-        self.menus = {}
+        self.menus = []
 
     def as_dict(self):
         return {

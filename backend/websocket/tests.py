@@ -1,18 +1,17 @@
 from django.test import TestCase, Client
 from django.core.cache import cache
-from django.contrib.auth.models import User
 from channels.testing import WebsocketCommunicator
 import asyncio
 import json
 
 from backend.routings import application
 from .consumer import WebsocketConsumer
-from api.models import Party, PartyType
+from api.models import User, Party, PartyType
+from websocket import event
 
 
-def async_test(f):
+def async_test(coro):
     def wrapper(*args, **kwargs):
-        coro = asyncio.coroutine(f)
         future = coro(*args, **kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(future)
@@ -28,7 +27,7 @@ class TestCaseWithCache(TestCase):
         get_redis_connection('default').flushdb()
 
 
-class WebsocketTestCase(TestCaseWithCache):
+class WebsocketConnectionTestCase(TestCaseWithCache):
     @async_test
     async def test_unauthenticated(self):
         communicator = WebsocketCommunicator(application, '/ws/party/')
@@ -51,10 +50,6 @@ class WebsocketTestCase(TestCaseWithCache):
         self.assertTrue(connected)
         self.assertEqual(communicator.instance.scope['user'], user)
 
-        resp = await communicator.receive_json_from()
-        self.assertEqual(resp['type'], 'success')
-        self.assertEqual(resp['event'], 'connect')
-
         await communicator.disconnect()
 
     @async_test
@@ -72,7 +67,7 @@ class WebsocketTestCase(TestCaseWithCache):
         communicator.scope['user'] = user
 
         await communicator.connect()
-        await communicator.receive_from()
+        await communicator.receive_json_from(1)
 
         self.client.logout()
         communicator.scope['user'] = AnonymousUser()
@@ -87,371 +82,149 @@ class WebsocketTestCase(TestCaseWithCache):
 
         await communicator.disconnect()
 
+
+class SingleWebsocketTestCase(TestCaseWithCache):
+    async def join(self):
+        await self.communicator.send_json_to({
+            'command': 'party.join',
+            'party_id': self.party.id,
+        })
+        await self.communicator.receive_json_from(1)
+
     @async_test
-    async def test_invalid_command(self):
+    async def setUp(self):
+        super().setUp()
         user = User.objects.create_user(
             email='ferris@rustacean.org',
             password='iluvrust',
             username='ferris',
         )
+        party = Party(
+            name="party 1 name",
+            type=int(PartyType.Private),
+            location="party 1 location",
+            leader=user,
+        )
+        party.save()
         self.client.login(email=user.email, password='iluvrust')
 
         communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
         communicator.scope['user'] = user
 
         await communicator.connect()
-        await communicator.receive_from()
+        await communicator.receive_json_from(1)
+
+        self.user = user
+        self.party = party
+        self.communicator = communicator
+
+    @async_test
+    async def tearDown(self):
+        await self.communicator.disconnect()
+        super().tearDown()
+
+    @async_test
+    async def test_invalid_command(self):
+        communicator = self.communicator
 
         await communicator.send_json_to({
             'command': 'foo',
             'data': 'bar',
         })
         resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'error')
-        self.assertEqual(resp['error'], 'Invalid command')
-
-        await communicator.disconnect()
+        self.assertDictEqual(resp, event.error.invalid_command())
 
     @async_test
     async def test_invalid_data(self):
-        user = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        self.client.login(email=user.email, password='iluvrust')
-
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_from()
+        communicator = self.communicator
 
         await communicator.send_json_to({
             'command': 'party.join',
             'foo': 'bar',
         })
         resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'error')
-        self.assertEqual(resp['error'], 'Invalid data')
-
-        await communicator.disconnect()
+        self.assertDictEqual(resp, event.error.invalid_data())
 
     @async_test
     async def test_party_join(self):
-        user = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user,
-        )
-        party.save()
-        self.client.login(email=user.email, password='iluvrust')
-
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_from()
+        user = self.user
+        party = self.party
+        communicator = self.communicator
+        party_id = party.id
 
         await communicator.send_json_to({
             'command': 'party.join',
-            'party_id': party.id,
+            'party_id': party_id,
         })
         resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'success')
-        self.assertEqual(resp['event'], 'party.join')
 
         party.refresh_from_db()
+        self.assertDictEqual(resp, event.state_update(party.state))
         self.assertEqual(party.state.members[0], user.id)
         self.assertEqual(party.member_count, 1)
-        self.assertEqual(cache.get('user-party:{}'.format(user.id)), party.id)
-
-        await communicator.disconnect()
-
-    @async_test
-    async def test_party_join_and_broadcast(self):
-        user1 = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        user2 = User.objects.create_user(
-            email='pbzweihander@rustacean.org',
-            password='iluvrusttoo',
-            username='pbzweihander',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user1,
-        )
-        party.save()
-        self.client.login(email=user1.email, password='iluvrust')
-        client2 = Client()
-        client2.login(email=user2.email, password='iluvrusttoo')
-
-        communicator1 = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator1.scope['user'] = user1
-
-        await communicator1.connect()
-        await communicator1.receive_from()
-
-        await communicator1.send_json_to({
-            'command': 'party.join',
-            'party_id': party.id,
-        })
-        await communicator1.receive_json_from(1)
-
-        communicator2 = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator2.scope['user'] = user2
-
-        await communicator2.connect()
-        await communicator2.receive_from()
-
-        await communicator2.send_json_to({
-            'command': 'party.join',
-            'party_id': party.id,
-        })
-        await communicator2.receive_from(1)
-
-        resp = await communicator1.receive_json_from(1)
-        self.assertEqual(resp['type'], 'party.join')
-        self.assertEqual(resp['user_id'], user2.id)
-
-        await communicator1.disconnect()
-        await communicator2.disconnect()
+        self.assertEqual(cache.get('user-party:{}'.format(user.id)), party_id)
 
     @async_test
     async def test_party_join_does_not_exist(self):
-        user = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        self.client.login(email=user.email, password='iluvrust')
-
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_from()
+        communicator = self.communicator
 
         await communicator.send_json_to({
             'command': 'party.join',
             'party_id': 0,
         })
         resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'error')
-        self.assertEqual(resp['error'], 'Party does not exist')
-
-        await communicator.disconnect()
+        self.assertDictEqual(resp, event.error.invalid_party())
 
     @async_test
     async def test_party_join_state_does_not_exist(self):
-        user = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user,
-        )
-        party.save()
-        self.client.login(email=user.email, password='iluvrust')
-
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_from()
+        party = self.party
+        communicator = self.communicator
+        party_id = party.id
 
         party.state.delete()
 
         await communicator.send_json_to({
             'command': 'party.join',
-            'party_id': party.id,
+            'party_id': party_id,
         })
         resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'error')
-        self.assertEqual(resp['error'], 'Party does not exist')
-
-        await communicator.disconnect()
-
-    @async_test
-    async def test_party_leave(self):
-        user1 = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        user2 = User.objects.create_user(
-            email='pbzweihander@rustacean.org',
-            password='iluvrusttoo',
-            username='pbzweihander',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user1,
-        )
-        party.save()
-
-        self.client.login(email=user1.email, password='iluvrust')
-        client2 = Client()
-        client2.login(email=user2.email, password='iluvrusttoo')
-
-        communicator1 = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator1.scope['user'] = user1
-        communicator2 = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator2.scope['user'] = user2
-
-        await communicator1.connect()
-        await communicator1.receive_from()
-
-        await communicator1.send_json_to({
-            'command': 'party.join',
-            'party_id': party.id,
-        })
-        await communicator1.receive_json_from(1)
-        await communicator2.send_json_to({
-            'command': 'party.join',
-            'party_id': party.id,
-        })
-        await communicator2.receive_json_from(1)
-        await communicator1.receive_json_from(1)
-
-        await communicator1.send_json_to({
-            'command': 'party.leave',
-        })
-        resp = await communicator1.receive_json_from(1)
-        self.assertEqual(resp['type'], 'success')
-        self.assertEqual(resp['event'], 'party.leave')
-
-        resp = await communicator2.receive_json_from(1)
-        self.assertEqual(resp['type'], 'party.leave')
-        self.assertEqual(resp['user_id'], user1.id)
-
-        party.refresh_from_db()
-        self.assertEqual(len(party.state.members), 1)
-        self.assertEqual(party.state.members[0], user2.id)
-        self.assertEqual(party.member_count, 1)
-        self.assertIsNone(cache.get('user-party:{}'.format(user1.id)))
-
-        await communicator1.disconnect()
+        self.assertDictEqual(resp, event.error.invalid_party())
 
     @async_test
     async def test_party_leave_and_deleted(self):
-        user = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user,
-        )
-        party.save()
+        user = self.user
+        party = self.party
+        communicator = self.communicator
         party_id = party.id
-        self.client.login(email=user.email, password='iluvrust')
 
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_from()
-
-        await communicator.send_json_to({
-            'command': 'party.join',
-            'party_id': party_id,
-        })
-        await communicator.receive_json_from(1)
+        await self.join()
 
         await communicator.send_json_to({
             'command': 'party.leave',
+            'test': 'test',
         })
-        resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'success')
-        self.assertEqual(resp['event'], 'party.leave')
+        await communicator.receive_nothing(1)
 
         self.assertIsNone(cache.get('user-party:{}'.format(user.id)))
         self.assertIsNone(cache.get('party:{}'.format(party_id)))
         self.assertFalse(Party.objects.filter(id=party_id).exists())
 
-        await communicator.disconnect()
-
     @async_test
     async def test_party_leave_not_in_party(self):
-        user = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user,
-        )
-        party.save()
-
-        self.client.login(email=user.email, password='iluvrust')
-
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_from()
+        communicator = self.communicator
 
         await communicator.send_json_to({
             'command': 'party.leave',
         })
         resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'error')
-        self.assertEqual(resp['error'], 'You are currently not in the party')
-
-        await communicator.disconnect()
+        self.assertDictEqual(resp, event.error.not_joined())
 
     @async_test
     async def test_party_leave_does_not_exist(self):
-        user = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user,
-        )
-        party.save()
-        party_id = party.id
-        self.client.login(email=user.email, password='iluvrust')
+        party = self.party
+        communicator = self.communicator
 
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_from()
-
-        await communicator.send_json_to({
-            'command': 'party.join',
-            'party_id': party_id,
-        })
-        await communicator.receive_json_from(1)
+        await self.join()
 
         party.delete()
 
@@ -459,47 +232,236 @@ class WebsocketTestCase(TestCaseWithCache):
             'command': 'party.leave',
         })
         resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'error')
-        self.assertEqual(resp['error'], 'Party does not exist')
-
-        await communicator.disconnect()
+        self.assertDictEqual(resp, event.error.invalid_party())
 
     @async_test
     async def test_party_leave_deleted_state(self):
-        user = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user,
-        )
-        party.save()
-        party_id = party.id
-        self.client.login(email=user.email, password='iluvrust')
+        party = self.party
+        communicator = self.communicator
 
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_from()
-
-        await communicator.send_json_to({
-            'command': 'party.join',
-            'party_id': party_id,
-        })
-        await communicator.receive_json_from(1)
+        await self.join()
 
         party.state.delete()
 
         await communicator.send_json_to({
             'command': 'party.leave',
         })
-        resp = await communicator.receive_json_from(1)
-        self.assertEqual(resp['type'], 'success')
-        self.assertEqual(resp['event'], 'party.leave')
+        await communicator.receive_nothing(1)
 
-        await communicator.disconnect()
+    @async_test
+    async def test_already_joined(self):
+        await self.join()
+
+        await self.communicator.send_json_to({
+            'command': 'party.join',
+            'party_id': self.party.id,
+        })
+        resp = await self.communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.already_joined())
+
+    @async_test
+    async def test_already_joined_connection(self):
+        await self.join()
+
+        await self.communicator.disconnect()
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = self.user
+
+        await communicator.connect()
+        resp = await communicator.receive_json_from(1)
+
+        self.assertDictEqual(resp, event.state_update(self.party.state))
+
+
+class DoubleWebsocketTestCase(TestCaseWithCache):
+    async def join_both(self):
+        await self.communicator1.send_json_to({
+            'command': 'party.join',
+            'party_id': self.party.id,
+        })
+        await self.communicator1.receive_json_from(1)
+
+        await self.communicator2.send_json_to({
+            'command': 'party.join',
+            'party_id': self.party.id,
+        })
+        await self.communicator2.receive_json_from(1)
+        await self.communicator1.receive_json_from(1)
+
+    @async_test
+    async def setUp(self):
+        super().setUp()
+
+        user1 = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        user2 = User.objects.create_user(
+            email='pbzweihander@rustacean.org',
+            password='iluvrusttoo',
+            username='pbzweihander',
+        )
+        party = Party(
+            name="party 1 name",
+            type=int(PartyType.Private),
+            location="party 1 location",
+            leader=user1,
+        )
+        party.save()
+        self.client.login(email=user1.email, password='iluvrust')
+        client2 = Client()
+        client2.login(email=user2.email, password='iluvrusttoo')
+
+        communicator1 = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator1.scope['user'] = user1
+        communicator2 = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator2.scope['user'] = user2
+
+        await communicator1.connect()
+        await communicator2.connect()
+        await communicator1.receive_json_from(1)
+        await communicator2.receive_json_from(1)
+
+        self.user1 = user1
+        self.user2 = user2
+        self.party = party
+        self.communicator1 = communicator1
+        self.communicator2 = communicator2
+
+    @async_test
+    async def tearDown(self):
+        await self.communicator1.disconnect()
+        await self.communicator2.disconnect()
+        super().tearDown()
+
+    @async_test
+    async def test_party_join_and_broadcast(self):
+        user2 = self.user2
+        party = self.party
+        communicator1 = self.communicator1
+        communicator2 = self.communicator2
+        party_id = party.id
+
+        await communicator1.send_json_to({
+            'command': 'party.join',
+            'party_id': party_id,
+        })
+        await communicator1.receive_json_from(1)
+
+        await communicator2.send_json_to({
+            'command': 'party.join',
+            'party_id': party_id,
+        })
+        await communicator2.receive_json_from(1)
+
+        resp = await communicator1.receive_json_from(1)
+        self.assertDictEqual(resp, event.party_join(user2.id))
+
+    @async_test
+    async def test_party_leave(self):
+        user1 = self.user1
+        user2 = self.user2
+        party = self.party
+        communicator1 = self.communicator1
+        communicator2 = self.communicator2
+
+        await self.join_both()
+
+        await communicator1.send_json_to({
+            'command': 'party.leave',
+        })
+
+        resp = await communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.party_leave(user1.id))
+
+        party.refresh_from_db()
+        self.assertEqual(len(party.state.members), 1)
+        self.assertEqual(party.state.members[0], user2.id)
+        self.assertEqual(party.member_count, 1)
+        self.assertIsNone(cache.get('user-party:{}'.format(user1.id)))
+
+    @async_test
+    async def test_menu_assign(self):
+        user1 = self.user1
+        user2 = self.user2
+        party = self.party
+        communicator1 = self.communicator1
+        communicator2 = self.communicator2
+        state = party.state
+
+        await self.join_both()
+
+        await communicator1.send_json_to({
+            'command': 'menu.assign',
+            'user_id': user1.id,
+            'menu_id': 11,
+        })
+        await communicator1.receive_json_from(1)
+        resp = await communicator2.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_assign(user1.id, 11))
+        self.assertListEqual(state.menus, [(user1.id, 11)])
+
+        await communicator2.send_json_to({
+            'command': 'menu.assign',
+            'user_id': user2.id,
+            'menu_id': 22,
+        })
+        await communicator2.receive_json_from(1)
+        resp = await communicator1.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_assign(user2.id, 22))
+        self.assertListEqual(state.menus, [(user1.id, 11), (user2.id, 22)])
+
+        await communicator2.send_json_to({
+            'command': 'menu.assign',
+            'user_id': user2.id,
+            'menu_id': 22,
+        })
+        await communicator1.receive_nothing()
+        await communicator2.receive_nothing()
+
+    @async_test
+    async def test_menu_unassign(self):
+        user1 = self.user1
+        user2 = self.user2
+        party = self.party
+        communicator1 = self.communicator1
+        communicator2 = self.communicator2
+        state = party.state
+        state.menus = [(user1.id, 11), (user2.id, 22)]
+        state.save()
+
+        await self.join_both()
+
+        await communicator1.send_json_to({
+            'command': 'menu.unassign',
+            'user_id': user1.id,
+            'menu_id': 11,
+        })
+        await communicator1.receive_json_from(1)
+        resp = await communicator2.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_unassign(user1.id, 11))
+        self.assertListEqual(state.menus, [(user2.id, 22)])
+
+        await communicator2.send_json_to({
+            'command': 'menu.unassign',
+            'user_id': user2.id,
+            'menu_id': 22,
+        })
+        await communicator2.receive_json_from(1)
+        resp = await communicator1.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_unassign(user2.id, 22))
+        self.assertListEqual(state.menus, [])
+
+        await communicator2.send_json_to({
+            'command': 'menu.unassign',
+            'user_id': user2.id,
+            'menu_id': 22,
+        })
+        await communicator1.receive_nothing()
+        await communicator2.receive_nothing()
