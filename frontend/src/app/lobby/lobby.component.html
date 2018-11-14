@@ -1,0 +1,12 @@
+<div>
+  <div>
+    <li *ngFor="let party of parties">
+      <app-lobby-list-item [party]="party"
+        [joinedPartyId]="partyService.joinedPartyId">
+      </app-lobby-list-item>
+    </li>
+  </div>
+  <div>
+    <button *ngIf="!partyService.joinedPartyId" (click)="createParty();">Create Party</button>
+  </div>
+</div>

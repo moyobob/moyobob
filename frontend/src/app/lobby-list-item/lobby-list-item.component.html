@@ -1,4 +1,2 @@
-<button routerLink="/party/{{party.id}}">
-  <span id="party-id">{{party.id}}</span>
-  <span id="party-name">{{party.name}}</span>
-</button>
+<span id="party-id">{{party.id}}</span> <span id="party-name">{{party.name}}</span>
+<button *ngIf="!this.joinedPartyId || this.joinedPartyId === this.party.id" (click)="routeToParty(party.id);">Join</button>

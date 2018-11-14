@@ -26,7 +26,7 @@ describe('UserService', () => {
 
   it('should send request when approved sign in', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.requestSignIn(mockUsername, mockPassword)
+    service.requestSignIn(mockEmail, mockPassword)
     .then(success => {
       expect(success).toBeTruthy();
       expect(service.signedInUsername).toEqual(mockUsername);
@@ -35,7 +35,7 @@ describe('UserService', () => {
     const request = httpTestingController.expectOne('/api/signin/');
     expect(request.request.method).toEqual('POST');
     expect(request.request.body).toEqual({
-      'username': mockUsername,
+      'email': mockEmail,
       'password': mockPassword
     });
     request.flush({
@@ -47,7 +47,7 @@ describe('UserService', () => {
 
   it('should not react when denied sign in', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.requestSignIn(mockUsername, mockPassword)
+    service.requestSignIn(mockEmail, mockPassword)
     .then(success => {
       expect(success).toBeFalsy();
     });
