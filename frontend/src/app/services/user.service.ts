@@ -15,7 +15,7 @@ export class UserService {
 
   requestSignIn(username: string, password: string) {
     return this.http.post<User>('/api/signin/', {
-      'email': username,
+      'username': username,
       'password': password,
     }).toPromise().then(user => {
       this.signedInUsername = user.username;

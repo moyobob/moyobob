@@ -105,4 +105,8 @@ export class PartyService {
     this.subscription.unsubscribe();
     this.webSocket$ = undefined;
   }
+
+  getPartyStateUpdate() {
+    return this.partyStateUpdate;
+  }
 }

@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component } from '@angular/core';
+import { Component, EventEmitter } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
 
@@ -68,7 +69,7 @@ describe('PartyComponent', () => {
 
   beforeEach(async(() => {
     const partyServiceSpy = jasmine.createSpyObj('PartyService', [
-      'getParty', 'joinParty', 'leaveParty', 'connectWebsocket', 'partyStateUpdate'
+      'getParty', 'joinParty', 'leaveParty', 'connectWebsocket', 'getPartyStateUpdate'
     ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -91,7 +92,7 @@ describe('PartyComponent', () => {
 
     partyService = TestBed.get(PartyService);
     partyService.getParty.and.returnValue(new Promise(r => r(mockParty)));
-    partyService.partyStateUpdate = of(undefined);
+    partyService.getPartyStateUpdate.and.returnValue(new EventEmitter());
 
     router = TestBed.get(Router);
   }));
