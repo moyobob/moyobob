@@ -58,7 +58,7 @@ class Party(models.Model):
             'leader_id': self.leader.id,
             'since': str(self.since),
             'member_count': self.member_count,
-            'restaurant': self.restaurant.id if self.restaurant != None else 0,
+            'restaurant': self.restaurant.id if self.restaurant is not None else 0,
         }
 
     def save(self, *args, **kwargs):
