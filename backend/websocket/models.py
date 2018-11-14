@@ -43,7 +43,8 @@ class PartyState(CacheModel):
 
     def __init__(self, party_id: int):
         self.id = party_id
-        self.phase = PartyPhase.ChoosingRestaurant
+        # TODO: Change to ChoosingRestaurant
+        self.phase = PartyPhase.ChoosingMenu
         self.restaurant = None
         self.members = []
         self.menus = []
