@@ -19,11 +19,8 @@ export class LobbyComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    if (this.userService.getSignedInUsername() == null) {
-      this.router.navigate(['/sign-in']);
-    } else {
-      this.getParties();
-    }
+    this.getParties();
+    this.partyService.connectWebsocket();
   }
 
   getParties(): void {

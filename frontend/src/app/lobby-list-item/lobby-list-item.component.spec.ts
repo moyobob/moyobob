@@ -1,8 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+
 import { LobbyListItemComponent } from './lobby-list-item.component';
 import { Party, PartyType } from '../types/party';
-import { RouterTestingModule } from '@angular/router/testing';
 
 const mockLobbyListItem: Party = {
   id: 1,
@@ -20,7 +22,10 @@ describe('LobbyListItemComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule,
+      ],
       declarations: [LobbyListItemComponent],
     })
       .compileComponents();

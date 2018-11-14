@@ -26,7 +26,7 @@ export class PartyCreateComponent implements OnInit {
   }
 
   back() {
-    this.router.navigate(['/party']);
+    this.router.navigate(['/lobby/']);
   }
 
   create() {
@@ -36,6 +36,10 @@ export class PartyCreateComponent implements OnInit {
     this.submitting = true;
 
     this.partyService.addParty(this.party)
-      .then(party => this.router.navigate([`/party/${party.id}`]));
+      .then(party => {
+        this.partyService.joinedPartyId = party.id;
+        this.partyService.connectWebsocket();
+        this.router.navigate(['/party/']);
+      });
   }
 }

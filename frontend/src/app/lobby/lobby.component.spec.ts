@@ -1,12 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Component, Input } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { LobbyComponent } from './lobby.component';
 import { Party, PartyType } from '../types/party';
 import { PartyService } from '../services/party.service';
-import { FormsModule } from '@angular/forms';
-import { Component, Input } from '@angular/core';
 import { User } from '../types/user';
 import { UserService } from '../services/user.service';
-import { Router } from '@angular/router';
 
 const mockUser: User = {
   id: 1,
@@ -38,6 +40,7 @@ const mockParties: Party[] = [
 @Component({ selector: 'app-lobby-list-item', template: '' })
 class MockLobbyListItemComponent {
   @Input() party;
+  @Input() joinedPartyId;
 }
 
 describe('LobbyComponent', () => {
@@ -48,7 +51,7 @@ describe('LobbyComponent', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
-    const partySpy = jasmine.createSpyObj('PartyService', ['getParties']);
+    const partySpy = jasmine.createSpyObj('PartyService', ['getParties', 'connectWebsocket']);
     const userSpy = jasmine.createSpyObj('UserService', ['getSignedInUsername']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -83,12 +86,6 @@ describe('LobbyComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  it('should redirect to signin when not signed in', async( () => {
-    userService.getSignedInUsername.and.returnValue(null);
-    component.ngOnInit();
-    expect(router.navigate).toHaveBeenCalledWith(['/sign-in']);
-  }));
 
   it('should get parties', async(() => {
     component.ngOnInit();
