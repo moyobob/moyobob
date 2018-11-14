@@ -7,7 +7,7 @@ from cauth.models import User
 
 
 def enum_to_choice(enum: IntEnum):
-    return [(tag, tag.value) for tag in enum]
+    return [(tag.value, tag.value) for tag in enum]
 
 
 class PartyType(IntEnum):
