@@ -26,6 +26,7 @@ export class PartyComponent implements OnInit {
     this.getParty();
     this.partyService.connectWebsocket();
     this.partyService.getPartyStateUpdate().subscribe(state => {
+      this.state = state;
       this.getParty();
     });
   }

@@ -8,6 +8,7 @@ import { User } from '../types/user';
 export class UserService {
 
   signedInUsername: String;
+  signedInUserId: number;
 
   constructor(private http: HttpClient) {
     this.signedInUsername = null;
@@ -15,10 +16,11 @@ export class UserService {
 
   requestSignIn(username: string, password: string) {
     return this.http.post<User>('/api/signin/', {
-      'username': username,
+      'email': username,
       'password': password,
     }).toPromise().then(user => {
       this.signedInUsername = user.username;
+      this.signedInUserId = user.id;
       return true;
     }, error => {
       return false;
@@ -36,6 +38,7 @@ export class UserService {
     return this.http.get<User>('/api/verify_session/').toPromise()
     .then(user => {
       this.signedInUsername = user.username;
+      this.signedInUserId = user.id;
       return true;
     }, error => {
       this.signedInUsername = undefined;

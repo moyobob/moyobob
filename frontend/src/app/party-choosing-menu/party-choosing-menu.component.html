@@ -1,3 +1,15 @@
-<p>
-  party-choosing-menu works!
-</p>
+<div>
+  <ul>
+    <li *ngFor="let menu of menus">
+      {{menu.name}}
+      <button *ngIf="randomVal && isAssigned(menu.id);" (click)="assign(menu.id);">
+        Assign
+      </button>
+      <ul>
+        <li *ngFor="let assignee of getAssignee(menu.id, randomVal)">
+          user id {{assignee}}
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

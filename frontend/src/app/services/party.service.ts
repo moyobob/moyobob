@@ -1,5 +1,7 @@
 import { Injectable, Output, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+
+import { Menu } from '../types/menu';
 import { Party, PartyState } from '../types/party';
 
 import { Observable, of, Subscription } from 'rxjs';
@@ -24,6 +26,7 @@ export class PartyService {
   @Output() partyLeave: EventEmitter<number>;
   @Output() partyNotJoined: EventEmitter<void>;
   @Output() partyStateUpdate: EventEmitter<PartyState>;
+  @Output() partyMenuAssign: EventEmitter<void>;
 
   constructor(private http: HttpClient) {
     this.webSocket$ = undefined;
@@ -33,6 +36,7 @@ export class PartyService {
     this.partyLeave = new EventEmitter();
     this.partyNotJoined = new EventEmitter();
     this.partyStateUpdate = new EventEmitter();
+    this.partyMenuAssign = new EventEmitter();
   }
 
   async getParties(): Promise<Party[]> {
@@ -60,6 +64,12 @@ export class PartyService {
     await this.http.delete(`api/party/${id}/`, httpOptions).toPromise();
   }
 
+  async getMenus(): Promise<Menu[]> {
+    return await this.http.get<Menu[]>(
+      `api/restaurant/${this.partyState.restaurant}/menu/`
+    ).toPromise();
+  }
+
   handleWebsocket(json: any): void {
     if (json['type'] === 'party.join') {
       this.partyJoin.emit(json['user_id']);
@@ -75,10 +85,15 @@ export class PartyService {
         this.partyNotJoined.emit();
       }
     } else if (json['type'] === 'state.update') {
+      json['state']['restaurant'] = 1;
       console.log(json['state']);
       this.partyState = json['state'];
       this.joinedPartyId = json['state']['id'];
       this.partyStateUpdate.emit(this.partyState);
+    } else if (json['type'] === 'menu.assign') {
+      console.log(json['user_id'], json['menu_id']);
+      this.partyState.menus.push([json['user_id'], json['menu_id']]);
+      this.partyMenuAssign.emit();
     }
   }
 
@@ -108,5 +123,14 @@ export class PartyService {
 
   getPartyStateUpdate() {
     return this.partyStateUpdate;
+  }
+
+  assignToMenu(menuId: number, userId: number) {
+    console.log(menuId, userId);
+    this.webSocket$.next({
+      'command': 'menu.assign',
+      'user_id': userId,
+      'menu_id': menuId
+    });
   }
 }

@@ -4,7 +4,7 @@
     <span>{{party.location}}</span>
     <span>{{party.members_count}}</span>
   </div>
-  <div [ngSwitch]="party.type">
+  <div [ngSwitch]="state.phase">
     <app-party-choosing-restaurant *ngSwitchCase="0"></app-party-choosing-restaurant>
     <app-party-choosing-menu *ngSwitchCase="1"></app-party-choosing-menu>
     <app-party-ordering *ngSwitchCase="2"></app-party-ordering>
