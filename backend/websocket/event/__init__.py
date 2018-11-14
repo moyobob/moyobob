@@ -1,3 +1,6 @@
+from . import error
+
+
 def party_join(user_id: int):
     return {
         'type': 'party.join',
