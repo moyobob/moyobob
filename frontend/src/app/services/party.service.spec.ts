@@ -38,7 +38,7 @@ const mockParty: Party = {
 describe('PartyService', () => {
   let httpTestingController: HttpTestingController;
   let partyService: PartyService;
-  const partyApi = 'api/party';
+  const partyApi = 'api/party/';
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
@@ -53,17 +53,17 @@ describe('PartyService', () => {
   }));
 
   it('should get all parties with get request', async(() => {
-    partyService.getParties().then( parties => expect(parties).toEqual(mockParties));
+    partyService.getParties().then(parties => expect(parties).toEqual(mockParties));
 
     const req = httpTestingController.expectOne(partyApi);
     expect(req.request.method).toEqual('GET');
     req.flush(mockParties);
   }));
 
-  it('should get party of id with get request', async( () => {
+  it('should get party of id with get request', async(() => {
     partyService.getParty(mockParty.id).then(party => expect(party).toEqual(mockParty));
 
-    const req = httpTestingController.expectOne(`${partyApi}/${mockParty.id}`);
+    const req = httpTestingController.expectOne(`${partyApi}${mockParty.id}/`);
     expect(req.request.method).toEqual('GET');
     req.flush(mockParty);
   }));
@@ -78,22 +78,22 @@ describe('PartyService', () => {
       since: 'Since 0',
       memberCount: 1,
     };
-    partyService.addParty(newParty).then( party => expect(party).toEqual(mockParty));
+    partyService.addParty(newParty).then(party => expect(party).toEqual(mockParty));
     const req = httpTestingController.expectOne(partyApi);
     expect(req.request.method).toEqual('POST');
     req.flush(mockParty);
   }));
 
-  it('should update party with put request', async( () => {
-    partyService.updateParty(mockParty).then( party => expect(party).toEqual(mockParty));
-    const req = httpTestingController.expectOne(`${partyApi}/${mockParty.id}`);
+  it('should update party with put request', async(() => {
+    partyService.updateParty(mockParty).then(party => expect(party).toEqual(mockParty));
+    const req = httpTestingController.expectOne(`${partyApi}${mockParty.id}/`);
     expect(req.request.method).toEqual('PUT');
     req.flush(mockParty);
   }));
 
-  it('should delete party with delete request', async( () => {
+  it('should delete party with delete request', async(() => {
     partyService.deleteParty(mockParty.id);
-    const req = httpTestingController.expectOne(`${partyApi}/${mockParty.id}`);
+    const req = httpTestingController.expectOne(`${partyApi}${mockParty.id}/`);
     expect(req.request.method).toEqual('DELETE');
     req.flush({});
   }));
