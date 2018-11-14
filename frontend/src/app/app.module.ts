@@ -9,6 +9,12 @@ import { LobbyListItemComponent } from './lobby-list-item/lobby-list-item.compon
 import { SignInComponent } from './sign-in/sign-in.component';
 import { LobbyComponent } from './lobby/lobby.component';
 import { PartyCreateComponent } from './party-create/party-create.component';
+import { PartyComponent } from './party/party.component';
+import { PartyChoosingMenuComponent } from './party-choosing-menu/party-choosing-menu.component';
+import { PartyChoosingRestaurantComponent } from './party-choosing-restaurant/party-choosing-restaurant.component';
+import { PartyOrderingComponent } from './party-ordering/party-ordering.component';
+import { PartyOrderedComponent } from './party-ordered/party-ordered.component';
+import { PartyPaymentComponent } from './party-payment/party-payment.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +23,12 @@ import { PartyCreateComponent } from './party-create/party-create.component';
     SignInComponent,
     LobbyComponent,
     PartyCreateComponent,
+    PartyComponent,
+    PartyChoosingMenuComponent,
+    PartyChoosingRestaurantComponent,
+    PartyOrderingComponent,
+    PartyOrderedComponent,
+    PartyPaymentComponent
   ],
   imports: [
     AppRoutingModule,
