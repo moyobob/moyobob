@@ -59,6 +59,20 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         await self.accept()
 
+    async def disconnect(self, _):
+        user = self.scope['user']
+        if not user.is_authenticated:
+            return
+
+        party_id = cache.get('user-party:{}'.format(user.id))
+        if party_id is None:
+            return
+
+        await self.channel_layer.group_discard(
+            'party-{}'.format(party_id),
+            self.channel_name,
+        )
+
     async def receive_json(self, msg):
         if not self.scope['user'].is_authenticated:
             await self.close(WEBSOCKET_DISCONNECT_UNAUTHORIZED)
