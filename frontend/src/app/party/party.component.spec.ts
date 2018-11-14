@@ -2,6 +2,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component } from '@angular/core';
 
+import { Observable, of } from 'rxjs';
+
 import { PartyComponent } from './party.component';
 import { PartyService } from '../services/party.service';
 import { Party, PartyType } from '../types/party';
@@ -65,7 +67,9 @@ describe('PartyComponent', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
-    const partyServiceSpy = jasmine.createSpyObj('PartyService', ['getParty', 'joinParty', 'leaveParty']);
+    const partyServiceSpy = jasmine.createSpyObj('PartyService', [
+      'getParty', 'joinParty', 'leaveParty', 'connectWebsocket', 'partyStateUpdate'
+    ]);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -87,6 +91,7 @@ describe('PartyComponent', () => {
 
     partyService = TestBed.get(PartyService);
     partyService.getParty.and.returnValue(new Promise(r => r(mockParty)));
+    partyService.partyStateUpdate = of(undefined);
 
     router = TestBed.get(Router);
   }));
