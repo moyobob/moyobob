@@ -132,7 +132,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
             'data': 'bar',
         })
         resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.error('Invalid command'))
+        self.assertDictEqual(resp, event.error.invalid_command())
 
     @async_test
     async def test_invalid_data(self):
@@ -143,7 +143,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
             'foo': 'bar',
         })
         resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.error('Invalid data'))
+        self.assertDictEqual(resp, event.error.invalid_data())
 
     @async_test
     async def test_party_join(self):
@@ -173,7 +173,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
             'party_id': 0,
         })
         resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.error('Party does not exist'))
+        self.assertDictEqual(resp, event.error.invalid_party())
 
     @async_test
     async def test_party_join_state_does_not_exist(self):
@@ -188,7 +188,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
             'party_id': party_id,
         })
         resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.error('Party does not exist'))
+        self.assertDictEqual(resp, event.error.invalid_party())
 
     @async_test
     async def test_party_leave_and_deleted(self):
@@ -217,8 +217,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
             'command': 'party.leave',
         })
         resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.error(
-            'You are currently not in the party'))
+        self.assertDictEqual(resp, event.error.not_joined())
 
     @async_test
     async def test_party_leave_does_not_exist(self):
@@ -233,7 +232,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
             'command': 'party.leave',
         })
         resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.error('Party does not exist'))
+        self.assertDictEqual(resp, event.error.invalid_party())
 
     @async_test
     async def test_party_leave_deleted_state(self):
@@ -258,8 +257,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
             'party_id': self.party.id,
         })
         resp = await self.communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.error(
-            'You are already joined to a party'))
+        self.assertDictEqual(resp, event.error.already_joined())
 
     @async_test
     async def test_already_joined_connection(self):

@@ -63,7 +63,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             (_, state) = get_party_of_user(user.id)
         except NotInPartyError:
             await self.send_json(
-                event.error("You are currently not in the party")
+                event.initially_not_joined()
             )
             return
 
@@ -96,15 +96,15 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             try:
                 await command(msg)
             except KeyError:
-                await self.send_json(event.error('Invalid data'))
+                await self.send_json(event.error.invalid_data())
             except Party.DoesNotExist:
-                await self.send_json(event.error('Party does not exist'))
+                await self.send_json(event.error.invalid_party())
             except NotInPartyError:
-                await self.send_json(event.error('You are currently not in the party'))
+                await self.send_json(event.error.not_joined())
             except AlreadyJoinedError:
-                await self.send_json(event.error('You are already joined to a party'))
+                await self.send_json(event.error.already_joined())
         else:
-            await self.send_json(event.error('Invalid command'))
+            await self.send_json(event.error.invalid_command())
 
     async def command_party_join(self, msg):
         user = self.scope['user']
