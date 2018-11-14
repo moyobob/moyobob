@@ -199,14 +199,8 @@ class PartyTestCase(TestCaseWithHttp):
 
         resp_json = resp.json()
         self.assertEqual(len(resp_json), 2)
-        self.assertEqual(resp_json[0]['name'], self.party1.name)
-        self.assertEqual(resp_json[0]['type'], self.party1.type)
-        self.assertEqual(resp_json[0]['location'], self.party1.location)
-        self.assertEqual(resp_json[0]['leader_id'], self.party1.leader.id)
-        self.assertEqual(resp_json[1]['name'], self.party2.name)
-        self.assertEqual(resp_json[1]['type'], self.party2.type)
-        self.assertEqual(resp_json[1]['location'], self.party2.location)
-        self.assertEqual(resp_json[1]['leader_id'], self.party2.leader.id)
+        self.assertListEqual(
+            resp_json, [self.party1.as_dict(), self.party2.as_dict()])
 
     def test_post_party(self):
         self.login()
@@ -284,6 +278,16 @@ class PartyTestCase(TestCaseWithHttp):
 
         resp_json = resp.json()
         self.assertDictEqual(resp_json, self.party1.as_dict())
+
+    def test_party_restaurant_field(self):
+        self.assertEqual(self.party1.as_dict()['restaurant'], 0)
+
+        restaurant = Restaurant(name="Rustaurant")
+        restaurant.save()
+        self.party1.restaurant = restaurant
+        self.party1.save()
+
+        self.assertEqual(self.party1.as_dict()['restaurant'], restaurant.id)
 
 
 class RestaurantTestCase(TestCaseWithHttp):
