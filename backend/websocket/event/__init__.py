@@ -1,13 +1,3 @@
-from .models import PartyState
-
-
-def error(cause: str):
-    return {
-        'type': 'error',
-        'error': cause,
-    }
-
-
 def party_join(user_id: int):
     return {
         'type': 'party.join',
@@ -38,8 +28,14 @@ def menu_unassign(user_id: int, menu_id: int):
     }
 
 
-def state_update(state: PartyState):
+def state_update(state):
     return {
         'type': 'state.update',
         'state': state.as_dict(),
+    }
+
+
+def initially_not_joined():
+    return {
+        'type': 'initial.not.joined',
     }
