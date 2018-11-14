@@ -22,8 +22,9 @@ export class PartyComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.id = +this.activatedRoute.snapshot.paramMap.get('id');
+    this.id = this.partyService.joinedPartyId;
     this.getParty();
+    this.joinParty();
   }
 
   getParty(): void {
@@ -34,11 +35,11 @@ export class PartyComponent implements OnInit {
   }
 
   joinParty(): void {
-    this.partyService.joinParty(this.id);
+    this.partyService.joinParty();
   }
 
   leaveParty(): void {
-    this.partyService.leaveParty(this.id);
-    this.router.navigate(['/party']);
+    this.partyService.leaveParty();
+    this.router.navigate(['/lobby/']);
   }
 }

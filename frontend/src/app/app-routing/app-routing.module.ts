@@ -9,9 +9,9 @@ import { PartyComponent } from '../party/party.component';
 
 const routes: Routes = [
   { path: 'sign-in', component: SignInComponent, canActivate: [AuthGuard] },
-  { path: 'party', component: LobbyComponent, canActivate: [AuthGuard] },
+  { path: 'lobby', component: LobbyComponent, canActivate: [AuthGuard] },
   { path: 'party/new', component: PartyCreateComponent, canActivate: [AuthGuard] },
-  { path: 'party/:id', component: PartyComponent, canActivate: [AuthGuard] },
+  { path: 'party', component: PartyComponent, canActivate: [AuthGuard] },
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
   { path: '**', redirectTo: '/sign-in' },
 ];
