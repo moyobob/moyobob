@@ -1,13 +1,12 @@
 from django.test import TestCase, Client
 from django.core.cache import cache
-from django.contrib.auth.models import User
 from channels.testing import WebsocketCommunicator
 import asyncio
 import json
 
 from backend.routings import application
 from .consumer import WebsocketConsumer
-from api.models import Party, PartyType
+from api.models import User, Party, PartyType
 from websocket import event
 
 

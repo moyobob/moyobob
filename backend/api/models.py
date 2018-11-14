@@ -1,10 +1,9 @@
 from django.db import models
-from django.forms.models import model_to_dict
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from enum import IntEnum
 
 from websocket.models import PartyState
+from cauth.models import User
 
 
 def enum_to_choice(enum: IntEnum):

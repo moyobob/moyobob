@@ -1,20 +1,12 @@
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed, HttpResponseNotFound
-from django.contrib.auth.models import User
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.db.utils import IntegrityError
 import json
 from json.decoder import JSONDecodeError
 
-from .models import Party, PartyType, Restaurant, Menu
-
-
-def user_as_dict(user: User):
-    return {
-        'id': user.id,
-        'username': user.username,
-        'email': user.email,
-    }
+from .models import User, Party, PartyType, Restaurant, Menu
 
 
 def HttpResponseOk(*args, **kwargs):
@@ -33,7 +25,11 @@ def signup(request: HttpRequest):
     except (JSONDecodeError, KeyError):
         return HttpResponseBadRequest()
 
-    User.objects.create_user(username=username, password=password, email=email)
+    try:
+        User.objects.create_user(
+            username=username, password=password, email=email)
+    except IntegrityError:
+        return HttpResponseBadRequest()
 
     return HttpResponseOk()
 
@@ -57,7 +53,7 @@ def signin(request: HttpRequest):
         return HttpResponseForbidden()
 
     login(request, user)
-    return JsonResponse(user_as_dict(user))
+    return JsonResponse(user.as_dict())
 
 
 def signout(request: HttpRequest):
@@ -81,7 +77,7 @@ def verify_session(request: HttpRequest):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
 
-    return JsonResponse(user_as_dict(request.user))
+    return JsonResponse(request.user.as_dict())
 
 
 def party(request: HttpRequest):
