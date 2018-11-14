@@ -7,9 +7,11 @@ import { User } from '../types/user';
 })
 export class UserService {
 
-  constructor(private http: HttpClient) { }
-
   signedInUsername: String;
+
+  constructor(private http: HttpClient) {
+    this.signedInUsername = null;
+  }
 
   requestSignIn(username: string, password: string) {
     return this.http.post<User>('/api/signin/', {
@@ -25,6 +27,20 @@ export class UserService {
 
   getSignedInUsername() {
     return this.signedInUsername;
+  }
+
+  verifyUser() {
+    if (this.signedInUsername !== null) {
+      return new Promise(resolve => resolve(this.signedInUsername !== undefined));
+    }
+    return this.http.get<User>('/api/verify_session/').toPromise()
+    .then(user => {
+      this.signedInUsername = user.username;
+      return true;
+    }, error => {
+      this.signedInUsername = undefined;
+      return false;
+    });
   }
 
 }
