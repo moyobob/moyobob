@@ -22,12 +22,16 @@ export class PartyComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.id = this.partyService.joinedPartyId;
-    this.getParty();
     this.joinParty();
+    this.getParty();
+    this.partyService.connectWebsocket();
+    this.partyService.partyStateUpdate.subscribe(state => {
+      this.getParty();
+    });
   }
 
   getParty(): void {
+    this.id = this.partyService.joinedPartyId;
     this.partyService.getParty(this.id)
       .then(party => {
         this.party = party;
@@ -35,7 +39,7 @@ export class PartyComponent implements OnInit {
   }
 
   joinParty(): void {
-    this.partyService.joinParty();
+    this.partyService.connectWebsocket();
   }
 
   leaveParty(): void {

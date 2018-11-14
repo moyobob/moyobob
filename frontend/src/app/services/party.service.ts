@@ -40,7 +40,11 @@ export class PartyService {
   }
 
   async getParty(id: number): Promise<Party> {
-    return await this.http.get<Party>(`api/party/${id}/`, httpOptions).toPromise();
+    if (id) {
+      return await this.http.get<Party>(`api/party/${id}/`, httpOptions).toPromise();
+    } else {
+      return await undefined;
+    }
   }
 
   async addParty(party: Partial<Party>): Promise<Party> {
@@ -56,34 +60,39 @@ export class PartyService {
     await this.http.delete(`api/party/${id}/`, httpOptions).toPromise();
   }
 
-  handleWebsocket(closureThis: PartyService, json: any): void {
+  handleWebsocket(json: any): void {
     if (json['type'] === 'party.join') {
-      closureThis.partyJoin.emit(json['user_id']);
+      this.partyJoin.emit(json['user_id']);
     } else if (json['type'] === 'party.leave') {
-      closureThis.partyLeave.emit(json['user_id']);
+      this.partyLeave.emit(json['user_id']);
     } else if (json['type'] === 'initial.not.joined') {
-      console.log(closureThis.joinedPartyId);
-      if (closureThis.joinedPartyId) {
-        closureThis.webSocket$.next({
+      if (this.joinedPartyId) {
+        this.webSocket$.next({
           'command': 'party.join',
-          'party_id': closureThis.joinedPartyId
+          'party_id': this.joinedPartyId
         });
       } else {
-        closureThis.partyNotJoined.emit();
+        this.partyNotJoined.emit();
       }
     } else if (json['type'] === 'state.update') {
-      closureThis.partyState = json['state'];
-      closureThis.partyStateUpdate.emit(closureThis.partyState);
+      console.log(json['state']);
+      this.partyState = json['state'];
+      this.joinedPartyId = json['state']['id'];
+      this.partyStateUpdate.emit(this.partyState);
     }
   }
 
-  joinParty(): void {
+  connectWebsocket(): void {
     if (this.webSocket$ === undefined) {
+      console.log('ws connected!');
       this.webSocket$ = new WebSocketSubject('ws://localhost:8000/ws/party/');
+      this.subscription = this.webSocket$.subscribe(json => this.handleWebsocket(json));
+    } else {
+      this.webSocket$.next({
+        'command': 'party.join',
+        'party_id': this.joinedPartyId
+      });
     }
-    this.subscription = this.webSocket$.subscribe(json =>
-      this.handleWebsocket(this, json)
-    );
   }
 
   leaveParty(): void {

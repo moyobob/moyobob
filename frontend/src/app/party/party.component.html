@@ -13,7 +13,7 @@
     <div *ngSwitchDefault></div>
   </div>
   <div>
-    <button routerLink="/party">Lobby</button>
+    <button routerLink="/lobby/">Lobby</button>
     <button *ngIf="partyService.joinedPartyId === 0" (click)="joinParty()">Join</button>
     <button *ngIf="partyService.joinedPartyId === id" (click)="leaveParty()">Leave</button>
   </div>
