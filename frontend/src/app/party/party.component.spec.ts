@@ -1,5 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Component } from '@angular/core';
 
 import { PartyComponent } from './party.component';
 import { PartyService } from '../services/party.service';
@@ -30,6 +31,33 @@ class MockActivatedRoute {
   snapshot = new MockSnapshot();
 }
 
+@Component({ selector: 'app-party-choosing-restaurant', template: '' })
+export class MockPartyChoosingRestaurantComponent {
+
+}
+
+@Component({ selector: 'app-party-choosing-menu', template: '' })
+export class MockPartyChoosingMenuComponent {
+
+}
+
+@Component({ selector: 'app-party-ordering', template: '' })
+export class MockPartyOrderingComponent {
+
+}
+
+
+@Component({ selector: 'app-party-ordered', template: '' })
+export class MockPartyOrderedComponent {
+
+}
+
+@Component({ selector: 'app-party-payment', template: '' })
+export class MockPartyPaymentComponent {
+
+}
+
+
 describe('PartyComponent', () => {
   let component: PartyComponent;
   let fixture: ComponentFixture<PartyComponent>;
@@ -41,7 +69,14 @@ describe('PartyComponent', () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
-      declarations: [PartyComponent],
+      declarations: [
+        PartyComponent,
+        MockPartyChoosingRestaurantComponent,
+        MockPartyChoosingMenuComponent,
+        MockPartyOrderingComponent,
+        MockPartyOrderedComponent,
+        MockPartyPaymentComponent,
+      ],
       providers: [
         { provide: PartyService, useValue: partyServiceSpy },
         { provide: Router, useValue: routerSpy },
