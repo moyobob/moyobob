@@ -14,8 +14,6 @@ export class PartyComponent implements OnInit {
   party: Party;
   state: PartyState;
   id: number;
-  // group: Group;
-  // user: User;
 
   constructor(
     private partyService: PartyService,
