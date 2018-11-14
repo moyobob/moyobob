@@ -8,13 +8,15 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
 import { LobbyListItemComponent } from './lobby-list-item/lobby-list-item.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { LobbyComponent } from './lobby/lobby.component';
+import { PartyCreateComponent } from './party-create/party-create.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LobbyListItemComponent,
     SignInComponent,
-    LobbyComponent
+    LobbyComponent,
+    PartyCreateComponent,
   ],
   imports: [
     AppRoutingModule,
