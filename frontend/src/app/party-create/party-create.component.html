@@ -1,0 +1,18 @@
+<div>
+  <div>
+    <input type="text" [(ngModel)]="party.name" placeholder="Name" autofocus>
+  </div>
+  <div>
+    <select [(ngModel)]="party.type">
+      <option value="0">In Group</option>
+      <option value="1">Private</option>
+    </select>
+  </div>
+  <div>
+    <input type="text" [(ngModel)]="party.location" placeholder="Location" autofocus>
+  </div>
+  <div>
+    <button (click)="back();">Back</button>
+    <button (click)="create();">Create</button>
+  </div>
+</div>
