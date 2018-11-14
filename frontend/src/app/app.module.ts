@@ -7,12 +7,14 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { LobbyListItemComponent } from './lobby-list-item/lobby-list-item.component';
 import { SignInComponent } from './sign-in/sign-in.component';
+import { LobbyComponent } from './lobby/lobby.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LobbyListItemComponent,
     SignInComponent,
+    LobbyComponent
   ],
   imports: [
     AppRoutingModule,
