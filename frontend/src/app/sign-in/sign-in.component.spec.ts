@@ -9,7 +9,7 @@ import { SignInComponent } from './sign-in.component';
 import { UserService } from '../services/user.service';
 
 class MockUserService {
-  requestSignIn(username: string, password: string) { }
+  requestSignIn(email: string, password: string) { }
 }
 
 describe('SignInComponent', () => {
@@ -20,7 +20,7 @@ describe('SignInComponent', () => {
   let router: jasmine.SpyObj<Router>;
   let spy: jasmine.Spy;
 
-  const mockUsername = 'kipa00';
+  const mockEmail = 'kipa00';
   const mockPassword = 'aSimpleYetStrongMockP@ssw0rd';
 
   beforeEach(async(() => {
@@ -59,7 +59,7 @@ describe('SignInComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should not call anything if username empty', () => {
+  it('should not call anything if email empty', () => {
     component.passwordInput = mockPassword;
     component.trySignIn(undefined);
 
@@ -68,7 +68,7 @@ describe('SignInComponent', () => {
   });
 
   it('should not call anything if password empty', async(() => {
-    component.usernameInput = mockUsername;
+    component.emailInput = mockEmail;
     component.trySignIn(undefined);
 
     expect(spy).toHaveBeenCalledTimes(0);
@@ -78,13 +78,13 @@ describe('SignInComponent', () => {
   it('should call requestSignIn if both filled', async(() => {
     spy.and.returnValue(of(true).toPromise());
 
-    component.usernameInput = mockUsername;
+    component.emailInput = mockEmail;
     component.passwordInput = mockPassword;
     component.trySignIn(undefined);
 
     fixture.whenStable().then(() => {
       expect(spy).toHaveBeenCalledWith(
-        mockUsername, mockPassword
+        mockEmail, mockPassword
       );
 
       expect(router.navigateByUrl).toHaveBeenCalledWith('/party');
@@ -95,13 +95,13 @@ describe('SignInComponent', () => {
     async(() => {
       spy.and.returnValue(of(false).toPromise());
 
-      component.usernameInput = mockUsername;
+      component.emailInput = mockEmail;
       component.passwordInput = mockPassword;
       component.trySignIn(undefined);
 
       fixture.whenStable().then(() => {
         expect(spy).toHaveBeenCalledWith(
-          mockUsername, mockPassword
+          mockEmail, mockPassword
         );
 
         expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
@@ -112,13 +112,13 @@ describe('SignInComponent', () => {
   it('should call requestSignIn if both filled and enter', async(() => {
     spy.and.returnValue(of(true).toPromise());
 
-    component.usernameInput = mockUsername;
+    component.emailInput = mockEmail;
     component.passwordInput = mockPassword;
     component.trySignIn({'key': 'Enter'});
 
     fixture.whenStable().then(() => {
       expect(spy).toHaveBeenCalledWith(
-        mockUsername, mockPassword
+        mockEmail, mockPassword
       );
 
       expect(router.navigateByUrl).toHaveBeenCalledWith('/party');
@@ -128,7 +128,7 @@ describe('SignInComponent', () => {
   it('should call anything if both filled but not enter', async(() => {
     spy.and.returnValue(of(true).toPromise());
 
-    component.usernameInput = mockUsername;
+    component.emailInput = mockEmail;
     component.passwordInput = mockPassword;
     component.trySignIn({'key': 'a'});
 
