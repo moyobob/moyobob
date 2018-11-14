@@ -59,6 +59,18 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         await self.accept()
 
+        try:
+            (_, state) = get_party_of_user(user.id)
+        except NotInPartyError:
+            await self.send_json(
+                event.error("You are currently not in the party")
+            )
+            return
+
+        await self.send_json(
+            event.state_update(state)
+        )
+
     async def disconnect(self, _):
         user = self.scope['user']
         if not user.is_authenticated:

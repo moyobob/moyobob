@@ -68,6 +68,7 @@ class WebsocketConnectionTestCase(TestCaseWithCache):
         communicator.scope['user'] = user
 
         await communicator.connect()
+        await communicator.receive_json_from(1)
 
         self.client.logout()
         communicator.scope['user'] = AnonymousUser()
@@ -112,6 +113,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
         communicator.scope['user'] = user
 
         await communicator.connect()
+        await communicator.receive_json_from(1)
 
         self.user = user
         self.party = party
@@ -260,6 +262,20 @@ class SingleWebsocketTestCase(TestCaseWithCache):
         self.assertDictEqual(resp, event.error(
             'You are already joined to a party'))
 
+    @async_test
+    async def test_already_joined_connection(self):
+        await self.join()
+
+        await self.communicator.disconnect()
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = self.user
+
+        await communicator.connect()
+        resp = await communicator.receive_json_from(1)
+
+        self.assertDictEqual(resp, event.state_update(self.party.state))
+
 
 class DoubleWebsocketTestCase(TestCaseWithCache):
     async def join_both(self):
@@ -308,6 +324,8 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
 
         await communicator1.connect()
         await communicator2.connect()
+        await communicator1.receive_json_from(1)
+        await communicator2.receive_json_from(1)
 
         self.user1 = user1
         self.user2 = user2
