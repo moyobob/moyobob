@@ -15,19 +15,21 @@ def party_leave(user_id: int):
     }
 
 
-def menu_assign(user_id: int, menu_id: int):
+def menu_assign(menu_id: int, quantity: int, users: list):
     return {
         'type': 'menu.assign',
-        'user_id': user_id,
         'menu_id': menu_id,
+        'quantity': quantity,
+        'users': users,
     }
 
 
-def menu_unassign(user_id: int, menu_id: int):
+def menu_unassign(menu_id: int, quantity: int, users: list):
     return {
         'type': 'menu.unassign',
-        'user_id': user_id,
         'menu_id': menu_id,
+        'quantity': quantity,
+        'users': users,
     }
 
 

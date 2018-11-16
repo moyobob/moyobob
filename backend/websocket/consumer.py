@@ -164,37 +164,56 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             party.delete()
 
     async def command_menu_assign(self, data):
-        user_id = data['user_id']
         menu_id = data['menu_id']
+        quantity = data['quantity']
+        users = data['users']
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        if (user_id, menu_id) in state.menus:
-            return
+        for (m, q, u) in state.menus:
+            if m == menu_id and q == quantity:
+                if all(map(lambda user: user in u, users)):
+                    await self.send_json(
+                        event.error.already_assigned(),
+                    )
+                    return
+                else:
+                    u.extend(users)
+                    break
+        else:
+            state.menus.append((menu_id, quantity, users))
 
-        state.menus.append((user_id, menu_id))
         state.save()
 
         await self.channel_layer.group_send(
             'party-{}'.format(party.id),
-            event.menu_assign(user_id, menu_id)
+            event.menu_assign(menu_id, quantity, users)
         )
 
     async def command_menu_unassign(self, data):
-        user_id = data['user_id']
         menu_id = data['menu_id']
+        quantity = data['quantity']
+        users = data['users']
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        if (user_id, menu_id) not in state.menus:
+        for (m, q, u) in state.menus:
+            if m == menu_id and q == quantity:
+                for user in users:
+                    u.remove(user)
+                break
+        else:
+            await self.send_json(
+                event.error.not_assigned(),
+            )
             return
 
-        state.menus.remove((user_id, menu_id))
+        state.menus = list(filter(lambda t: len(t[2]) > 0, state.menus))
         state.save()
 
         await self.channel_layer.group_send(
             'party-{}'.format(party.id),
-            event.menu_unassign(user_id, menu_id)
+            event.menu_unassign(menu_id, quantity, users)
         )
 
     async def party_join(self, data):
@@ -212,17 +231,19 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def menu_assign(self, data):
-        user_id = data['user_id']
         menu_id = data['menu_id']
+        quantity = data['quantity']
+        users = data['users']
 
         await self.send_json(
-            event.menu_assign(user_id, menu_id)
+            event.menu_assign(menu_id, quantity, users)
         )
 
     async def menu_unassign(self, data):
-        user_id = data['user_id']
         menu_id = data['menu_id']
+        quantity = data['quantity']
+        users = data['users']
 
         await self.send_json(
-            event.menu_unassign(user_id, menu_id)
+            event.menu_unassign(menu_id, quantity, users)
         )

@@ -395,33 +395,50 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
 
         await communicator1.send_json_to({
             'command': 'menu.assign',
-            'user_id': user1.id,
             'menu_id': 11,
+            'quantity': 1,
+            'users': [user1.id],
         })
         await communicator1.receive_json_from(1)
         resp = await communicator2.receive_json_from(1)
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_assign(user1.id, 11))
-        self.assertListEqual(state.menus, [(user1.id, 11)])
+        self.assertDictEqual(resp, event.menu_assign(11, 1, [user1.id]))
+        self.assertListEqual(state.menus, [(11, 1, [user1.id])])
 
         await communicator2.send_json_to({
             'command': 'menu.assign',
-            'user_id': user2.id,
-            'menu_id': 22,
+            'menu_id': 11,
+            'quantity': 1,
+            'users': [user2.id],
         })
         await communicator2.receive_json_from(1)
         resp = await communicator1.receive_json_from(1)
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_assign(user2.id, 22))
-        self.assertListEqual(state.menus, [(user1.id, 11), (user2.id, 22)])
+        self.assertDictEqual(resp, event.menu_assign(11, 1, [user2.id]))
+        self.assertListEqual(state.menus, [(11, 1, [user1.id, user2.id])])
 
         await communicator2.send_json_to({
             'command': 'menu.assign',
-            'user_id': user2.id,
             'menu_id': 22,
+            'quantity': 2,
+            'users': [user2.id],
         })
-        await communicator1.receive_nothing()
-        await communicator2.receive_nothing()
+        await communicator2.receive_json_from(1)
+        resp = await communicator1.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_assign(22, 2, [user2.id]))
+        self.assertListEqual(
+            state.menus, [(11, 1, [user1.id, user2.id]), (22, 2, [user2.id])])
+
+        await communicator2.send_json_to({
+            'command': 'menu.assign',
+            'menu_id': 11,
+            'quantity': 1,
+            'users': [user2.id],
+        })
+        await communicator1.receive_nothing(1)
+        resp = await communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.already_assigned())
 
     @async_test
     async def test_menu_unassign(self):
@@ -431,37 +448,53 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
         communicator1 = self.communicator1
         communicator2 = self.communicator2
         state = party.state
-        state.menus = [(user1.id, 11), (user2.id, 22)]
+        state.menus = [(11, 1, [user1.id, user2.id]), (22, 2, [user2.id])]
         state.save()
 
         await self.join_both()
 
-        await communicator1.send_json_to({
-            'command': 'menu.unassign',
-            'user_id': user1.id,
-            'menu_id': 11,
-        })
-        await communicator1.receive_json_from(1)
-        resp = await communicator2.receive_json_from(1)
-        state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_unassign(user1.id, 11))
-        self.assertListEqual(state.menus, [(user2.id, 22)])
-
         await communicator2.send_json_to({
             'command': 'menu.unassign',
-            'user_id': user2.id,
             'menu_id': 22,
+            'quantity': 2,
+            'users': [user2.id],
         })
         await communicator2.receive_json_from(1)
         resp = await communicator1.receive_json_from(1)
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_unassign(user2.id, 22))
+        self.assertDictEqual(resp, event.menu_unassign(22, 2, [user2.id]))
+        self.assertListEqual(state.menus, [(11, 1, [user1.id, user2.id])])
+
+        await communicator1.send_json_to({
+            'command': 'menu.unassign',
+            'menu_id': 11,
+            'quantity': 1,
+            'users': [user1.id],
+        })
+        await communicator1.receive_json_from(1)
+        resp = await communicator2.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_unassign(11, 1, [user1.id]))
+        self.assertListEqual(state.menus, [(11, 1, [user2.id])])
+
+        await communicator2.send_json_to({
+            'command': 'menu.unassign',
+            'menu_id': 11,
+            'quantity': 1,
+            'users': [user2.id],
+        })
+        await communicator2.receive_json_from(1)
+        resp = await communicator1.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_unassign(11, 1, [user2.id]))
         self.assertListEqual(state.menus, [])
 
         await communicator2.send_json_to({
             'command': 'menu.unassign',
-            'user_id': user2.id,
-            'menu_id': 22,
+            'menu_id': 11,
+            'quantity': 1,
+            'users': [user2.id],
         })
         await communicator1.receive_nothing()
-        await communicator2.receive_nothing()
+        resp = await communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.not_assigned())

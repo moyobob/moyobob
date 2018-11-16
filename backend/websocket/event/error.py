@@ -26,3 +26,15 @@ def already_joined():
     return {
         'type': 'error.already.joined',
     }
+
+
+def already_assigned():
+    return {
+        'type': 'error.already.assigned',
+    }
+
+
+def not_assigned():
+    return {
+        'type': 'error.not.assigned',
+    }
