@@ -6,6 +6,7 @@ import json
 
 from backend.routings import application
 from .consumer import WebsocketConsumer
+from .models import MenuEntries
 from api.models import User, Party, PartyType
 from websocket import event
 
@@ -383,7 +384,7 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
         self.assertIsNone(cache.get('user-party:{}'.format(user1.id)))
 
     @async_test
-    async def test_menu_assign(self):
+    async def test_menu_create(self):
         user1 = self.user1
         user2 = self.user2
         party = self.party
@@ -394,107 +395,181 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
         await self.join_both()
 
         await communicator1.send_json_to({
-            'command': 'menu.assign',
+            'command': 'menu.create',
             'menu_id': 11,
             'quantity': 1,
             'users': [user1.id],
         })
         await communicator1.receive_json_from(1)
         resp = await communicator2.receive_json_from(1)
+        id1 = resp['menu_entry_id']
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_assign(11, 1, [user1.id]))
-        self.assertListEqual(state.menus, [(11, 1, [user1.id])])
+        self.assertDictEqual(resp, event.menu_create(id1, 11, 1, [user1.id]))
+        self.assertTupleEqual(state.menus.get(id1), (11, 1, [user1.id]))
 
         await communicator2.send_json_to({
-            'command': 'menu.assign',
+            'command': 'menu.create',
             'menu_id': 11,
             'quantity': 1,
             'users': [user2.id],
         })
         await communicator2.receive_json_from(1)
         resp = await communicator1.receive_json_from(1)
+        id2 = resp['menu_entry_id']
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_assign(11, 1, [user2.id]))
-        self.assertListEqual(state.menus, [(11, 1, [user1.id, user2.id])])
-
-        await communicator2.send_json_to({
-            'command': 'menu.assign',
-            'menu_id': 22,
-            'quantity': 2,
-            'users': [user2.id],
+        self.assertDictEqual(resp, event.menu_create(id2, 11, 1, [user2.id]))
+        self.assertTupleEqual(state.menus.get(id2), (11, 1, [user2.id]))
+        self.assertDictEqual(state.menus.inner, {
+            id1: (11, 1, [user1.id]),
+            id2: (11, 1, [user2.id]),
         })
-        await communicator2.receive_json_from(1)
-        resp = await communicator1.receive_json_from(1)
-        state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_assign(22, 2, [user2.id]))
-        self.assertListEqual(
-            state.menus, [(11, 1, [user1.id, user2.id]), (22, 2, [user2.id])])
-
-        await communicator2.send_json_to({
-            'command': 'menu.assign',
-            'menu_id': 11,
-            'quantity': 1,
-            'users': [user2.id],
-        })
-        await communicator1.receive_nothing(1)
-        resp = await communicator2.receive_json_from(1)
-        self.assertDictEqual(resp, event.error.already_assigned())
 
     @async_test
-    async def test_menu_unassign(self):
+    async def test_menu_update(self):
         user1 = self.user1
         user2 = self.user2
         party = self.party
         communicator1 = self.communicator1
         communicator2 = self.communicator2
         state = party.state
-        state.menus = [(11, 1, [user1.id, user2.id]), (22, 2, [user2.id])]
+        state.menus.inner = {1: (11, 1, [user1.id])}
         state.save()
 
         await self.join_both()
 
         await communicator2.send_json_to({
-            'command': 'menu.unassign',
-            'menu_id': 22,
-            'quantity': 2,
-            'users': [user2.id],
+            'command': 'menu.update',
+            'menu_entry_id': 1,
+            'quantity': 1,
         })
         await communicator2.receive_json_from(1)
         resp = await communicator1.receive_json_from(1)
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_unassign(22, 2, [user2.id]))
-        self.assertListEqual(state.menus, [(11, 1, [user1.id, user2.id])])
+        self.assertDictEqual(resp, event.menu_update(1, 1, [], []))
+        self.assertTupleEqual(state.menus.get(1), (11, 2, [user1.id]))
 
         await communicator1.send_json_to({
-            'command': 'menu.unassign',
-            'menu_id': 11,
+            'command': 'menu.update',
+            'menu_entry_id': 1,
             'quantity': 1,
-            'users': [user1.id],
+            'add_user_ids': [user2.id],
         })
         await communicator1.receive_json_from(1)
         resp = await communicator2.receive_json_from(1)
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_unassign(11, 1, [user1.id]))
-        self.assertListEqual(state.menus, [(11, 1, [user2.id])])
+        self.assertDictEqual(resp, event.menu_update(1, 1, [user2.id], []))
+        self.assertTupleEqual(
+            state.menus.get(1), (11, 3, [user1.id, user2.id]))
 
         await communicator2.send_json_to({
-            'command': 'menu.unassign',
-            'menu_id': 11,
-            'quantity': 1,
-            'users': [user2.id],
+            'command': 'menu.update',
+            'menu_entry_id': 1,
+            'quantity': -2,
+            'remove_user_ids': [user1.id],
         })
         await communicator2.receive_json_from(1)
         resp = await communicator1.receive_json_from(1)
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_unassign(11, 1, [user2.id]))
-        self.assertListEqual(state.menus, [])
+        self.assertDictEqual(resp, event.menu_update(1, -2, [], [user1.id]))
+        self.assertTupleEqual(state.menus.get(1), (11, 1, [user2.id]))
 
         await communicator2.send_json_to({
-            'command': 'menu.unassign',
-            'menu_id': 11,
+            'command': 'menu.update',
+            'menu_entry_id': 2,
             'quantity': 1,
-            'users': [user2.id],
         })
         await communicator1.receive_nothing()
         resp = await communicator2.receive_json_from(1)
-        self.assertDictEqual(resp, event.error.not_assigned())
+        self.assertDictEqual(resp, event.error.invalid_menu_entry())
+
+    @async_test
+    async def test_menu_delete(self):
+        user1 = self.user1
+        user2 = self.user2
+        party = self.party
+        communicator1 = self.communicator1
+        communicator2 = self.communicator2
+        state = party.state
+        state.menus.inner = {1: (11, 1, [user1.id]), 2: (22, 2, [user2.id])}
+        state.save()
+
+        await self.join_both()
+
+        await communicator2.send_json_to({
+            'command': 'menu.delete',
+            'menu_entry_id': 1,
+        })
+        await communicator2.receive_json_from(1)
+        resp = await communicator1.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_delete(1))
+        self.assertIsNone(state.menus.get(1))
+        self.assertDictEqual(state.menus.inner, {2: (22, 2, [user2.id])})
+
+        await communicator1.send_json_to({
+            'command': 'menu.delete',
+            'menu_entry_id': 2,
+        })
+        await communicator1.receive_json_from(1)
+        resp = await communicator2.receive_json_from(1)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.menu_delete(2))
+        self.assertIsNone(state.menus.get(2))
+        self.assertDictEqual(state.menus.inner, {})
+
+        await communicator2.send_json_to({
+            'command': 'menu.delete',
+            'menu_entry_id': 3,
+        })
+        await communicator1.receive_nothing()
+        resp = await communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.invalid_menu_entry())
+
+
+class MenuEntriesTestCase(TestCase):
+    def setUp(self):
+        self.entries = MenuEntries()
+
+    def test_add(self):
+        self.entries.add(1, 1, [1])
+        self.assertDictEqual(self.entries.inner, {1: (1, 1, [1])})
+        self.entries.add(2, 2, [2])
+        self.assertDictEqual(self.entries.inner, {
+                             1: (1, 1, [1]), 2: (2, 2, [2])})
+
+    def test_delete(self):
+        self.entries.inner = {1: (1, 1, [1]), 2: (2, 2, [2])}
+
+        self.entries.delete(1)
+        self.assertDictEqual(self.entries.inner, {2: (2, 2, [2])})
+        self.entries.delete(2)
+        self.assertDictEqual(self.entries.inner, {})
+        with self.assertRaises(KeyError):
+            self.entries.delete(3)
+
+    def test_get(self):
+        self.entries.inner = {1: (1, 1, [1]), 2: (2, 2, [2])}
+
+        self.assertTupleEqual(self.entries.get(1), (1, 1, [1]))
+        self.assertTupleEqual(self.entries.get(2), (2, 2, [2]))
+        self.assertIsNone(self.entries.get(3))
+
+    def test_update(self):
+        self.entries.inner = {1: (1, 1, [1])}
+
+        self.entries.update(1, 1)
+        self.assertDictEqual(self.entries.inner, {1: (1, 2, [1])})
+        self.entries.update(1, 1, add_users=[2])
+        self.assertDictEqual(self.entries.inner, {1: (1, 3, [1, 2])})
+        self.entries.update(1, -2, remove_users=[1])
+        self.assertDictEqual(self.entries.inner, {1: (1, 1, [2])})
+        with self.assertRaises(KeyError):
+            self.entries.update(2, 1)
+
+    def test_getitem(self):
+        self.entries.inner = {1: (1, 1, [1]), 2: (2, 2, [2])}
+
+        self.assertTupleEqual(self.entries[1], (1, 1, [1]))
+        self.assertTupleEqual(self.entries[2], (2, 2, [2]))
+        with self.assertRaises(KeyError):
+            self.entries[3]
