@@ -271,7 +271,6 @@ class SingleWebsocketTestCase(TestCaseWithCache):
 
         await communicator.connect()
         resp = await communicator.receive_json_from(1)
-
         self.assertDictEqual(resp, event.state_update(self.party.state))
 
 
@@ -524,6 +523,26 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
         await communicator1.receive_nothing()
         resp = await communicator2.receive_json_from(1)
         self.assertDictEqual(resp, event.error.invalid_menu_entry())
+
+    @async_test
+    async def test_already_joined_connection_receive_broadcast(self):
+        await self.join_both()
+
+        await self.communicator1.disconnect()
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = self.user1
+
+        await communicator.connect()
+        resp = await communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.state_update(self.party.state))
+
+        await self.communicator2.send_json_to({
+            'command': 'party.leave',
+        })
+
+        resp = await communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.party_leave(self.user2.id))
 
 
 class MenuEntriesTestCase(TestCase):
