@@ -370,18 +370,18 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
 
         await self.join_both()
 
-        await communicator1.send_json_to({
+        await communicator2.send_json_to({
             'command': 'party.leave',
         })
 
-        resp = await communicator2.receive_json_from(1)
-        self.assertDictEqual(resp, event.party_leave(user1.id))
+        resp = await communicator1.receive_json_from(1)
+        self.assertDictEqual(resp, event.party_leave(user2.id))
 
         party.refresh_from_db()
         self.assertEqual(len(party.state.members), 1)
-        self.assertEqual(party.state.members[0], user2.id)
+        self.assertEqual(party.state.members[0], user1.id)
         self.assertEqual(party.member_count, 1)
-        self.assertIsNone(cache.get('user-party:{}'.format(user1.id)))
+        self.assertIsNone(cache.get('user-party:{}'.format(user2.id)))
 
     @async_test
     async def test_menu_create(self):
