@@ -16,6 +16,12 @@ def invalid_party():
     }
 
 
+def invalid_menu_entry():
+    return {
+        'type': 'error.invalid.menu.entry',
+    }
+
+
 def not_joined():
     return {
         'type': 'error.not.joined',
