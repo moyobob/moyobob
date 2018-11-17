@@ -53,3 +53,10 @@ def initially_not_joined():
     return {
         'type': 'initial.not.joined',
     }
+
+
+def leader_change(user_id: int):
+    return {
+        'type': 'leader.change',
+        'user_id': user_id,
+    }

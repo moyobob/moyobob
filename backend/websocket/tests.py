@@ -525,6 +525,18 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
         resp = await communicator2.receive_json_from(1)
         self.assertDictEqual(resp, event.error.invalid_menu_entry())
 
+    @async_test
+    async def test_change_leader_on_leaving(self):
+        await self.join_both()
+
+        await self.communicator1.send_json_to({
+            'command': 'party.leave'
+        })
+        await self.communicator2.receive_json_from(1)
+
+        self.party.refresh_from_db()
+        self.assertEqual(self.party.leader, self.user2)
+
 
 class MenuEntriesTestCase(TestCase):
     def setUp(self):
