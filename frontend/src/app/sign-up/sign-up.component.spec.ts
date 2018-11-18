@@ -8,13 +8,38 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { SignUpComponent } from './sign-up.component';
 import { UserService } from '../services/user.service';
 
+class MockUserService {
+  requestSignUp(email: string, password: string, username: string) { }
+}
 describe('SignUpComponent', () => {
   let component: SignUpComponent;
   let fixture: ComponentFixture<SignUpComponent>;
 
+  let mockUserService: jasmine.SpyObj<UserService>;
+  let router: jasmine.SpyObj<Router>;
+  let spy: jasmine.Spy;
+
+  const mockEmail = 'tori@gmail.com';
+  const mockPassword = 'aSimpleYetStrongMockP@ssw0rd';
+
   beforeEach(async(() => {
+    const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
     TestBed.configureTestingModule({
-      declarations: [ SignUpComponent ]
+      imports: [
+        FormsModule,
+        HttpClientTestingModule,
+        RouterTestingModule,
+      ],
+      declarations: [ SignUpComponent ],
+      providers: [
+        {
+          provide: UserService,
+          useClass: MockUserService
+        }, {
+          provide: Router,
+          useValue: routerSpy
+        }
+      ]
     })
     .compileComponents();
   }));
@@ -22,6 +47,10 @@ describe('SignUpComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(SignUpComponent);
     component = fixture.componentInstance;
+    mockUserService = TestBed.get(UserService);
+    router = TestBed.get(Router);
+    spy = spyOn(mockUserService, 'requestSignUp');
+    component.signUpStatus = component.inputStatus.HaveNotTriedSignUp;
     fixture.detectChanges();
   });
 
