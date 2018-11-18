@@ -49,15 +49,15 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - frontend-deps-{{ .Branch }}-{{ checksum "frontend/package-lock.json" }}
-            - frontend-deps-{{ .Branch }}-
-            - frontend-deps-
+            - frontend-0-{{ .Branch }}-{{ checksum "frontend/package-lock.json" }}
+            - frontend-0-{{ .Branch }}-
+            - frontend-0-
       - run:
           name: Installing dependencies
           command: npm install
           working_directory: frontend
       - save_cache:
-          key: frontend-deps-{{ .Branch }}-{{ checksum "frontend/package-lock.json" }}
+          key: frontend-0-{{ .Branch }}-{{ checksum "frontend/package-lock.json" }}
           paths:
             - frontend/node_modules
       - run:
