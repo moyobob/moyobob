@@ -9,6 +9,8 @@ describe('UserService', () => {
   const mockEmail = 'k2pa00@gmail.com';
   const mockUsername = 'kipa00';
   const mockPassword = 'aSimpleYetStrongMockP@ssw0rd';
+  const mockEmail_signup = 'hemhem@gmail.com';
+  const mockUsername_signup = 'hem';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -66,4 +68,24 @@ describe('UserService', () => {
     expect(service.getSignedInUsername()).toEqual(mockUsername);
   }));
 
+  it('should send request when sign up', async(() => {
+    const service: UserService = TestBed.get(UserService);
+    service.requestSignUp(mockEmail_signup, mockPassword, mockUsername_signup)
+      .then(success => {
+        expect(success).toBeTruthy();
+      });
+
+    const request = httpTestingController.expectOne('/api/signup/');
+    expect(request.request.method).toEqual('POST');
+    expect(request.request.body).toEqual({
+      'email': mockEmail_signup,
+      'password': mockPassword,
+      'username': mockUsername_signup
+    });
+    request.flush({
+      id: 2,
+      email: mockEmail_signup,
+      username: mockUsername_signup
+    });
+  }));
 });

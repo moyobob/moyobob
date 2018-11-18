@@ -16,6 +16,7 @@ import { PartyOrderingComponent } from './party-ordering/party-ordering.componen
 import { PartyOrderedComponent } from './party-ordered/party-ordered.component';
 import { PartyPaymentComponent } from './party-payment/party-payment.component';
 import { SelectMenuComponent } from './party-choosing-menu/select-menu/select-menu.component';
+import { SignUpComponent } from './sign-up/sign-up.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { SelectMenuComponent } from './party-choosing-menu/select-menu/select-me
     PartyOrderedComponent,
     PartyPaymentComponent,
     SelectMenuComponent,
+    SignUpComponent,
   ],
   imports: [
     AppRoutingModule,
