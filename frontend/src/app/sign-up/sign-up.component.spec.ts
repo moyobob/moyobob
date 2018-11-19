@@ -20,6 +20,7 @@ describe('SignUpComponent', () => {
   let spy: jasmine.Spy;
 
   const mockEmail = 'tori@gmail.com';
+  const mockUsername = 'hemtori';
   const mockPassword = 'aSimpleYetStrongMockP@ssw0rd';
 
   beforeEach(async(() => {
@@ -57,4 +58,47 @@ describe('SignUpComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  it('should not call anything if email empty', () => {
+    component.passwordInput = mockPassword;
+    component.userNameInput = mockUsername;
+    component.trySignUp(undefined);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+    expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
+  });
+
+  it('should not call anything if password empty', async(() => {
+    component.emailInput = mockEmail;
+    component.userNameInput = mockUsername;
+    component.trySignUp(undefined);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+    expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
+  }));
+
+  it('should not call anything if username empty', async(() => {
+    component.emailInput = mockEmail;
+    component.passwordInput = mockPassword;
+    component.trySignUp(undefined);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+    expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
+  }));
+
+  it('should call requestSignUp if three things filled', async(() => {
+    spy.and.returnValue(of(true).toPromise());
+
+    component.emailInput = mockEmail;
+    component.passwordInput = mockPassword;
+    component.userNameInput = mockUsername;
+    component.trySignUp(undefined);
+
+    fixture.whenStable().then(() => {
+      expect(spy).toHaveBeenCalledWith(
+        mockEmail, mockPassword, mockUsername
+      );
+
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/sign-in/');
+    });
+  }));
 });
