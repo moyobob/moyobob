@@ -20,12 +20,16 @@ header-includes:
 ---
 
 2018-11-05,
-version 2.0
+version 3.0
 
 ## Revision
 
 - 1.0 2018-10-22 - initial document :tada:
 - 2.0 2018-11-05 - Sprint 3
+  - Model Design has been updated
+  - View Design has been updated
+  - Chagned parts are marked as [blue]{.important}
+- 3.0 2018-11-19 - Sprint 4
   - Model Design has been updated
   - View Design has been updated
   - Chagned parts are marked as [blue]{.important}
@@ -67,227 +71,164 @@ We decided to show information like party status, which needs to interact and be
 
 ![View Design](view-design.png)\
 
-#### Common
+#### [Common]{.important}
+
+This will be shown in every page.
 
 - Top Bar Component
 - Side Bar Component
 
-##### Top Bar Component
+##### [Top Bar Component]{.important}
 
-- Logo : `<img>`
-- Side Bar Button : `<button>`
-- My Info Button : `<button>`
+Vertical Scrolling should hide this component in mobile landscape.
+- Logo
+- Side Bar Button : when pressed, shows the [Side Bar].
+- My Info Button : when pressed, moves to [User Info].
 
-##### Side Bar Component
+##### [Side Bar Component]{.important}
 
-Shown when pressing Side Bar Button in Top Bar Component.
+Shown when pressing Side Bar Button in [Top Bar] Component.
 
-- Group List Button : `<button>`
-- Restaurant List Button : `<button>`
-- Payment List Button : `<button>`
+- Payment List Button : when pressed, moves to [Payment List].
 
-#### [Lobby Component]{.important} (`/party`)
+#### [Lobby]{.important} (`/party`)
 
 The Main Page.
 
-- Party List : `<ul>`
-  - LobbyListItemComponent
-- Make Party Button : `<button>`
+- Party List : Shows the party already joined at top. Clicking on a [Party] in the list moves to corresponding [Party].
+  - Party Info
+    - Party Name
+    - Group Name
+    - Number of Participants
+    - Current State
+    - etc
+  - Make Party Button : when pressed, moves to [Create Party].
 
-##### [LobbyListItemComponent]{.important}
-
-- Party Info : `<div>`
-  - Party Name : `<span>`
-  - Group Name : `<span>`
-  - Number of Participants : `<span>`
-  - Current State : `<span>`
-
-##### [PartyCreate Component]{.important} (`/party/create`)
+##### [Create Party]{.important} (`/party/create`)
 
 Can create [Party].
 
-- Party Name : `<input>`
-- Party Characteristic : `<select>`
-  - Public : `<option>`
-  - Protected : `<option>`
-  - Private : `<option>`
-- Group Name : `<input>`
-- Place to Eat : `<input>`
-- Restaurant : `<input>`
-- Submit Button : `<button>`
+- Party Name
+- Party Characteristic
+  - Public
+  - Protected
+  - Private
+- Group Name : should hide when [Party] is public
+- Place to Eat
+- Restaurant : Optional, [Party] starts with status [Selecting Menu] when provided
+- etc
+- Submit Button : when pressed, creates a [Party], and moves to [the page of that Party](#Party).
 
-#### [PartyComponent]{.important} (`/party/:id`)
+#### [Party]{.important} (`/party/:id`)
 
 Provides the main features such as choosing menus. Different infos are shown with respect to participation status and party status.
 
 - Shows regardless of participation status
-  - Party Name : `<h2>`
-  - Group Name : `<h3>`
-  - Number of Participants : `<span>`
-  - Restaurant Chosen: `<span>`
+  - Party Name
+  - Group Name
+  - Number of Participants
+  - Restaurant Chosen: if not chosen, blank
   - etc
-  - Lobby Button : `<button>`
-  - Leave Button : `<button>`
+  - Lobby Button : pressing this button won't leave the party
+  - Leave Button
+    - when pressed before the party is in `Select Menu` status, clear any information related to user;
+    - when pressed after the party is in `Ordered`, leave the party with the history of party and payment information, and the payment information can be shown in [Payment List] Page.
 - Not Participating
   - Clicking the Party in the Lobby changes the participation status to Participating
 - Participating: when participating, shows the corresponding component.
-  - Selecting Restaurant
-  - Selecting Menu
-  - Ordering
-  - Ordered
-  - Payment
-  - End
+  - [Selecting Restaurant]
+  - [Selecting Menu]
+  - [Ordering]
+  - [Ordered]
+  - [Payment]
+  - [End]
 
-##### Selecting Restaurant Component
+##### [Selecting Restaurant Component]{.important}
 
-- Search Restaurant : `<input>`
-  - Search Button : `<button>`
-- List of Selected Restaurant : `<ul>`; most voted top
+- Search Restaurant : search with restaurant name and/or restaurant category.
+  - Search Button : when pressed, moves to [Restaurant List]
+- List of Selected Restaurant : most voted top
   - Pressing the restaurant votes for that restaurant.
-  - Proceed Button : `<button>`
+  - Proceed Button : shown only to Party Leader, when pressed, restaurant selection is complete and moves to [Selecting Menu]
 
-##### Selecting Menu Component
+##### [Selecting Menu Component]{.important}
 
-- User List : `<table>`
-  - User Name : `<span>`
-  - Menu : `<div>`
-  - Proceed Button : `<button>`
+- User List : Users and their menus are shown, and mine should be the top. Pressing my list moves to [Menu List].
+  - User Name
+  - Menu : if no menus are chosen, shows the ? icon
+  - Proceed Button : When every user presses the Proceed Button then the party status changes to [Ordering]
 
-##### Ordering Component
+##### [Ordering Component]{.important}
 
-- Payment Info : `<ul>`
-  - Users' name and price are shown for each menu (`<li>`)
-- Phone number for restaurant : `<span>`
-- Ordered Button : `<button>`
+- Payment Info
+  - Users' name and price are shown for each menu
+- Phone number for restaurant
+- Ordered Button : shown only to Party Leader, when pressed, moves to [Ordered]
 
-##### Ordered Component
+##### [Ordered Component]{.important}
 
 - A message is shown to notify that the order is complete.
-- Expected Time : `<span>`
-- Payment Complete : `<button>`
+- Expected Time : Party Leader can put this. If not put, not shown.
+- Payment Complete : shown only to Party Leader, when pressed, User List is shown, and selecting who paid for the meal moves to [Payment].
 
-##### Payment Component
+##### [Payment Component]{.important}
 
 Shows the required amount of money to pay.
 
-- how much one should pay : `<h2>`
-- the person who paid for the meal : `<h3>`
-- the means to pay the bill : `<span>`
+- how much one should pay
+- the person who paid for the meal
+- the means to pay the bill
   - Account Number etc; retrieved from user info or can register when the case is the user registered only for this party.
-- menu one picked and the price : `<ul>`
+- menu one picked and the price
 
-#### Menu List
+#### [Menu List]{.important}
 
 Every user can select his or her menu.
 
-- List of chosen menu : `<ul>`
-- Add Menu Button : `<button>`
+- List of chosen menu
+  - Pressing menu assigns oneself to the menu.
+- Add Menu Button
+  - when pressed, shows the list of all menus of the restaurant.
+  - Selecting one or more menus, selecting assignees (can be none) and pressing Add Button adds the menu with corresponding information.
 
-#### User Info (`/user/:username`)
+#### [User Info]{.important} (`/user/:username`)
 
 Shows or modifies user information.
 
-- Name : `<span>`
-- E-mail : `<span>`
-- Contact Info : `<span>`
-- Payment Info : `<span>`
-- Modify Button : `<button>`
+- Name
+- E-mail
+- Contact Info
+- Payment Info
+- Modify Button
 
-#### Group List (`/group`)
-
-Shows the list of the group.
-
-- Find Group : `<button>`
-- Group List : `<ul>`
-  - Group Name : `<span>`
-- Create Group Button : `<button>`
-
-##### Group (`/group/:id`)
-
-Shows or modifies the information of the group.
-
-- Name : `<span>`
-- Description: `<span>`
-- Users : `<ul>`
-- Leader : `<span>`
-- Edit Group Button : `<button>`
-
-##### Edit Group (`/group/:id/edit`)
-
-Shows the view to edit group.
-
-- Group Name : `<input>`
-- Characteristic : `<select>`
-  - Public : `<option>`
-  - Protected : `<option>`
-  - Private : `<option>`
-- Confirm Button : `<button>`
-
-##### Create Group
-
-Shows the view to add group. (`/group/create`)
-
-- Group Name : `<input>`
-- Characteristic : `<select>`
-  - Public : `<option>`
-  - Protected : `<option>`
-  - Private : `<option>`
-- Create Button : `<button>`
-
-#### Restaurant List Component (`/restaurant`, `/party/:id`)
+#### [Restaurant List Component]{.important}
 
 List all restaurants or search for the specific restaurant.
 
-- Search Bar : `<input>`
-- Search Button : `<button>`
-- List of Restaurants : `<li>`
-  - Restaurant Name : `<span>`
-  - Restaurant Category : `<span>`
+- Search Bar
+- Search Button
+- List of Restaurants
+  - Restaurant Name
+  - Restaurant Category
 
-##### Edit Restaurant Component (`/restaurant/:id/edit`)
-
-Shows the view to edit restaurant.
-
-- Restaurant Name : `<input>`
-- Phone Number : `<input>`
-- Category : `<input>`
-- Menu Remove Button : `<button>`
-- Menu Add Button : `<button>`
-- Confirm Button : `<button>`
-
-##### Create Restaurant Component (`/restaurant/create`)
-
-Shows the view to create restaurant.
-
-- Restaurant Name : `<input>`
-- Phone Number : `<input>`
-- Category : `<input>`
-- Create Button : `<button>`
-
-#### Add Menu Component
-
-Shows the view to add menus.
-
-- Menu Name : `<input>`
-- Price : `<input>`
-- Confirm Button: `<button>`
-
-#### Payment List (`/payment`)
+#### [Payment List]{.important} (`/payment`)
 
 Shows every payment one made, either should pay or should be paid.
 
-- Should Pay : `<ul>`
-- Should be Paid : `<ul>`
+- Should Pay : shows every payment with the information of the same receiver merged.
+- Should be Paid : shows every payment with the information of the same sender merged.
 
 ## [Backend Design Detail]{.important}
 
-### [In DB]{.important}
+### In DB
 
 Models stored in SQL Database
 
-#### [User]{.important}
+#### User
 
 User object is provided by Django for authentication.
+
+[Reference](https://docs.djangoproject.com/en/2.1/ref/contrib/auth/#django.contrib.auth.models.User)
 
 Use email and password for authentication and username as nickname.
 
@@ -295,7 +236,7 @@ Use email and password for authentication and username as nickname.
 - password
 - username
 
-#### [Party]{.important}
+#### Party
 
 - name: string
 - type: SmallIntegerField with choces of PartyType
@@ -303,7 +244,7 @@ Use email and password for authentication and username as nickname.
 - leader: ForeignKey of User
 - since: datetime
 
-##### [PartyType]{.important}
+##### PartyType
 
 extends Enum
 
@@ -311,7 +252,7 @@ extends Enum
   - `0`: InGroup
   - `1`: Private
 
-#### [Group]{.important}
+#### Group
 
 - name: string
 - description: string
@@ -320,7 +261,7 @@ extends Enum
 - leader: ForeignKey of User
 - members: ManyToManyField of User
 
-##### [GroupType]{.important}
+##### GroupType
 
 extends Enum
 
@@ -328,7 +269,7 @@ extends Enum
   - `0`: Public
   - `1`: Private
 
-##### [GroupPublicity]{.important}
+##### GroupPublicity
 
 extends Enum
 
@@ -336,21 +277,21 @@ extends Enum
   - `0`: Free
   - `1`: AdmissionRequired
 
-#### [Restaurant]{.important}
+#### Restaurant
 
 - name: string
 - category: Category
 - phone: string
 - service_time_from: time
 - service_time_to: time
-- menus: ManyToManyField of [Menu]
+- menus: ManyToManyField of Menu
 
 #### Menu
 
 - name: string
 - price: integer
 
-#### [PaymentInformation]{.important}
+#### PaymentInformation
 
 - user: OneToOneField of User
 - phone_number: string (Nullable)
@@ -371,7 +312,7 @@ cache key: `party:{id}`
 - phase: PartyPhase
 - restaurant: id of Restaurant (Nullable)
 - members: list of User's id
-- menus: list of tuple of User's id and Menu's id
+- menus: list of tuple (Menu's id, quantity: integer, list of User's id)
 
 ##### [PartyPhase]{.important}
 
@@ -388,18 +329,94 @@ extends integer, and works like enum
 
 #### [RESTful API]{.important}
 
-| API Endpoint       | GET                        | POST                    | PUT                  | DELETE            |
-| ------------------ | -------------------------- | ----------------------- | -------------------- | ----------------- |
-| `/party/`          | Get list of parties        | Create a new party      | X                    | X                 |
-| `/party/:id/`      | Get detail of party        | X                       | X                    | End the party     |
-| `/group/`          | Get list of groups         | Create a new group      | X                    | X                 |
-| `/group/:id/`      | Get detail of group        | X                       | Edit detail of group | Delete group      |
-| `/signin/`         | X                          | Sign in                 | X                    | X                 |
-| `/signup/`         | X                          | Sign up                 | X                    | X                 |
-| `/user/`           | Get detail of current user | X                       | Edit current user    | X                 |
-| `/user/:id/`       | Get detail of user         | X                       | X                    | X                 |
-| `/restaurant/`     | Get list of restaurant     | Create a new restaurant | X                    | X                 |
-| `/restaurant/:id/` | Get detail of restaurant   | X                       | Edit restaurant      | Delete restaurant |
+- Status Code
+  - `200`: Ok
+  - `400`: Bad request
+  - `403`: Forbidden or Not authorized
+  - `404`: Not found
+  - `405`: Method not allowed
+- `/api/signin/`
+  - `POST`: Sign in
+    - Request: email and password of User
+    - Response: User
+- `/api/signup/`
+  - `POST`: Sign up
+    - Request: username, email, and password of User
+    - Response: Empty
+- `/api/user/`
+  - `GET`: Get detail of current user
+    - Request: Empty
+    - Response: User
+- `/api/user/<int:user_id>/`
+  - `GET`: Get detail of user
+    - Request: Empty
+    - Response: User
+- `/api/party/`
+  - `GET`: Get list of parties
+    - Request: Empty
+    - Response: list of Party
+  - `POST`: Create a new party
+    - Request: name, type, and location of Party
+    - Response: Party
+- `/api/party/<int:party_id>/`
+  - `GET`: Get detail of party
+    - Request: Empty
+    - Response: Party
+  - `DELETE`: End the party
+    - Request: Empty
+    - Response: Empty
+- `/api/group/`
+  - `GET`: Get list of groups
+    - Request: Empty
+    - Response: list of Group
+  - `POST`: Create a new group
+    - Request: Empty
+    - Response: Group
+- `/api/group/<int:group_id>/`
+  - `GET`: Get detail of group
+    - Request: Empty
+    - Response: Group
+  - `PUT`: Edit detail of group
+    - Request: Group
+    - Response: Group
+  - `DELETE`: Delete group
+    - Request: Empty
+    - Response: Empty
+- `/api/restaurant/`
+  - `GET`: Get list of restaurant
+    - Request: Empty
+    - Response: list of Restaurant
+  - `POST`: Create a new restaurant
+    - Request: Restaurant
+    - Response: Restaurant
+- `/api/restaurant/<int:restaurant_id>/`
+  - `GET`: Get detail of restaurant
+    - Request: Empty
+    - Response: Restaurant
+  - `PUT`: Edit restaurant
+    - Request: Restaurant
+    - Response: Restaurant
+  - `DELETE`: Delete restaurant
+    - Request: Empty
+    - Response: Empty
+- `/api/restaurant/<int:restaurant_id>/menu/`
+  - `GET`: Get list of menu
+    - Request: Empty
+    - Response: list of Menu
+  - `POST`: Create a new menu
+    - Request: Menu
+    - Response: Menu
+- `/api/menu/<int:menu_id>/`
+  - `GET`: Get detail of menu
+    - Request: Empty
+    - Response: Menu
+  - `PUT`: Edit menu
+    - Request: Menu
+    - Response: Menu
+  - `DELETE`: Delete menu
+    - Request: Empty
+    - Response: Empty
+
 
 #### [Websocket API]{.important}
 
@@ -414,25 +431,78 @@ Command is an action from frontend to backend
 - PartyJoin
   - `command`: `"party.join"`
   - `party_id`: integer
+  - Response: StateUpdate
+  - Error: InitiallyNotJoined, InvalidDataError, InvalidPartyError, AlreadyJoinedError
 - PartyLeave
   - `command`: `"party.leave"`
   - `party_id`: integer
+  - Response: Nothing
+  - Error: InvalidDataError, InvalidPartyError, NotJoinedError
+- MenuCreate
+  - `command`: `"menu.create"`
+  - `menu_id`: integer
+  - `quantity`: integer
+  - `users`: list of integer
+  - Response: MenuCreate
+  - Error: InvalidDataError, NotJoinedError
+- MenuUpdate
+  - `command`: `"menu.update"`
+  - `menu_entry_id`: integer
+  - `quantity`: integer
+  - `add_user_ids`: list of integer
+  - `remove_user_ids`: list of integer
+  - Response: MenuUpdate
+  - Error: InvalidDataError, NotJoinedError, InvalidMenuEntryError
+- MenuDelete
+  - `command`: `"menu.delete"`
+  - `menu_entry_id`: integer
+  - Response: MenuDelete
+  - Error: InvalidDataError, NotJoinedError, InvalidMenuEntryError
 
 ##### [Event]{.important}
 
 Event is an reply from backend to frontend and a communication in-between backend
 
-- Success
-  - `type`: `"success"`
-  - `event`: string
-- Error
-  - `type`: `"error"`
-  - `error`: string
+- InvalidCommandError
+  - `type`: `"error.invalid.command"`
+- InvalidDataError
+  - `type`: `"error.invalid.data"`
+- InvalidPartyError
+  - `type`: `"error.invalid.party"`
+- InvalidMenuEntryError
+  - `type`: `"error.invalid.menu.entry"`
+- NotJoinedError
+  - `type`: `"error.not.joined"`
+- AlreadyJoinedError
+  - `type`: `"error.already.joined"`
+- InitiallyNotJoined
+  - `type`: `"initial.not.joined"`
 - PartyJoin
   - `type`: `"party.join"`
   - `user_id`: integer
 - PartyLeave
   - `type`: `"party.leave"`
+  - `user_id`: integer
+- MenuCreate
+  - `command`: `"menu.create"`
+  - `menu_entry_id`: integer
+  - `menu_id`: integer
+  - `quantity`: integer
+  - `users`: list of integer
+- MenuUpdate
+  - `command`: `"menu.update"`
+  - `menu_entry_id`: integer
+  - `quantity`: integer
+  - `add_user_ids`: list of integer
+  - `remove_user_ids`: list of integer
+- MenuDelete
+  - `command`: `"menu.delete"`
+  - `menu_entry_id`: integer
+- StateUpdate
+  - `type`: `"state.update"`
+  - `state`: PartyState
+- LeaderChange
+  - `type`: `"leader.change"`
   - `user_id`: integer
 
 ## Implementation Plan
