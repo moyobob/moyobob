@@ -4,7 +4,7 @@ from django.core.cache import cache
 import json
 
 from .models import PartyState
-from api.models import Party
+from api.models import Party, User
 from websocket import event
 from .exception import NotInPartyError, AlreadyJoinedError
 
@@ -165,6 +165,16 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 'party-{}'.format(party_id),
                 event.party_leave(user_id)
             )
+
+            if party.leader.id == user_id:
+                next_user_id = state.members[0]
+                user = User.objects.get(id=next_user_id)
+                party.leader = user
+                party.save()
+
+                await self.send_json(
+                    event.leader_change(next_user_id),
+                )
         else:
             party.delete()
 
