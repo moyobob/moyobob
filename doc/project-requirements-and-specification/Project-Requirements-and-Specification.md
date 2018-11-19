@@ -26,7 +26,7 @@ version 4.0
 - 2.0 2018-10-23 - Sprint 2
 - 3.0 2018-11-05 - Sprint 3
 - 4.0 2018-11-19 - Sprint 4
-  - Nothing have been changed
+  - Updated User Stories
 
 ## Project Abstract
 
@@ -60,7 +60,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 - MessengerApp (e.g.KakaoTalk, Slack)
   - differentiated by giving functions for decision making and collecting a bill.
 
-## User Stories
+## [User Stories]{.important}
 
 ### Sign Up
 
@@ -122,6 +122,17 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the other people open Moyobob
 1. And they join the Party
 
+### [Joining a Group-Opened Party]{.important}
+
+- As a Group member, I want to join a Party, so that I can eat delivery food with them
+
+1. Given that I'm a Group member
+2. and the Group has a Group-Opened Party I can join now
+3. When I open Lobby Page
+4. The system shows a list of parties I can join now and Create New Party button
+5. When I click a Party I want to join
+6. The system approves me to join that Party and leads me to Party page
+
 ### Choosing Restaurant
 
 - As a Party Leader, I want to gather Restaurant preference of other Users in Party, so that I can confirm what Restaurant to order.
@@ -138,21 +149,46 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the system fixes the Restaurant to our Party
 1. And the system leads the Party's state to Choosing Menu
 
-### Choosing Menus
+### [Choosing Menus (add a menu)]{.important}
 
 - As a Party member, I want to select a Menu for myself
 1. Given that I'm a Party member already participating in Party
 1. And the Party I am participating is in the state of Choosing Menu
 1. When I open the Party Page
 1. Then the system leads me to Choosing Menu page
-1. And the system shows boxes for each menu which has menu name, select box for quantity and OK button.
-1. When I choose a Menu and quantity, I click OK button
-1. Then the system shows me assign pop-up
-1. I can assign the menu for myself or friend or all members in the Party
-1. When I assign the menu for myself and click OK button
-1. Then the system shows me the present situation which tells me what I choose and how much I have to pay, what other members choose and total amount.
-1. When all member finish to choose menu, the Party Leader ends the state by clicking next state button
-1. And the system leads the Party's state to ordering
+1. The system shows current situation of choosing menu (who assigned what, total bill, charge for me) and Add Menu Button
+1. When I click Add Menu button
+1. The system leads me to Select Menu Page
+1. When I click specific menu and choose quantity by up/down button, and click Choose User button
+1. The system shows pop-up window of party member list
+1. When I click a member or members whom I want to assign the menu and OK button
+1. The system leads me Select Menu Page
+1. When I click Back button
+1. The system leads me Party Page
+ErrorCase If I choose wrong menu. or just want to select another menu, I can cancel it in PartyPage(not MenuListPage).
+
+### [Choosing Menus (modify an assigned menu)]{.important}
+
+- As a Party member, I want to modify an assigend Menu
+1. Given that I'm a party member, the party is in the state of Choosing Menu
+2. When I open Party Page
+3. The system shows current situation of choosing menu(who assigned what, total bill, charge for me) and Add Menu button
+4. When I click specific assigned menu(even if it's assigned to other)
+5. The system shows pop-up window and asks me to modify the quantity(by up/down button) or delete the assigned menu(if that menu is assigned to more than one person, the system shows extra button: 'assign free only for this user')
+6. When I finish modifying the menu and click OK button
+7. The system closes the pop-up
+
+### [Finishing Choosing Menu state - Party Leader]{.important}
+
+- As a Party Leader, I want to finish Choosing Menu state, so that the Party moves on to the next state
+
+1. Given that I'm a Party Leader
+2. And the Party is in the state of Choosing Menu, and it seems that every Party member finished choosing menu
+3. When I open Party Page
+4. The system shows Prev state button(only for Party Leader), Next State button(only for Party Leader) and current situation of choosing menu, Add Menu button
+5. When I click the Next State button
+6. The system change Party state to Ordering State and update Party Page for corresponding state
+ErrorCase If I click Next State button too early, I can click prev state button to goback the page.
 
 ### After the delivery arrived
 
