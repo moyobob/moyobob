@@ -61,13 +61,17 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
         try:
-            (_, state) = get_party_of_user(user.id)
+            (party, state) = get_party_of_user(user.id)
         except NotInPartyError:
             await self.send_json(
                 event.initially_not_joined()
             )
             return
 
+        await self.channel_layer.group_add(
+            'party-{}'.format(party.id),
+            self.channel_name,
+        )
         await self.send_json(
             event.state_update(state)
         )
