@@ -15,19 +15,30 @@ def party_leave(user_id: int):
     }
 
 
-def menu_assign(user_id: int, menu_id: int):
+def menu_create(menu_entry_id: int, menu_id: int, quantity: int, users: list):
     return {
-        'type': 'menu.assign',
-        'user_id': user_id,
+        'type': 'menu.create',
+        'menu_entry_id': menu_entry_id,
         'menu_id': menu_id,
+        'quantity': quantity,
+        'users': users,
     }
 
 
-def menu_unassign(user_id: int, menu_id: int):
+def menu_update(menu_entry_id: int, quantity: int, add_user_ids: list, remove_user_ids: list):
     return {
-        'type': 'menu.unassign',
-        'user_id': user_id,
-        'menu_id': menu_id,
+        'type': 'menu.update',
+        'menu_entry_id': menu_entry_id,
+        'quantity': quantity,
+        'add_user_ids': add_user_ids,
+        'remove_user_ids': remove_user_ids,
+    }
+
+
+def menu_delete(menu_entry_id: int):
+    return {
+        'type': 'menu.delete',
+        'menu_entry_id': menu_entry_id,
     }
 
 
@@ -41,4 +52,11 @@ def state_update(state):
 def initially_not_joined():
     return {
         'type': 'initial.not.joined',
+    }
+
+
+def leader_change(user_id: int):
+    return {
+        'type': 'leader.change',
+        'user_id': user_id,
     }

@@ -4,7 +4,7 @@ from django.core.cache import cache
 import json
 
 from .models import PartyState
-from api.models import Party
+from api.models import Party, User
 from websocket import event
 from .exception import NotInPartyError, AlreadyJoinedError
 
@@ -47,8 +47,9 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         self.commands = {
             'party.join': self.command_party_join,
             'party.leave': self.command_party_leave,
-            'menu.assign': self.command_menu_assign,
-            'menu.unassign': self.command_menu_unassign,
+            'menu.create': self.command_menu_create,
+            'menu.update': self.command_menu_update,
+            'menu.delete': self.command_menu_delete,
         }
 
     async def connect(self):
@@ -60,13 +61,17 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         await self.accept()
 
         try:
-            (_, state) = get_party_of_user(user.id)
+            (party, state) = get_party_of_user(user.id)
         except NotInPartyError:
             await self.send_json(
                 event.initially_not_joined()
             )
             return
 
+        await self.channel_layer.group_add(
+            'party-{}'.format(party.id),
+            self.channel_name,
+        )
         await self.send_json(
             event.state_update(state)
         )
@@ -160,41 +165,75 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 'party-{}'.format(party_id),
                 event.party_leave(user_id)
             )
+
+            if party.leader.id == user_id:
+                next_user_id = state.members[0]
+                user = User.objects.get(id=next_user_id)
+                party.leader = user
+                party.save()
+
+                await self.send_json(
+                    event.leader_change(next_user_id),
+                )
         else:
             party.delete()
 
-    async def command_menu_assign(self, data):
-        user_id = data['user_id']
+    async def command_menu_create(self, data):
         menu_id = data['menu_id']
+        quantity = data['quantity']
+        users = data['users']
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        if (user_id, menu_id) in state.menus:
-            return
-
-        state.menus.append((user_id, menu_id))
+        menu_entry_id = state.menus.add(menu_id, quantity, users)
         state.save()
 
         await self.channel_layer.group_send(
             'party-{}'.format(party.id),
-            event.menu_assign(user_id, menu_id)
+            event.menu_create(menu_entry_id, menu_id, quantity, users),
         )
 
-    async def command_menu_unassign(self, data):
-        user_id = data['user_id']
-        menu_id = data['menu_id']
+    async def command_menu_update(self, data):
+        menu_entry_id = data['menu_entry_id']
+        quantity = data['quantity']
+        add_user_ids = data.get('add_user_ids') or []
+        remove_user_ids = data.get('remove_user_ids') or []
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        if (user_id, menu_id) not in state.menus:
+        try:
+            state.menus.update(
+                menu_entry_id, quantity, add_users=add_user_ids, remove_users=remove_user_ids)
+        except KeyError:
+            await self.send_json(
+                event.error.invalid_menu_entry()
+            )
             return
-
-        state.menus.remove((user_id, menu_id))
         state.save()
 
         await self.channel_layer.group_send(
             'party-{}'.format(party.id),
-            event.menu_unassign(user_id, menu_id)
+            event.menu_update(menu_entry_id, quantity,
+                              add_user_ids, remove_user_ids),
+        )
+
+    async def command_menu_delete(self, data):
+        menu_entry_id = data['menu_entry_id']
+
+        (party, state) = get_party_of_user(self.scope['user'].id)
+
+        try:
+            state.menus.delete(menu_entry_id)
+        except KeyError:
+            await self.send_json(
+                event.error.invalid_menu_entry()
+            )
+            return
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.menu_delete(menu_entry_id)
         )
 
     async def party_join(self, data):
@@ -211,18 +250,30 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             event.party_leave(user_id)
         )
 
-    async def menu_assign(self, data):
-        user_id = data['user_id']
+    async def menu_create(self, data):
+        menu_entry_id = data['menu_entry_id']
         menu_id = data['menu_id']
+        quantity = data['quantity']
+        users = data['users']
 
         await self.send_json(
-            event.menu_assign(user_id, menu_id)
+            event.menu_create(menu_entry_id, menu_id, quantity, users)
         )
 
-    async def menu_unassign(self, data):
-        user_id = data['user_id']
-        menu_id = data['menu_id']
+    async def menu_update(self, data):
+        menu_entry_id = data['menu_entry_id']
+        quantity = data['quantity']
+        add_user_ids = data['add_user_ids']
+        remove_user_ids = data['remove_user_ids']
 
         await self.send_json(
-            event.menu_unassign(user_id, menu_id)
+            event.menu_update(menu_entry_id, quantity,
+                              add_user_ids, remove_user_ids)
+        )
+
+    async def menu_delete(self, data):
+        menu_entry_id = data['menu_entry_id']
+
+        await self.send_json(
+            event.menu_delete(menu_entry_id)
         )
