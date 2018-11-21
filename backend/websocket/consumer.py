@@ -124,7 +124,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         # TODO: Check party permission
 
-        state.members.append(user_id)
+        state.member_ids.append(user_id)
         party.member_count += 1
         state.save()
         party.save()
@@ -149,7 +149,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(user_id)
         party_id = party.id
 
-        state.members.remove(user_id)
+        state.member_ids.remove(user_id)
         party.member_count -= 1
         state.save()
         party.save()
@@ -167,7 +167,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             )
 
             if party.leader.id == user_id:
-                next_user_id = state.members[0]
+                next_user_id = state.member_ids[0]
                 user = User.objects.get(id=next_user_id)
                 party.leader = user
                 party.save()
@@ -181,16 +181,16 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
     async def command_menu_create(self, data):
         menu_id = data['menu_id']
         quantity = data['quantity']
-        users = data['users']
+        user_ids = data['user_ids']
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        menu_entry_id = state.menus.add(menu_id, quantity, users)
+        menu_entry_id = state.menu_entries.add(menu_id, quantity, user_ids)
         state.save()
 
         await self.channel_layer.group_send(
             'party-{}'.format(party.id),
-            event.menu_create(menu_entry_id, menu_id, quantity, users),
+            event.menu_create(menu_entry_id, menu_id, quantity, user_ids),
         )
 
     async def command_menu_update(self, data):
@@ -202,8 +202,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(self.scope['user'].id)
 
         try:
-            state.menus.update(
-                menu_entry_id, quantity, add_users=add_user_ids, remove_users=remove_user_ids)
+            state.menu_entries.update(
+                menu_entry_id, quantity, add_user_ids=add_user_ids, remove_user_ids=remove_user_ids)
         except KeyError:
             await self.send_json(
                 event.error.invalid_menu_entry()
@@ -223,7 +223,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(self.scope['user'].id)
 
         try:
-            state.menus.delete(menu_entry_id)
+            state.menu_entries.delete(menu_entry_id)
         except KeyError:
             await self.send_json(
                 event.error.invalid_menu_entry()
@@ -254,10 +254,10 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         menu_entry_id = data['menu_entry_id']
         menu_id = data['menu_id']
         quantity = data['quantity']
-        users = data['users']
+        user_ids = data['user_ids']
 
         await self.send_json(
-            event.menu_create(menu_entry_id, menu_id, quantity, users)
+            event.menu_create(menu_entry_id, menu_id, quantity, user_ids)
         )
 
     async def menu_update(self, data):
