@@ -15,13 +15,13 @@ def party_leave(user_id: int):
     }
 
 
-def menu_create(menu_entry_id: int, menu_id: int, quantity: int, users: list):
+def menu_create(menu_entry_id: int, menu_id: int, quantity: int, user_ids: list):
     return {
         'type': 'menu.create',
         'menu_entry_id': menu_entry_id,
         'menu_id': menu_id,
         'quantity': quantity,
-        'users': users,
+        'user_ids': user_ids,
     }
 
 

@@ -91,9 +91,9 @@ class MenuEntries:
     def as_dict(self):
         return self.inner
 
-    def add(self, menu_id: int, quantity: int, users: list):
+    def add(self, menu_id: int, quantity: int, user_ids: list):
         id = self.last_id + 1
-        self.inner[id] = ((menu_id, quantity, users))
+        self.inner[id] = ((menu_id, quantity, user_ids))
         self.last_id = id
         return id
 
@@ -103,11 +103,11 @@ class MenuEntries:
     def get(self, menu_entry_id: int, default=None):
         return self.inner.get(menu_entry_id, default)
 
-    def update(self, menu_entry_id: int, quantity: int, add_users=[], remove_users=[]):
+    def update(self, menu_entry_id: int, quantity: int, add_user_ids=[], remove_user_ids=[]):
         (m, q, ul) = self.inner[menu_entry_id]
         q += quantity
-        ul.extend(add_users)
-        for u in remove_users:
+        ul.extend(add_user_ids)
+        for u in remove_user_ids:
             ul.remove(u)
         self.inner[menu_entry_id] = (m, q, ul)
         return self.inner[menu_entry_id]

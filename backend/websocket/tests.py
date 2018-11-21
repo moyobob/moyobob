@@ -397,7 +397,7 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
             'command': 'menu.create',
             'menu_id': 11,
             'quantity': 1,
-            'users': [user1.id],
+            'user_ids': [user1.id],
         })
         await communicator1.receive_json_from(1)
         resp = await communicator2.receive_json_from(1)
@@ -410,7 +410,7 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
             'command': 'menu.create',
             'menu_id': 11,
             'quantity': 1,
-            'users': [user2.id],
+            'user_ids': [user2.id],
         })
         await communicator2.receive_json_from(1)
         resp = await communicator1.receive_json_from(1)
@@ -590,9 +590,9 @@ class MenuEntriesTestCase(TestCase):
 
         self.entries.update(1, 1)
         self.assertDictEqual(self.entries.inner, {1: (1, 2, [1])})
-        self.entries.update(1, 1, add_users=[2])
+        self.entries.update(1, 1, add_user_ids=[2])
         self.assertDictEqual(self.entries.inner, {1: (1, 3, [1, 2])})
-        self.entries.update(1, -2, remove_users=[1])
+        self.entries.update(1, -2, remove_user_ids=[1])
         self.assertDictEqual(self.entries.inner, {1: (1, 1, [2])})
         with self.assertRaises(KeyError):
             self.entries.update(2, 1)
