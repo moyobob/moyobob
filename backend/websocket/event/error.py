@@ -16,6 +16,12 @@ def invalid_party():
     }
 
 
+def invalid_restaurant():
+    return {
+        'type': 'error.invalid.restaurant',
+    }
+
+
 def invalid_menu_entry():
     return {
         'type': 'error.invalid.menu.entry',
@@ -31,4 +37,10 @@ def not_joined():
 def already_joined():
     return {
         'type': 'error.already.joined',
+    }
+
+
+def not_voted():
+    return {
+        'type': 'error.not.voted',
     }
