@@ -185,7 +185,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        menu_entry_id = state.menus.add(menu_id, quantity, user_ids)
+        menu_entry_id = state.menu_entries.add(menu_id, quantity, user_ids)
         state.save()
 
         await self.channel_layer.group_send(
@@ -202,7 +202,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(self.scope['user'].id)
 
         try:
-            state.menus.update(
+            state.menu_entries.update(
                 menu_entry_id, quantity, add_user_ids=add_user_ids, remove_user_ids=remove_user_ids)
         except KeyError:
             await self.send_json(
@@ -223,7 +223,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(self.scope['user'].id)
 
         try:
-            state.menus.delete(menu_entry_id)
+            state.menu_entries.delete(menu_entry_id)
         except KeyError:
             await self.send_json(
                 event.error.invalid_menu_entry()

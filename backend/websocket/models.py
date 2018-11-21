@@ -41,7 +41,7 @@ class PartyState(CacheModel):
         self.phase = PartyPhase.ChoosingMenu
         self.restaurant = None
         self.member_ids = []
-        self.menus = MenuEntries()
+        self.menu_entries = MenuEntries()
 
     @classmethod
     def get(cls, id: int):
@@ -60,7 +60,7 @@ class PartyState(CacheModel):
         self.phase = o['phase']
         self.restaurant = o.get('restaurant', None)
         self.member_ids = o['member_ids']
-        self.menus = MenuEntries.from_dict(o['menus'])
+        self.menu_entries = MenuEntries.from_dict(o['menu_entries'])
 
     def as_dict(self):
         return {
@@ -68,7 +68,7 @@ class PartyState(CacheModel):
             'phase': self.phase,
             'restaurant': self.restaurant,
             'member_ids': self.member_ids,
-            'menus': self.menus.as_dict() if isinstance(self.menus, MenuEntries) else self.menus,
+            'menu_entries': self.menu_entries.as_dict() if isinstance(self.menu_entries, MenuEntries) else self.menu_entries,
         }
 
 
