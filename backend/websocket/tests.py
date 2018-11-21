@@ -161,7 +161,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
 
         party.refresh_from_db()
         self.assertDictEqual(resp, event.state_update(party.state))
-        self.assertEqual(party.state.members[0], user.id)
+        self.assertEqual(party.state.member_ids[0], user.id)
         self.assertEqual(party.member_count, 1)
         self.assertEqual(cache.get('user-party:{}'.format(user.id)), party_id)
 
@@ -377,8 +377,8 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
         self.assertDictEqual(resp, event.party_leave(user2.id))
 
         party.refresh_from_db()
-        self.assertEqual(len(party.state.members), 1)
-        self.assertEqual(party.state.members[0], user1.id)
+        self.assertEqual(len(party.state.member_ids), 1)
+        self.assertEqual(party.state.member_ids[0], user1.id)
         self.assertEqual(party.member_count, 1)
         self.assertIsNone(cache.get('user-party:{}'.format(user2.id)))
 

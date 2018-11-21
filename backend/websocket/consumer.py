@@ -124,7 +124,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         # TODO: Check party permission
 
-        state.members.append(user_id)
+        state.member_ids.append(user_id)
         party.member_count += 1
         state.save()
         party.save()
@@ -149,7 +149,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(user_id)
         party_id = party.id
 
-        state.members.remove(user_id)
+        state.member_ids.remove(user_id)
         party.member_count -= 1
         state.save()
         party.save()
@@ -167,7 +167,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             )
 
             if party.leader.id == user_id:
-                next_user_id = state.members[0]
+                next_user_id = state.member_ids[0]
                 user = User.objects.get(id=next_user_id)
                 party.leader = user
                 party.save()
