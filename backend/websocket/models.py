@@ -68,7 +68,8 @@ class PartyState(CacheModel):
             'phase': self.phase,
             'restaurant_id': self.restaurant_id,
             'member_ids': self.member_ids,
-            'menu_entries': self.menu_entries.as_dict() if isinstance(self.menu_entries, MenuEntries) else self.menu_entries,
+            'menu_entries': self.menu_entries.as_dict() if isinstance(
+                self.menu_entries, MenuEntries) else self.menu_entries,
         }
 
 
