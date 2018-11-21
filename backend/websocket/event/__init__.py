@@ -15,6 +15,20 @@ def party_leave(user_id: int):
     }
 
 
+def restaurant_vote(restaurant_id: int):
+    return {
+        'type': 'restaurant.vote',
+        'restaurant_id': restaurant_id,
+    }
+
+
+def restaurant_unvote(restaurant_id: int):
+    return {
+        'type': 'restaurant.unvote',
+        'restaurant_id': restaurant_id,
+    }
+
+
 def menu_create(menu_entry_id: int, menu_id: int, quantity: int, user_ids: list):
     return {
         'type': 'menu.create',
