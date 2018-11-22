@@ -11,6 +11,12 @@ from api.models import User, Party, PartyType
 from websocket import event
 
 
+def new_communicator(user: User):
+    communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+    communicator.scope['user'] = user
+    return communicator
+
+
 def async_test(coro):
     def wrapper(*args, **kwargs):
         future = coro(*args, **kwargs)
@@ -83,8 +89,7 @@ class WebsocketConnectionTestCase(TestCaseWithCache):
 
         await communicator.disconnect()
 
-
-class SingleWebsocketTestCase(TestCaseWithCache):
+class TestCaseWithSingleWebsocket(TestCaseWithCache):
     async def join(self):
         await self.communicator.send_json_to({
             'command': 'party.join',
@@ -92,38 +97,89 @@ class SingleWebsocketTestCase(TestCaseWithCache):
         })
         await self.communicator.receive_json_from(1)
 
+
     @async_test
     async def setUp(self):
         super().setUp()
-        user = User.objects.create_user(
+        self.user = User.objects.create_user(
             email='ferris@rustacean.org',
             password='iluvrust',
             username='ferris',
         )
-        party = Party(
+        self.party = Party(
             name="party 1 name",
             type=int(PartyType.Private),
             location="party 1 location",
-            leader=user,
+            leader=self.user,
         )
-        party.save()
-        self.client.login(email=user.email, password='iluvrust')
+        self.party.save()
+        self.client.login(email=self.user.email, password='iluvrust')
 
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = user
-
-        await communicator.connect()
-        await communicator.receive_json_from(1)
-
-        self.user = user
-        self.party = party
-        self.communicator = communicator
+        self.communicator = new_communicator(self.user)
+        await self.communicator.connect()
+        await self.communicator.receive_json_from(1)
 
     @async_test
     async def tearDown(self):
         await self.communicator.disconnect()
         super().tearDown()
 
+
+class TestCaseWithDoubleWebsocket(TestCaseWithCache):
+    async def join_both(self):
+        await self.communicator1.send_json_to({
+            'command': 'party.join',
+            'party_id': self.party.id,
+        })
+        await self.communicator1.receive_json_from(1)
+
+        await self.communicator2.send_json_to({
+            'command': 'party.join',
+            'party_id': self.party.id,
+        })
+        await self.communicator2.receive_json_from(1)
+        await self.communicator1.receive_json_from(1)
+
+    @async_test
+    async def setUp(self):
+        super().setUp()
+
+        self.user1 = User.objects.create_user(
+            email='ferris@rustacean.org',
+            password='iluvrust',
+            username='ferris',
+        )
+        self.user2 = User.objects.create_user(
+            email='pbzweihander@rustacean.org',
+            password='iluvrusttoo',
+            username='pbzweihander',
+        )
+        self.party = Party(
+            name="party 1 name",
+            type=int(PartyType.Private),
+            location="party 1 location",
+            leader=self.user1,
+        )
+        self.party.save()
+        self.client.login(email=self.user1.email, password='iluvrust')
+        client2 = Client()
+        client2.login(email=self.user2.email, password='iluvrusttoo')
+
+        self.communicator1 = new_communicator(self.user1)
+        self.communicator2 = new_communicator(self.user2)
+
+        await self.communicator1.connect()
+        await self.communicator2.connect()
+        await self.communicator1.receive_json_from(1)
+        await self.communicator2.receive_json_from(1)
+
+    @async_test
+    async def tearDown(self):
+        await self.communicator1.disconnect()
+        await self.communicator2.disconnect()
+        super().tearDown()
+
+class ConsumerTestCase(TestCaseWithSingleWebsocket):
     @async_test
     async def test_invalid_command(self):
         communicator = self.communicator
@@ -146,6 +202,8 @@ class SingleWebsocketTestCase(TestCaseWithCache):
         resp = await communicator.receive_json_from(1)
         self.assertDictEqual(resp, event.error.invalid_data())
 
+
+class PartyTestCase1(TestCaseWithSingleWebsocket):
     @async_test
     async def test_party_join(self):
         user = self.user
@@ -274,68 +332,7 @@ class SingleWebsocketTestCase(TestCaseWithCache):
         self.assertDictEqual(resp, event.state_update(self.party.state))
 
 
-class DoubleWebsocketTestCase(TestCaseWithCache):
-    async def join_both(self):
-        await self.communicator1.send_json_to({
-            'command': 'party.join',
-            'party_id': self.party.id,
-        })
-        await self.communicator1.receive_json_from(1)
-
-        await self.communicator2.send_json_to({
-            'command': 'party.join',
-            'party_id': self.party.id,
-        })
-        await self.communicator2.receive_json_from(1)
-        await self.communicator1.receive_json_from(1)
-
-    @async_test
-    async def setUp(self):
-        super().setUp()
-
-        user1 = User.objects.create_user(
-            email='ferris@rustacean.org',
-            password='iluvrust',
-            username='ferris',
-        )
-        user2 = User.objects.create_user(
-            email='pbzweihander@rustacean.org',
-            password='iluvrusttoo',
-            username='pbzweihander',
-        )
-        party = Party(
-            name="party 1 name",
-            type=int(PartyType.Private),
-            location="party 1 location",
-            leader=user1,
-        )
-        party.save()
-        self.client.login(email=user1.email, password='iluvrust')
-        client2 = Client()
-        client2.login(email=user2.email, password='iluvrusttoo')
-
-        communicator1 = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator1.scope['user'] = user1
-        communicator2 = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator2.scope['user'] = user2
-
-        await communicator1.connect()
-        await communicator2.connect()
-        await communicator1.receive_json_from(1)
-        await communicator2.receive_json_from(1)
-
-        self.user1 = user1
-        self.user2 = user2
-        self.party = party
-        self.communicator1 = communicator1
-        self.communicator2 = communicator2
-
-    @async_test
-    async def tearDown(self):
-        await self.communicator1.disconnect()
-        await self.communicator2.disconnect()
-        super().tearDown()
-
+class PartyTestCase2(TestCaseWithDoubleWebsocket):
     @async_test
     async def test_party_join_and_broadcast(self):
         user2 = self.user2
@@ -382,6 +379,40 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
         self.assertEqual(party.member_count, 1)
         self.assertIsNone(cache.get('user-party:{}'.format(user2.id)))
 
+    @async_test
+    async def test_change_leader_on_leaving(self):
+        await self.join_both()
+
+        await self.communicator1.send_json_to({
+            'command': 'party.leave'
+        })
+        await self.communicator2.receive_json_from(1)
+
+        self.party.refresh_from_db()
+        self.assertEqual(self.party.leader, self.user2)
+
+    @async_test
+    async def test_already_joined_connection_receive_broadcast(self):
+        await self.join_both()
+
+        await self.communicator1.disconnect()
+
+        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
+        communicator.scope['user'] = self.user1
+
+        await communicator.connect()
+        resp = await communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.state_update(self.party.state))
+
+        await self.communicator2.send_json_to({
+            'command': 'party.leave',
+        })
+
+        resp = await communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.party_leave(self.user2.id))
+
+
+class MenuTestCase(TestCaseWithDoubleWebsocket):
     @async_test
     async def test_menu_create(self):
         user1 = self.user1
@@ -525,38 +556,6 @@ class DoubleWebsocketTestCase(TestCaseWithCache):
         await communicator1.receive_nothing()
         resp = await communicator2.receive_json_from(1)
         self.assertDictEqual(resp, event.error.invalid_menu_entry())
-
-    @async_test
-    async def test_change_leader_on_leaving(self):
-        await self.join_both()
-
-        await self.communicator1.send_json_to({
-            'command': 'party.leave'
-        })
-        await self.communicator2.receive_json_from(1)
-
-        self.party.refresh_from_db()
-        self.assertEqual(self.party.leader, self.user2)
-
-    @async_test
-    async def test_already_joined_connection_receive_broadcast(self):
-        await self.join_both()
-
-        await self.communicator1.disconnect()
-
-        communicator = WebsocketCommunicator(WebsocketConsumer, '/',)
-        communicator.scope['user'] = self.user1
-
-        await communicator.connect()
-        resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.state_update(self.party.state))
-
-        await self.communicator2.send_json_to({
-            'command': 'party.leave',
-        })
-
-        resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.party_leave(self.user2.id))
 
 
 class MenuEntriesTestCase(TestCase):
