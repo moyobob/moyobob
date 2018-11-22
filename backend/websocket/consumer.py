@@ -47,8 +47,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         self.commands = {
             'party.join': self.command_party_join,
             'party.leave': self.command_party_leave,
-            'restaurant.vote': self.restaurant_vote,
-            'restaurant.unvote': self.restaurant_unvote,
+            'restaurant.vote': self.command_restaurant_vote,
+            'restaurant.unvote': self.command_restaurant_unvote,
             'menu.create': self.command_menu_create,
             'menu.update': self.command_menu_update,
             'menu.delete': self.command_menu_delete,
@@ -191,7 +191,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         restaurant_id = data['restaurant_id']
 
         (party, state) = get_party_of_user(user.id)
-        _ = Restaurant.objects.get(id=restaurant_id)
+        rest = Restaurant.objects.get(id=restaurant_id)
 
         for (i, (rid, votes)) in enumerate(state.restaurant_votes):
             if rid == restaurant_id:
@@ -221,11 +221,16 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             await self.send_json(
                 event.error.not_voted(),
             )
+            return
+        state.restaurant_votes = list(filter(
+            lambda t: t[1] > 0,
+            state.restaurant_votes,
+        ))
         state.save()
 
         await self.channel_layer.group_send(
             'party-{}'.format(party.id),
-            event.restaurant_vote(restaurant_id),
+            event.restaurant_unvote(restaurant_id),
         )
 
     async def command_menu_create(self, data):
