@@ -10,6 +10,12 @@ def invalid_data():
     }
 
 
+def invalid_user():
+    return {
+        'type': 'error.invalid.user',
+    }
+
+
 def invalid_party():
     return {
         'type': 'error.invalid.party',

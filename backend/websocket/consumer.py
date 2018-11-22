@@ -104,6 +104,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 await command(msg)
             except KeyError:
                 await self.send_json(event.error.invalid_data())
+            except User.DoesNotExist:
+                await self.send_json(event.error.invalid_user())
             except Party.DoesNotExist:
                 await self.send_json(event.error.invalid_party())
             except Restaurant.DoesNotExist:
@@ -232,7 +234,10 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         user_ids = data['user_ids']
 
         (party, state) = get_party_of_user(self.scope['user'].id)
+
         _ = Menu.objects.get(id=menu_id)
+        for u in user_ids:
+            _ = User.objects.get(id=u)
 
         menu_entry_id = state.menu_entries.add(menu_id, quantity, user_ids)
         state.save()
@@ -249,6 +254,11 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         remove_user_ids = data.get('remove_user_ids') or []
 
         (party, state) = get_party_of_user(self.scope['user'].id)
+
+        for u in add_user_ids:
+            _ = User.objects.get(id=u)
+        for u in remove_user_ids:
+            _ = User.objects.get(id=u)
 
         try:
             state.menu_entries.update(

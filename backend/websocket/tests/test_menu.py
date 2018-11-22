@@ -3,12 +3,70 @@ from django.test import TestCase
 
 from websocket import event
 from . import async_test, new_communicator
-from . import TestCaseWithDoubleWebsocket
+from . import TestCaseWithSingleWebsocket, TestCaseWithDoubleWebsocket
 from websocket.models import MenuEntries
 from api.models import Party, Menu
 
 
-class MenuTestCase(TestCaseWithDoubleWebsocket):
+class MenuTestCase1(TestCaseWithSingleWebsocket):
+    @async_test
+    async def test_invalid_menu(self):
+        await self.join()
+
+        await self.communicator.send_json_to({
+            'command': 'menu.create',
+            'menu_id': 0,
+            'quantity': 1,
+            'user_ids': [self.user.id],
+        })
+        resp = await self.communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.invalid_menu())
+
+    @async_test
+    async def test_invalid_user(self):
+        await self.join()
+
+        menu = Menu(name="Rust")
+        menu.save()
+
+        await self.communicator.send_json_to({
+            'command': 'menu.create',
+            'menu_id': menu.id,
+            'quantity': 1,
+            'user_ids': [0],
+        })
+        resp = await self.communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.invalid_user())
+
+        await self.communicator.send_json_to({
+            'command': 'menu.create',
+            'menu_id': menu.id,
+            'quantity': 1,
+            'user_ids': [self.user.id],
+        })
+        resp = await self.communicator.receive_json_from(1)
+        menu_entry_id = resp['menu_entry_id']
+
+        await self.communicator.send_json_to({
+            'command': 'menu.update',
+            'menu_entry_id': menu_entry_id,
+            'quantity': 1,
+            'add_user_ids': [0],
+        })
+        resp = await self.communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.invalid_user())
+
+        await self.communicator.send_json_to({
+            'command': 'menu.update',
+            'menu_entry_id': menu_entry_id,
+            'quantity': 1,
+            'remove_user_ids': [0],
+        })
+        resp = await self.communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.invalid_user())
+
+
+class MenuTestCase2(TestCaseWithDoubleWebsocket):
     def setUp(self):
         super().setUp()
         self.menu1 = Menu(name="Rust")
