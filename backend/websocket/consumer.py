@@ -4,7 +4,7 @@ from django.core.cache import cache
 import json
 
 from .models import PartyState
-from api.models import Party, User
+from api.models import Party, User, Restaurant
 from websocket import event
 from .exception import NotInPartyError, AlreadyJoinedError
 
@@ -47,6 +47,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         self.commands = {
             'party.join': self.command_party_join,
             'party.leave': self.command_party_leave,
+            'restaurant.vote': self.restaurant_vote,
+            'restaurant.unvote': self.restaurant_unvote,
             'menu.create': self.command_menu_create,
             'menu.update': self.command_menu_update,
             'menu.delete': self.command_menu_delete,
@@ -104,6 +106,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_json(event.error.invalid_data())
             except Party.DoesNotExist:
                 await self.send_json(event.error.invalid_party())
+            except Restaurant.DoesNotExist:
+                await self.send_json(event.error.invalid_restaurant())
             except NotInPartyError:
                 await self.send_json(event.error.not_joined())
             except AlreadyJoinedError:
@@ -178,6 +182,48 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         else:
             party.delete()
 
+    async def command_restaurant_vote(self, data):
+        user = self.scope['user']
+        restaurant_id = data['restaurant_id']
+
+        (party, state) = get_party_of_user(user.id)
+        _ = Restaurant.objects.get(id=restaurant_id)
+
+        for (i, (rid, votes)) in enumerate(state.restaurant_votes):
+            if rid == restaurant_id:
+                state.restaurant_votes[i] = (rid, votes + 1)
+                break
+        else:
+            state.restaurant_votes.append((restaurant_id, 1))
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.restaurant_vote(restaurant_id),
+        )
+
+    async def command_restaurant_unvote(self, data):
+        user = self.scope['user']
+        restaurant_id = data['restaurant_id']
+
+        (party, state) = get_party_of_user(user.id)
+        _ = Restaurant.objects.get(id=restaurant_id)
+
+        for (i, (rid, votes)) in enumerate(state.restaurant_votes):
+            if rid == restaurant_id:
+                state.restaurant_votes[i] = (rid, votes - 1)
+                break
+        else:
+            await self.send_json(
+                event.error.not_voted(),
+            )
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.restaurant_vote(restaurant_id),
+        )
+
     async def command_menu_create(self, data):
         menu_id = data['menu_id']
         quantity = data['quantity']
@@ -248,6 +294,20 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         await self.send_json(
             event.party_leave(user_id)
+        )
+
+    async def restaurant_vote(self, data):
+        restaurant_id = data['restaurant_id']
+
+        await self.send_json(
+            event.restaurant_vote(restaurant_id),
+        )
+
+    async def restaurant_unvote(self, data):
+        restaurant_id = data['restaurant_id']
+
+        await self.send_json(
+            event.restaurant_unvote(restaurant_id),
         )
 
     async def menu_create(self, data):
