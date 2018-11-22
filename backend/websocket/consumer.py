@@ -191,7 +191,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         restaurant_id = data['restaurant_id']
 
         (party, state) = get_party_of_user(user.id)
-        rest = Restaurant.objects.get(id=restaurant_id)
+        Restaurant.objects.get(id=restaurant_id)
 
         for (i, (rid, votes)) in enumerate(state.restaurant_votes):
             if rid == restaurant_id:
@@ -211,7 +211,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         restaurant_id = data['restaurant_id']
 
         (party, state) = get_party_of_user(user.id)
-        _ = Restaurant.objects.get(id=restaurant_id)
+        Restaurant.objects.get(id=restaurant_id)
 
         for (i, (rid, votes)) in enumerate(state.restaurant_votes):
             if rid == restaurant_id:
@@ -240,9 +240,9 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
-        _ = Menu.objects.get(id=menu_id)
+        Menu.objects.get(id=menu_id)
         for u in user_ids:
-            _ = User.objects.get(id=u)
+            User.objects.get(id=u)
 
         menu_entry_id = state.menu_entries.add(menu_id, quantity, user_ids)
         state.save()
@@ -261,9 +261,9 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(self.scope['user'].id)
 
         for u in add_user_ids:
-            _ = User.objects.get(id=u)
+            User.objects.get(id=u)
         for u in remove_user_ids:
-            _ = User.objects.get(id=u)
+            User.objects.get(id=u)
 
         try:
             state.menu_entries.update(
