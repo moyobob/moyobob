@@ -22,6 +22,12 @@ def invalid_restaurant():
     }
 
 
+def invalid_menu():
+    return {
+        'type': 'error.invalid.menu',
+    }
+
+
 def invalid_menu_entry():
     return {
         'type': 'error.invalid.menu.entry',

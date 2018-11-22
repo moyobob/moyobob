@@ -4,7 +4,7 @@ from django.core.cache import cache
 import json
 
 from .models import PartyState
-from api.models import Party, User, Restaurant
+from api.models import Party, User, Restaurant, Menu
 from websocket import event
 from .exception import NotInPartyError, AlreadyJoinedError
 
@@ -108,6 +108,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_json(event.error.invalid_party())
             except Restaurant.DoesNotExist:
                 await self.send_json(event.error.invalid_restaurant())
+            except Menu.DoesNotExist:
+                await self.send_json(event.error.invalid_menu())
             except NotInPartyError:
                 await self.send_json(event.error.not_joined())
             except AlreadyJoinedError:
@@ -230,6 +232,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         user_ids = data['user_ids']
 
         (party, state) = get_party_of_user(self.scope['user'].id)
+        _ = Menu.objects.get(id=menu_id)
 
         menu_entry_id = state.menu_entries.add(menu_id, quantity, user_ids)
         state.save()

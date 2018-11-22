@@ -5,10 +5,17 @@ from websocket import event
 from . import async_test, new_communicator
 from . import TestCaseWithDoubleWebsocket
 from websocket.models import MenuEntries
-from api.models import Party
+from api.models import Party, Menu
 
 
 class MenuTestCase(TestCaseWithDoubleWebsocket):
+    def setUp(self):
+        super().setUp()
+        self.menu1 = Menu(name="Rust")
+        self.menu2 = Menu(name="Cargo")
+        self.menu1.save()
+        self.menu2.save()
+
     @async_test
     async def test_menu_create(self):
         user1 = self.user1
@@ -22,7 +29,7 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
 
         await communicator1.send_json_to({
             'command': 'menu.create',
-            'menu_id': 11,
+            'menu_id': self.menu1.id,
             'quantity': 1,
             'user_ids': [user1.id],
         })
@@ -30,12 +37,14 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
         resp = await communicator2.receive_json_from(1)
         id1 = resp['menu_entry_id']
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_create(id1, 11, 1, [user1.id]))
-        self.assertTupleEqual(state.menu_entries.get(id1), (11, 1, [user1.id]))
+        self.assertDictEqual(resp, event.menu_create(
+            id1, self.menu1.id, 1, [user1.id]))
+        self.assertTupleEqual(state.menu_entries.get(
+            id1), (self.menu1.id, 1, [user1.id]))
 
         await communicator2.send_json_to({
             'command': 'menu.create',
-            'menu_id': 11,
+            'menu_id': self.menu1.id,
             'quantity': 1,
             'user_ids': [user2.id],
         })
@@ -43,11 +52,13 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
         resp = await communicator1.receive_json_from(1)
         id2 = resp['menu_entry_id']
         state.refresh_from_db()
-        self.assertDictEqual(resp, event.menu_create(id2, 11, 1, [user2.id]))
-        self.assertTupleEqual(state.menu_entries.get(id2), (11, 1, [user2.id]))
+        self.assertDictEqual(resp, event.menu_create(
+            id2, self.menu1.id, 1, [user2.id]))
+        self.assertTupleEqual(state.menu_entries.get(
+            id2), (self.menu1.id, 1, [user2.id]))
         self.assertDictEqual(state.menu_entries.inner, {
-            id1: (11, 1, [user1.id]),
-            id2: (11, 1, [user2.id]),
+            id1: (self.menu1.id, 1, [user1.id]),
+            id2: (self.menu1.id, 1, [user2.id]),
         })
 
     @async_test
@@ -58,7 +69,7 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
         communicator1 = self.communicator1
         communicator2 = self.communicator2
         state = party.state
-        state.menu_entries.inner = {1: (11, 1, [user1.id])}
+        state.menu_entries.inner = {1: (self.menu1.id, 1, [user1.id])}
         state.save()
 
         await self.join_both()
@@ -72,7 +83,8 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
         resp = await communicator1.receive_json_from(1)
         state.refresh_from_db()
         self.assertDictEqual(resp, event.menu_update(1, 1, [], []))
-        self.assertTupleEqual(state.menu_entries.get(1), (11, 2, [user1.id]))
+        self.assertTupleEqual(state.menu_entries.get(1),
+                              (self.menu1.id, 2, [user1.id]))
 
         await communicator1.send_json_to({
             'command': 'menu.update',
@@ -85,7 +97,7 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
         state.refresh_from_db()
         self.assertDictEqual(resp, event.menu_update(1, 1, [user2.id], []))
         self.assertTupleEqual(
-            state.menu_entries.get(1), (11, 3, [user1.id, user2.id]))
+            state.menu_entries.get(1), (self.menu1.id, 3, [user1.id, user2.id]))
 
         await communicator2.send_json_to({
             'command': 'menu.update',
@@ -97,7 +109,8 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
         resp = await communicator1.receive_json_from(1)
         state.refresh_from_db()
         self.assertDictEqual(resp, event.menu_update(1, -2, [], [user1.id]))
-        self.assertTupleEqual(state.menu_entries.get(1), (11, 1, [user2.id]))
+        self.assertTupleEqual(state.menu_entries.get(1),
+                              (self.menu1.id, 1, [user2.id]))
 
         await communicator2.send_json_to({
             'command': 'menu.update',
@@ -117,7 +130,7 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
         communicator2 = self.communicator2
         state = party.state
         state.menu_entries.inner = {
-            1: (11, 1, [user1.id]), 2: (22, 2, [user2.id])}
+            1: (self.menu1.id, 1, [user1.id]), 2: (self.menu2.id, 2, [user2.id])}
         state.save()
 
         await self.join_both()
@@ -132,7 +145,7 @@ class MenuTestCase(TestCaseWithDoubleWebsocket):
         self.assertDictEqual(resp, event.menu_delete(1))
         self.assertIsNone(state.menu_entries.get(1))
         self.assertDictEqual(state.menu_entries.inner,
-                             {2: (22, 2, [user2.id])})
+                             {2: (self.menu2.id, 2, [user2.id])})
 
         await communicator1.send_json_to({
             'command': 'menu.delete',
