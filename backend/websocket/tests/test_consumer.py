@@ -1,5 +1,5 @@
-from . import event
-from .tests import TestCaseWithSingleWebsocket, async_test
+from . import TestCaseWithSingleWebsocket, async_test
+from websocket import event
 
 
 class ConsumerTestCase(TestCaseWithSingleWebsocket):

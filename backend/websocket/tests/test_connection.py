@@ -1,8 +1,8 @@
 from channels.testing import WebsocketCommunicator
 
 from backend.routings import application
-from .consumer import WebsocketConsumer
-from .tests import TestCaseWithCache, async_test
+from websocket.consumer import WebsocketConsumer
+from . import TestCaseWithCache, async_test
 from api.models import User
 
 

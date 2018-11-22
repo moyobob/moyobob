@@ -1,10 +1,10 @@
 from django.core.cache import cache
 from django.test import TestCase
 
-from . import event
-from .tests import async_test, new_communicator
-from .tests import TestCaseWithDoubleWebsocket
-from .models import MenuEntries
+from websocket import event
+from . import async_test, new_communicator
+from . import TestCaseWithDoubleWebsocket
+from websocket.models import MenuEntries
 from api.models import Party
 
 

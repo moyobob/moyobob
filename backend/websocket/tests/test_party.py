@@ -1,8 +1,8 @@
 from django.core.cache import cache
 
-from . import event
-from .tests import async_test, new_communicator
-from .tests import TestCaseWithSingleWebsocket, TestCaseWithDoubleWebsocket
+from websocket import event
+from . import async_test, new_communicator
+from . import TestCaseWithSingleWebsocket, TestCaseWithDoubleWebsocket
 from api.models import Party
 
 

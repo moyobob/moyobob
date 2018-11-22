@@ -5,10 +5,10 @@ import asyncio
 import json
 
 from backend.routings import application
-from .consumer import WebsocketConsumer
-from .models import MenuEntries
 from api.models import User, Party, PartyType
 from websocket import event
+from websocket.consumer import WebsocketConsumer
+from websocket.models import MenuEntries
 
 
 def new_communicator(user: User):
