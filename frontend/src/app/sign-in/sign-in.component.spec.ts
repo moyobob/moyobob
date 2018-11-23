@@ -87,7 +87,7 @@ describe('SignInComponent', () => {
         mockEmail, mockPassword
       );
 
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/lobby/');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('lobby');
     });
   }));
 
@@ -121,7 +121,7 @@ describe('SignInComponent', () => {
         mockEmail, mockPassword
       );
 
-      expect(router.navigateByUrl).toHaveBeenCalledWith('/lobby/');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('lobby');
     });
   }));
 
