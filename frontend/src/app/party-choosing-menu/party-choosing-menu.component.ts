@@ -1,58 +1,49 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 
-import { PartyService } from '../services/party.service';
-import { UserService } from '../services/user.service';
-import { Menu, PartyMenu, PartyMenuUpdateRequest } from '../types/menu';
+import { Menu, PartyMenu, PartyMenuUpdateRequest, PartyMenuCreateRequest } from '../types/menu';
+import { PartyState, Party } from '../types/party';
+import { User } from '../types/user';
 
 @Component({
   selector: 'app-party-choosing-menu',
   templateUrl: './party-choosing-menu.component.html',
   styleUrls: ['./party-choosing-menu.component.css']
 })
-export class PartyChoosingMenuComponent implements OnInit {
+export class PartyChoosingMenuComponent implements OnInit, OnChanges {
+  @Input() partyState: PartyState;
+  @Input() user: User;
+  @Input() menus: Menu[];
 
-  menus: PartyMenu[];
-  menusOfRestaurant: Menu[];
+  @Output() addMenu: EventEmitter<PartyMenuCreateRequest>;
+  @Output() updateMenu: EventEmitter<PartyMenuUpdateRequest>;
+
+  menuEntries: PartyMenu[];
   showAddMenuDialog: boolean;
 
-  constructor(private userService: UserService, private partyService: PartyService) { }
+  constructor() {
+    this.addMenu = new EventEmitter();
+    this.updateMenu = new EventEmitter();
+  }
 
   ngOnInit() {
-    this.menus = [];
-    this.menusOfRestaurant = [];
+    this.menuEntries = [];
     this.showAddMenuDialog = false;
+  }
 
-    this.partyService.getMenus().then(menus => {
-      this.menusOfRestaurant = menus;
-    });
-    this.partyService.partyStateUpdate.subscribe(partyState => {
-      this.menus = partyState.menus;
-    });
-    this.partyService.partyMenuCreate.subscribe(menus => {
-      this.menus = menus;
-    });
-
-    if (this.partyService.partyState.menus) {
-      this.menus = this.partyService.partyState.menus;
-    }
-    /*
-    this.partyService.partyMenuAssign.subscribe(updateRequest => {
-    });
-    //*/
+  ngOnChanges(changes: SimpleChanges) {
+    this.menuEntries = this.partyState.menus;
   }
 
   getMenuNameById(id: number) {
-    const menu = this.menusOfRestaurant.filter(menuor => menuor.id === id);
+    const menu = this.menus.filter(menuor => menuor.id === id);
     if (menu.length) {
       return menu[0].name;
     }
     return '';
   }
 
-  // adding menus
-
   requestAddMenu(event) {
-    this.partyService.createMenu(event);
+    this.addMenu.emit(event);
     this.showAddMenuDialog = false;
   }
 
@@ -65,33 +56,36 @@ export class PartyChoosingMenuComponent implements OnInit {
   }
 
   isAssigned(userIds) {
-    return userIds.some(x => x === this.userService.signedInUserId);
+    return userIds.some(x => x === this.user.id);
   }
 
   updatePartyMenu(partyMenu, quantityDelta, removing) {
+    let req: PartyMenuUpdateRequest;
+
     if (partyMenu.quantity + quantityDelta <= 0 ||
       partyMenu.userIds.length + quantityDelta <= 0) {
-        this.partyService.updateMenu({
-          id: partyMenu.id,
-          quantityDelta: -partyMenu.quantity,
-          addUserIds: [],
-          removeUserIds: partyMenu.userIds
-        });
+      req = {
+        id: partyMenu.id,
+        quantityDelta: -partyMenu.quantity,
+        addUserIds: [],
+        removeUserIds: partyMenu.userIds
+      };
     } else if (removing) {
-      this.partyService.updateMenu({
+      req = {
         id: partyMenu.id,
         quantityDelta: quantityDelta,
         addUserIds: [],
-        removeUserIds: [this.userService.signedInUserId]
-      });
+        removeUserIds: [this.user.id]
+      };
     } else {
-      this.partyService.updateMenu({
+      req = {
         id: partyMenu.id,
         quantityDelta: quantityDelta,
-        addUserIds: [this.userService.signedInUserId],
+        addUserIds: [this.user.id],
         removeUserIds: []
-      });
+      };
     }
-  }
 
+    this.updateMenu.emit(req);
+  }
 }

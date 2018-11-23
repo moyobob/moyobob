@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, SimpleChange } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
 
 import { PartyChoosingMenuComponent } from './party-choosing-menu.component';
@@ -10,41 +10,23 @@ import {
 } from '../types/menu';
 import { PartyState } from '../types/party';
 
-import { UserService } from '../services/user.service';
-import { PartyService } from '../services/party.service';
+const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 
-const mockPartyMenu1 = { id: 1, menuId: 1, quantity: 2, userIds: [1] };
-const mockPartyMenu2 = { id: 2, menuId: 2, quantity: 2, userIds: [1, 2] };
-const mockPartyMenu3 = { id: 3, menuId: 3, quantity: 1, userIds: [2] };
+const mockMenuEntry1 = { id: 1, menuId: 1, quantity: 2, userIds: [1] };
+const mockMenuEntry2 = { id: 2, menuId: 2, quantity: 2, userIds: [1, 2] };
+const mockMenuEntry3 = { id: 3, menuId: 3, quantity: 1, userIds: [2] };
 
 const mockMenu1 = { id: 1, name: 'Mock Menu 1', price: -120 };
 
-class MockUserService {
-  signedInUserId = 1;
-}
+const mockPartyState = {
+  id: 1,
+  phase: 0,
+  restaurant: null,
+  members: [],
+  menus: [mockMenuEntry1, mockMenuEntry2]
+};
 
-class MockPartyService {
-  partyStateUpdate: EventEmitter<PartyState> = new EventEmitter();
-  partyMenuCreate: EventEmitter<PartyMenu[]> = new EventEmitter();
-  partyState: PartyState = {
-    id: 1,
-    phase: 0,
-    restaurant: null,
-    members: [],
-    menus: []
-  };
-  getMenus() {
-    return new Promise(resolve => resolve([mockMenu1]));
-  }
-  createMenu(partyMenuCreateRequest: PartyMenuCreateRequest) {
-
-  }
-  updateMenu(partyMenuUpdateRequest: PartyMenuUpdateRequest) {
-
-  }
-}
-
-@Component({selector: 'app-select-menu', template: ''})
+@Component({ selector: 'app-select-menu', template: '' })
 class MockSelectMenuComponent {
   @Input() menus: Menu[];
   @Input() loggedInUserId: number;
@@ -56,8 +38,6 @@ describe('PartyChoosingMenuComponent', () => {
   let component: PartyChoosingMenuComponent;
   let fixture: ComponentFixture<PartyChoosingMenuComponent>;
 
-  let mockPartyService: MockPartyService;
-
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
@@ -67,24 +47,12 @@ describe('PartyChoosingMenuComponent', () => {
       imports: [
         HttpClientModule,
       ],
-      providers: [
-        { provide: UserService, useClass: MockUserService },
-        { provide: PartyService, useClass: MockPartyService },
-      ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   it('should not update menu when not preloaded', () => {
     fixture = TestBed.createComponent(PartyChoosingMenuComponent);
-    mockPartyService = TestBed.get(PartyService);
-    mockPartyService.partyState = {
-      id: 1,
-      phase: 0,
-      restaurant: null,
-      members: [],
-      menus: undefined
-    };
     component = fixture.componentInstance;
     fixture.detectChanges();
 
@@ -93,46 +61,34 @@ describe('PartyChoosingMenuComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(PartyChoosingMenuComponent);
-    mockPartyService = TestBed.get(PartyService);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
+    component.partyState = mockPartyState;
+    component.menus = [mockMenu1];
+    component.user = mockUser;
+    component.ngOnChanges({
+      partyState: new SimpleChange(undefined, mockPartyState, true),
+      menus: new SimpleChange(undefined, [mockMenu1], true),
+      user: new SimpleChange(undefined, mockUser, true),
+    });
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('menu should set when partyStateUpdate', async(() => {
-    mockPartyService.partyStateUpdate.emit({
-      id: 1,
-      phase: 0,
-      restaurant: null,
-      members: [],
-      menus: [mockPartyMenu1, mockPartyMenu2]
-    });
-    fixture.whenStable().then(() => {
-      expect(component.menus).toEqual([mockPartyMenu1, mockPartyMenu2]);
-    });
-  }));
+  it('have menu entries', () => {
+    expect(component.menuEntries).toEqual(mockPartyState.menus);
+  });
 
-  it('menu should set when partyMenuCreate', async(() => {
-    mockPartyService.partyMenuCreate.emit([mockPartyMenu1, mockPartyMenu2]);
-    fixture.whenStable().then(() => {
-      expect(component.menus).toEqual([mockPartyMenu1, mockPartyMenu2]);
-    });
-  }));
+  it('getMenuNameById should return name if exist', () => {
+    expect(component.getMenuNameById(1)).toEqual(mockMenu1.name);
+  });
 
-  it('getMenuNameById should return name if exist', async(() => {
-    fixture.whenStable().then(() => {
-      expect(component.getMenuNameById(1)).toEqual(mockMenu1.name);
-    });
-  }));
-
-  it('getMenuNameById should return empty string if not exist', async(() => {
-    fixture.whenStable().then(() => {
-      expect(component.getMenuNameById(2)).toEqual('');
-    });
-  }));
+  it('getMenuNameById should return empty string if not exist', () => {
+    expect(component.getMenuNameById(2)).toEqual('');
+  });
 
   it('toggleAddMenu should toggle showAddMenuDialog', () => {
     component.showAddMenuDialog = true;
@@ -150,61 +106,62 @@ describe('PartyChoosingMenuComponent', () => {
     expect(component.showAddMenuDialog).toBeFalsy();
   });
 
-  it('requestAddMenu should set showAddMenuDialog to false and request', () => {
-    spyOn(mockPartyService, 'createMenu');
+  it('requestAddMenu should set showAddMenuDialog to false and request', async((done) => {
     const mockPartyMenuCreateRequest = {
       menuId: 2,
       quantity: 1,
       users: [1]
     };
+    component.addMenu.toPromise().then(req => {
+      expect(req).toEqual(mockPartyMenuCreateRequest);
+      done();
+    });
 
     component.showAddMenuDialog = true;
     component.requestAddMenu(mockPartyMenuCreateRequest);
     expect(component.showAddMenuDialog).toBeFalsy();
-    expect(mockPartyService.createMenu)
-      .toHaveBeenCalledWith(mockPartyMenuCreateRequest);
-  });
-
-  it('updatePartyMenu should remove all when no people', async(() => {
-    spyOn(mockPartyService, 'updateMenu');
-    component.menus = [mockPartyMenu1, mockPartyMenu2];
-    fixture.whenStable().then(() => {
-      component.updatePartyMenu(mockPartyMenu1, -1, true);
-      expect(mockPartyService.updateMenu).toHaveBeenCalledWith({
-        id: mockPartyMenu1.id,
-        quantityDelta: -mockPartyMenu1.quantity,
-        addUserIds: [],
-        removeUserIds: mockPartyMenu1.userIds
-      });
-    });
   }));
 
-  it('updatePartyMenu should remove me when people and quantity', async(() => {
-    spyOn(mockPartyService, 'updateMenu');
-    component.menus = [mockPartyMenu1, mockPartyMenu2];
-    fixture.whenStable().then(() => {
-      component.updatePartyMenu(mockPartyMenu2, -1, true);
-      expect(mockPartyService.updateMenu).toHaveBeenCalledWith({
-        id: mockPartyMenu2.id,
+  it('updatePartyMenu should remove all when no people', async((done) => {
+    component.updateMenu.toPromise().then(req => {
+      expect(req).toEqual({
+        id: mockMenuEntry1.id,
+        quantityDelta: -mockMenuEntry1.quantity,
+        addUserIds: [],
+        removeUserIds: mockMenuEntry1.userIds
+      });
+      done();
+    });
+
+    component.updatePartyMenu(mockMenuEntry1, -1, true);
+  }));
+
+  it('updatePartyMenu should remove me when people and quantity', async((done) => {
+    component.updateMenu.toPromise().then(req => {
+      expect(req).toHaveBeenCalledWith({
+        id: mockMenuEntry2.id,
         quantityDelta: -1,
         addUserIds: [],
         removeUserIds: [1]
       });
+      done();
     });
+
+    component.updatePartyMenu(mockMenuEntry2, -1, true);
   }));
 
-  it('updatePartyMenu should add me when removing false', async(() => {
-    spyOn(mockPartyService, 'updateMenu');
-    component.menus = [mockPartyMenu3];
-    fixture.whenStable().then(() => {
-      component.updatePartyMenu(mockPartyMenu3, 1, false);
-      expect(mockPartyService.updateMenu).toHaveBeenCalledWith({
-        id: mockPartyMenu3.id,
+  it('updatePartyMenu should add me when removing false', async((done) => {
+    component.updateMenu.toPromise().then(req => {
+      expect(req).toHaveBeenCalledWith({
+        id: mockMenuEntry3.id,
         quantityDelta: 1,
         addUserIds: [1],
         removeUserIds: []
       });
+      done();
     });
+
+    component.updatePartyMenu(mockMenuEntry3, 1, false);
   }));
 
   it('isUserId should return true when I am in', () => {
