@@ -68,24 +68,16 @@ export class MockPartyPaymentComponent {
 }
 
 class MockPartyService {
-  partyJoin: EventEmitter<number> = new EventEmitter();
-  partyLeave: EventEmitter<number> = new EventEmitter();
-  partyNotJoined: EventEmitter<void> = new EventEmitter();
-  partyStateUpdate: EventEmitter<PartyState> = new EventEmitter();
-  partyMenuCreate: EventEmitter<PartyMenu[]> = new EventEmitter();
-  partyMenuUpdate: EventEmitter<PartyMenu[]> = new EventEmitter();
+  public partyStateUpdate: EventEmitter<PartyState> = new EventEmitter();
+  public initiallyNotJoined: EventEmitter<void> = new EventEmitter();
 
-
-  connectWebsocket() {
+  getParty(_: number) {
     return undefined;
   }
-  getParty() {
+  createMenu(_: PartyMenuCreateRequest) {
     return undefined;
   }
-  getPartyStateUpdate() {
-    return undefined;
-  }
-  getMenus() {
+  updateMenu(_: PartyMenuUpdateRequest) {
     return undefined;
   }
 }
