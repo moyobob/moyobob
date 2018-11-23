@@ -27,7 +27,9 @@ jobs:
             - "/usr/local/lib/python3.6/site-packages"
       - run:
           name: Migrating DB
-          command: python manage.py migrate
+          command: |
+            mkdir db
+            python manage.py migrate
           working_directory: backend
       - run:
           name: Running linter
