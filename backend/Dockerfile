@@ -1,9 +1,11 @@
-FROM python:3-stretch
+FROM python:3-alpine
 
 WORKDIR /app
 
+RUN apk --no-cache add --virtual .build-deps gcc musl-dev
 COPY requirements.txt .
 RUN pip install -r requirements.txt --no-cache-dir
+RUN apk --no-cache del --purge .build-deps
 
 COPY manage.py .
 COPY backend backend
@@ -17,4 +19,4 @@ RUN python manage.py migrate
 EXPOSE 8000
 VOLUME /app/db
 
-CMD python manage.py runserver 0.0.0.0:8000
+CMD gunicorn --bind 0.0.0.0:8000 backend.wsgi:application
