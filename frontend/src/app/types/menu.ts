@@ -4,13 +4,6 @@ export class Menu {
   price: number;
 }
 
-export class PartyMenu {
-  id: number;
-  menuId: number;
-  quantity: number;
-  userIds: number[];
-}
-
 export class PartyMenuCreateRequest {
   menuId: number;
   quantity: number;
