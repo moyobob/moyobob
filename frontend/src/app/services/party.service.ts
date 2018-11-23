@@ -94,10 +94,10 @@ export class PartyService {
       }
     } else if (json['type'] === 'state.update') {
       this.isJoined = true;
-      json['state']['restaurant'] = 1;
+      json['state']['restaurant_id'] = 1;
       const menus = [];
-      for (const menuEntryId of Object.keys(json['state']['menus'])) {
-        const [menuId, quantity, userIds] = json['state']['menus'][menuEntryId];
+      for (const menuEntryId of Object.keys(json['state']['menu_entries'])) {
+        const [menuId, quantity, userIds] = json['state']['menu_entries'][menuEntryId];
         menus.push({
           id: +menuEntryId,
           menuId: menuId,
@@ -108,8 +108,8 @@ export class PartyService {
       this.partyState = {
         id: json['state']['id'],
         phase: json['state']['phase'],
-        restaurant: json['state']['restaurant'],
-        members: json['state']['members'],
+        restaurant: json['state']['restaurant_id'],
+        members: json['state']['member_ids'],
         menus: menus
       };
       this.joinedPartyId = json['state']['id'];
@@ -120,7 +120,7 @@ export class PartyService {
         id: json['menu_entry_id'],
         menuId: json['menu_id'],
         quantity: json['quantity'],
-        userIds: json['users']
+        userIds: json['user_ids']
       });
       this.partyMenuCreate.emit(this.partyState.menus);
     } else if (json['type'] === 'menu.update') {
@@ -174,7 +174,7 @@ export class PartyService {
       'command': 'menu.create',
       'menu_id': request.menuId,
       'quantity': request.quantity,
-      'users': request.users
+      'user_ids': request.users
     });
   }
 
