@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 
-import { Menu, PartyMenu, PartyMenuUpdateRequest, PartyMenuCreateRequest } from '../types/menu';
-import { PartyState, Party } from '../../types/party';
+import { Menu, PartyMenuUpdateRequest, PartyMenuCreateRequest } from '../../types/menu';
+import { PartyState, MenuEntry } from '../../types/party';
 import { User } from '../../types/user';
 
 @Component({
@@ -17,7 +17,7 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   @Output() addMenu: EventEmitter<PartyMenuCreateRequest>;
   @Output() updateMenu: EventEmitter<PartyMenuUpdateRequest>;
 
-  menuEntries: PartyMenu[];
+  menuEntries: MenuEntry[];
   showAddMenuDialog: boolean;
 
   constructor() {
