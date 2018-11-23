@@ -1,2 +1,3 @@
 <span id="party-id">{{party.id}}</span> <span id="party-name">{{party.name}}</span>
-<button *ngIf="!this.joinedPartyId || this.joinedPartyId === this.party.id" (click)="routeToParty(party.id);">Join</button>
+<button *ngIf="!this.joinedPartyId" (click)="joinPartyButton(party.id);">Join</button>
+<button *ngIf="this.joinedPartyId === this.party.id" (click)="navigateToPartyButton();">Join</button>

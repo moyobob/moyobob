@@ -43,6 +43,12 @@ export class MenuEntry {
   userIds: number[];
 }
 
+export class PartyCreateRequest {
+  name: string;
+  type: PartyType;
+  location: string;
+}
+
 export class MenuEntryCreateRequest {
   menuId: number;
   quantity: number;

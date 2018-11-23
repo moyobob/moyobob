@@ -89,7 +89,7 @@ describe('LobbyComponent', () => {
 
   it('should get parties', async(() => {
     component.ngOnInit();
-    fixture.whenStable().then( () => {
+    fixture.whenStable().then(() => {
       fixture.detectChanges();
       expect(partyService.getParties).toHaveBeenCalled();
       expect(component.parties).toEqual(mockParties);

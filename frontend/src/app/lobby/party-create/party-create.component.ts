@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Party, PartyType } from '../../types/party';
-import { PartyService } from '../../services/party.service';
+import { PartyType, PartyCreateRequest } from '../../types/party';
 
 @Component({
   selector: 'app-party-create',
@@ -10,7 +9,10 @@ import { PartyService } from '../../services/party.service';
   styleUrls: ['./party-create.component.css']
 })
 export class PartyCreateComponent implements OnInit {
-  party: Partial<Party> = {
+  @Output() createParty: EventEmitter<PartyCreateRequest> = new EventEmitter();
+  @Output() cancel: EventEmitter<void> = new EventEmitter();
+
+  party: PartyCreateRequest = {
     name: '',
     type: PartyType.InGroup,
     location: '',
@@ -19,27 +21,21 @@ export class PartyCreateComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private partyService: PartyService,
   ) { }
 
   ngOnInit() {
   }
 
-  back() {
-    this.router.navigate(['/lobby/']);
+  cancelButton() {
+    this.cancel.emit();
   }
 
-  create() {
+  createButton() {
     if (this.submitting) {
       return;
     }
     this.submitting = true;
 
-    this.partyService.addParty(this.party)
-      .then(party => {
-        this.partyService.joinedPartyId = party.id;
-        this.partyService.connectWebsocket();
-        this.router.navigate(['/party/']);
-      });
+    this.createParty.emit(this.party);
   }
 }

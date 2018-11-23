@@ -2,13 +2,13 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 
-import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
+import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest, PartyCreateRequest } from '../types/party';
 
 import { WebsocketService } from './websocket.service';
 import {
   Event, PartyJoinEvent, PartyLeaveEvent, InitiallyNotJoinedEvent, StateUpdateEvent, MenuCreateEvent, MenuUpdateEvent
 } from '../types/event';
-import { PartyLeaveCommand, MenuCreateCommand, MenuUpdateCommand } from '../types/command';
+import { PartyLeaveCommand, MenuCreateCommand, MenuUpdateCommand, PartyJoinCommand } from '../types/command';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -45,7 +45,7 @@ export class PartyService {
     }
   }
 
-  async addParty(party: Partial<Party>): Promise<Party> {
+  async addParty(party: PartyCreateRequest): Promise<Party> {
     return await this.http.post<Party>('api/party/', party, httpOptions).toPromise();
   }
 
@@ -127,6 +127,15 @@ export class PartyService {
         break;
       }
     }
+  }
+
+  joinParty(partyId: number): void {
+    if (this.partyState !== undefined) {
+      return;
+    }
+
+    const command = new PartyJoinCommand(partyId);
+    this.websocketService.send(command);
   }
 
   leaveParty(): void {

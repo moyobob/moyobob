@@ -1,8 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 
 import { Party } from '../../types/party';
-import { PartyService } from '../../services/party.service';
 
 @Component({
   selector: 'app-lobby-list-item',
@@ -10,17 +8,21 @@ import { PartyService } from '../../services/party.service';
   styleUrls: ['./lobby-list-item.component.css']
 })
 export class LobbyListItemComponent implements OnInit {
-
   @Input() party: Party;
   @Input() joinedPartyId: number;
 
-  constructor(private partyService: PartyService, private router: Router) { }
+  @Output() joinParty: EventEmitter<number> = new EventEmitter();
+  @Output() navigateToParty: EventEmitter<void> = new EventEmitter();
+
+  constructor() { }
 
   ngOnInit() { }
 
-  routeToParty(partyId: number) {
-    this.partyService.joinedPartyId = partyId;
-    this.router.navigateByUrl('/party/');
+  joinPartyButton(partyId: number) {
+    this.joinParty.emit(partyId);
   }
 
+  navigateToPartyButton() {
+    this.navigateToParty.emit();
+  }
 }
