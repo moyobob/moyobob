@@ -51,7 +51,7 @@ export class UserService {
       'email': email,
       'password': password,
       'username': username
-    }).toPromise().then(status => {
+    }).toPromise().then(() => {
       return true;
       }, error => {
       return false;

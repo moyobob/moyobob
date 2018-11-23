@@ -58,6 +58,7 @@ describe('SignUpComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
   it('should not call anything if email empty', () => {
     component.passwordInput = mockPassword;
     component.userNameInput = mockUsername;

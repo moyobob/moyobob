@@ -46,12 +46,9 @@ export class SignUpComponent implements OnInit {
       } else {
         this.signUpStatus = InputStatus.TriedSignUp;
         this.userService.requestSignUp(this.emailInput, this.passwordInput, this.userNameInput)
-        .then(success => {
-          if (success) {
+        .then(() => {
+            // console.log('signup OK');
             this.router.navigateByUrl('/sign-in/');
-          } else {
-            this.signUpStatus = InputStatus.SomethingWrong;
-          }
         });
       }
     }

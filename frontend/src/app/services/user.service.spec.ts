@@ -68,6 +68,46 @@ describe('UserService', () => {
     expect(service.getSignedInUsername()).toEqual(mockUsername);
   }));
 
+  it('return Promise when already signedIn and verifyUser', async(() => {
+    const service: UserService = TestBed.get(UserService);
+    service.signedInUsername = 'hem';
+    service.verifyUser().then(
+      result => {
+        expect(result).toBeTruthy();
+      }
+    );
+  }));
+
+  it('should send request when verifyUser first time', async(() => {
+    const service: UserService = TestBed.get(UserService);
+    service.verifyUser()
+      .then(success => {
+        expect(success).toBeTruthy();
+      });
+
+    const request = httpTestingController.expectOne('/api/verify_session/');
+    expect(request.request.method).toEqual('GET');
+    request.flush({
+      id: 1,
+      username: mockUsername
+    });
+  }));
+
+  it('should not react when no one signed in', async(() => {
+    const service: UserService = TestBed.get(UserService);
+    service.verifyUser()
+      .then(success => {
+        expect(success).toBeFalsy();
+      });
+
+    const request = httpTestingController.expectOne('/api/verify_session/');
+    expect(request.request.method).toEqual('GET');
+    request.flush({}, {
+      status: 403,
+      statusText: 'Forbidden'
+    });
+  }));
+
   it('should send request when sign up', async(() => {
     const service: UserService = TestBed.get(UserService);
     service.requestSignUp(mockEmail_signup, mockPassword, mockUsername_signup)
@@ -86,6 +126,21 @@ describe('UserService', () => {
       id: 2,
       email: mockEmail_signup,
       username: mockUsername_signup
+    });
+  }));
+
+  it('should not react when denied sign up', async(() => {
+    const service: UserService = TestBed.get(UserService);
+    service.requestSignUp(mockEmail_signup, mockPassword, mockUsername_signup)
+    .then(success => {
+      expect(success).toBeFalsy();
+    });
+
+    const request = httpTestingController.expectOne('/api/signup/');
+    expect(request.request.method).toEqual('POST');
+    request.flush({}, {
+      status: 403,
+      statusText: 'Forbidden'
     });
   }));
 });
