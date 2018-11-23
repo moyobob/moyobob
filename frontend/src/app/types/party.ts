@@ -43,6 +43,19 @@ export class MenuEntry {
   userIds: number[];
 }
 
+export class MenuEntryCreateRequest {
+  menuId: number;
+  quantity: number;
+  users: number[];
+}
+
+export class MenuEntryUpdateRequest {
+  id: number;
+  quantityDelta: number;
+  addUserIds: number[];
+  removeUserIds: number[];
+}
+
 export class PartyState {
   @deserialize
   id: number;

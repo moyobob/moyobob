@@ -5,8 +5,8 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { PartyChoosingMenuComponent } from './party-choosing-menu.component';
 
-import { Menu, PartyMenuCreateRequest } from '../../types/menu';
-import { PartyState } from '../../types/party';
+import { Menu } from '../../types/menu';
+import { PartyState, MenuEntryCreateRequest } from '../../types/party';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 
@@ -28,7 +28,7 @@ const mockPartyState: PartyState = {
 class MockSelectMenuComponent {
   @Input() menus: Menu[];
   @Input() loggedInUserId: number;
-  @Output() request: EventEmitter<PartyMenuCreateRequest>;
+  @Output() request: EventEmitter<MenuEntryCreateRequest>;
   @Output() cancel: EventEmitter<void>;
 }
 
@@ -105,18 +105,18 @@ describe('PartyChoosingMenuComponent', () => {
   });
 
   it('requestAddMenu should set showAddMenuDialog to false and request', async((done) => {
-    const mockPartyMenuCreateRequest = {
+    const mockRequest = {
       menuId: 2,
       quantity: 1,
       users: [1]
     };
     component.addMenu.toPromise().then(req => {
-      expect(req).toEqual(mockPartyMenuCreateRequest);
+      expect(req).toEqual(mockRequest);
       done();
     });
 
     component.showAddMenuDialog = true;
-    component.requestAddMenu(mockPartyMenuCreateRequest);
+    component.requestAddMenu(mockRequest);
     expect(component.showAddMenuDialog).toBeFalsy();
   }));
 

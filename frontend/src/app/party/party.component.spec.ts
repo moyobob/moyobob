@@ -7,9 +7,9 @@ import { PartyComponent } from './party.component';
 import { PartyService } from '../services/party.service';
 import { UserService } from '../services/user.service';
 
-import { Party, PartyType, PartyState, MenuEntry } from '../types/party';
+import { Party, PartyType, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 import { User } from '../types/user';
-import { Menu, PartyMenuCreateRequest, PartyMenuUpdateRequest } from '../types/menu';
+import { Menu } from '../types/menu';
 
 const mockParty: Party = {
   id: 3,
@@ -47,8 +47,8 @@ export class MockPartyChoosingMenuComponent {
   @Input() user: User;
   @Input() menus: Menu[];
 
-  @Output() addMenu: EventEmitter<PartyMenuCreateRequest> = new EventEmitter();
-  @Output() updateMenu: EventEmitter<PartyMenuUpdateRequest> = new EventEmitter();
+  @Output() addMenu: EventEmitter<MenuEntryCreateRequest> = new EventEmitter();
+  @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest> = new EventEmitter();
 }
 
 @Component({ selector: 'app-party-ordering', template: '' })
@@ -74,10 +74,10 @@ class MockPartyService {
   getParty(_: number) {
     return undefined;
   }
-  createMenu(_: PartyMenuCreateRequest) {
+  createMenu(_: MenuEntryCreateRequest) {
     return undefined;
   }
-  updateMenu(_: PartyMenuUpdateRequest) {
+  updateMenu(_: MenuEntryUpdateRequest) {
     return undefined;
   }
 }

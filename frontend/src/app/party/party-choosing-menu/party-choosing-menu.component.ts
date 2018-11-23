@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 
-import { Menu, PartyMenuUpdateRequest, PartyMenuCreateRequest } from '../../types/menu';
-import { PartyState, MenuEntry } from '../../types/party';
+import { Menu } from '../../types/menu';
+import { PartyState, MenuEntry, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../../types/party';
 import { User } from '../../types/user';
 
 @Component({
@@ -14,8 +14,8 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   @Input() user: User;
   @Input() menus: Menu[];
 
-  @Output() addMenu: EventEmitter<PartyMenuCreateRequest>;
-  @Output() updateMenu: EventEmitter<PartyMenuUpdateRequest>;
+  @Output() addMenu: EventEmitter<MenuEntryCreateRequest>;
+  @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest>;
 
   menuEntries: MenuEntry[];
   showAddMenuDialog: boolean;
@@ -62,7 +62,7 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   }
 
   updatePartyMenu(partyMenu, quantityDelta, removing) {
-    let req: PartyMenuUpdateRequest;
+    let req: MenuEntryUpdateRequest;
 
     if (partyMenu.quantity + quantityDelta <= 0 ||
       partyMenu.userIds.length + quantityDelta <= 0) {

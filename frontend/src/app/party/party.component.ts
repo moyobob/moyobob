@@ -6,8 +6,8 @@ import { UserService } from '../services/user.service';
 import { PartyService } from '../services/party.service';
 import { WebsocketService } from '../services/websocket.service';
 
-import { Party, PartyState } from '../types/party';
-import { PartyMenuCreateRequest, PartyMenuUpdateRequest, Menu } from '../types/menu';
+import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
+import { Menu } from '../types/menu';
 import { User } from '../types/user';
 import { RestaurantService } from '../services/restaurant.service';
 
@@ -74,11 +74,11 @@ export class PartyComponent implements OnInit, OnDestroy {
     this.router.navigate(['/lobby/']);
   }
 
-  addMenu(req: PartyMenuCreateRequest) {
+  addMenu(req: MenuEntryCreateRequest) {
     this.partyService.createMenu(req);
   }
 
-  updateMenu(req: PartyMenuUpdateRequest) {
+  updateMenu(req: MenuEntryUpdateRequest) {
     this.partyService.updateMenu(req);
   }
 }
