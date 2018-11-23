@@ -4,11 +4,11 @@ import { Subscription } from 'rxjs';
 
 import { UserService } from '../services/user.service';
 import { PartyService } from '../services/party.service';
+import { RestaurantService } from '../services/restaurant.service';
 
 import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 import { Menu } from '../types/menu';
 import { User } from '../types/user';
-import { RestaurantService } from '../services/restaurant.service';
 
 @Component({
   selector: 'app-party',

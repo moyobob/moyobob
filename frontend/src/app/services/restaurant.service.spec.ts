@@ -41,10 +41,9 @@ describe('RestaurantService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should get restaurant detail', async((done) => {
+  it('should get restaurant detail', async(() => {
     service.getRestaurant(mockRestaurant.id).then(restaurant => {
       expect(restaurant).toEqual(mockRestaurant);
-      done();
     });
 
     const req = httpTestingController.expectOne(`api/restaurant/${mockRestaurant.id}/`);
@@ -52,10 +51,9 @@ describe('RestaurantService', () => {
     req.flush(mockRestaurant);
   }));
 
-  it('should get menus of restaurant', async((done) => {
+  it('should get menus of restaurant', async(() => {
     service.getMenus(mockRestaurant.id).then(menus => {
       expect(menus).toEqual(mockMenus);
-      done();
     });
 
     const req = httpTestingController.expectOne(`api/restaurant/${mockRestaurant.id}/menu/`);

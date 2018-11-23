@@ -6,6 +6,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PartyComponent } from './party.component';
 import { PartyService } from '../services/party.service';
 import { UserService } from '../services/user.service';
+import { RestaurantService } from '../services/restaurant.service';
 
 import { Party, PartyType, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 import { User } from '../types/user';
@@ -71,28 +72,26 @@ class MockPartyService {
   public partyStateUpdate: EventEmitter<PartyState> = new EventEmitter();
   public initiallyNotJoined: EventEmitter<void> = new EventEmitter();
 
+  connectWebsocket(): void { }
   getParty(_: number) {
     return undefined;
   }
-  createMenu(_: MenuEntryCreateRequest) {
-    return undefined;
-  }
-  updateMenu(_: MenuEntryUpdateRequest) {
-    return undefined;
-  }
+  leaveParty(): void { }
+  createMenu(_: MenuEntryCreateRequest): void { }
+  updateMenu(_: MenuEntryUpdateRequest): void { }
 }
 
 describe('PartyComponent', () => {
   let component: PartyComponent;
   let fixture: ComponentFixture<PartyComponent>;
   let partyServiceGetParty: jasmine.Spy;
-  let partyServiceGetPartyStateUpdate: jasmine.Spy;
-  let partyServiceGetMenus: jasmine.Spy;
   let userService: jasmine.SpyObj<UserService>;
+  let restaurantService: jasmine.SpyObj<RestaurantService>;
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
     const userServiceSpy = jasmine.createSpyObj('UserService', ['signedInUserId']);
+    const restaurantServiceSpy = jasmine.createSpyObj('RestaurantService', ['getMenus']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -107,6 +106,7 @@ describe('PartyComponent', () => {
       providers: [
         { provide: PartyService, useClass: MockPartyService },
         { provide: UserService, useValue: userServiceSpy },
+        { provide: RestaurantService, useValue: restaurantServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useClass: MockActivatedRoute },
       ]
@@ -116,13 +116,12 @@ describe('PartyComponent', () => {
     const partyService = TestBed.get(PartyService);
     partyServiceGetParty = spyOn(partyService, 'getParty');
     partyServiceGetParty.and.returnValue(new Promise(r => r(mockParty)));
-    partyServiceGetPartyStateUpdate = spyOn(partyService, 'getPartyStateUpdate');
-    partyServiceGetPartyStateUpdate.and.returnValue(new EventEmitter());
-    partyServiceGetMenus = spyOn(partyService, 'getMenus');
-    partyServiceGetMenus.and.returnValue(new Promise(r => r([])));
 
     userService = TestBed.get(UserService);
     userService.signedInUserId.and.returnValue(1);
+
+    restaurantService = TestBed.get(RestaurantService);
+    restaurantService.getMenus.and.returnValue([]);
 
     router = TestBed.get(Router);
   }));

@@ -48,6 +48,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   createParty(req: PartyCreateRequest): void {
     this.partyService.addParty(req).then(party => {
+      this.joinParty(party.id);
     });
   }
 

@@ -1,5 +1,4 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { Router } from '@angular/router';
 
 import { PartyType, PartyCreateRequest } from '../../types/party';
 
@@ -19,9 +18,7 @@ export class PartyCreateComponent implements OnInit {
   };
   submitting = false;
 
-  constructor(
-    private router: Router,
-  ) { }
+  constructor() { }
 
   ngOnInit() {
   }
