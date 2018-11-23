@@ -31,7 +31,9 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.menuEntries = this.partyState.menus;
+    if (this.partyState) {
+      this.menuEntries = this.partyState.menus;
+    }
   }
 
   getMenuNameById(id: number) {

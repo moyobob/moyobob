@@ -1,13 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, EventEmitter } from '@angular/core';
-
-import { Observable, of } from 'rxjs';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { PartyComponent } from './party.component';
 import { PartyService } from '../services/party.service';
-import { Party, PartyType } from '../types/party';
+import { Party, PartyType, PartyState } from '../types/party';
+import { User } from '../types/user';
+import { Menu, PartyMenuCreateRequest, PartyMenuUpdateRequest, PartyMenu } from '../types/menu';
+import { UserService } from '../services/user.service';
 
 const mockParty: Party = {
   id: 3,
@@ -41,7 +42,12 @@ export class MockPartyChoosingRestaurantComponent {
 
 @Component({ selector: 'app-party-choosing-menu', template: '' })
 export class MockPartyChoosingMenuComponent {
+  @Input() partyState: PartyState;
+  @Input() user: User;
+  @Input() menus: Menu[];
 
+  @Output() addMenu: EventEmitter<PartyMenuCreateRequest> = new EventEmitter();
+  @Output() updateMenu: EventEmitter<PartyMenuUpdateRequest> = new EventEmitter();
 }
 
 @Component({ selector: 'app-party-ordering', template: '' })
@@ -60,17 +66,40 @@ export class MockPartyPaymentComponent {
 
 }
 
+class MockPartyService {
+  partyJoin: EventEmitter<number> = new EventEmitter();
+  partyLeave: EventEmitter<number> = new EventEmitter();
+  partyNotJoined: EventEmitter<void> = new EventEmitter();
+  partyStateUpdate: EventEmitter<PartyState> = new EventEmitter();
+  partyMenuCreate: EventEmitter<PartyMenu[]> = new EventEmitter();
+  partyMenuUpdate: EventEmitter<PartyMenu[]> = new EventEmitter();
+
+
+  connectWebsocket() {
+    return undefined;
+  }
+  getParty() {
+    return undefined;
+  }
+  getPartyStateUpdate() {
+    return undefined;
+  }
+  getMenus() {
+    return undefined;
+  }
+}
 
 describe('PartyComponent', () => {
   let component: PartyComponent;
   let fixture: ComponentFixture<PartyComponent>;
-  let partyService: jasmine.SpyObj<PartyService>;
+  let partyServiceGetParty: jasmine.Spy;
+  let partyServiceGetPartyStateUpdate: jasmine.Spy;
+  let partyServiceGetMenus: jasmine.Spy;
+  let userService: jasmine.SpyObj<UserService>;
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
-    const partyServiceSpy = jasmine.createSpyObj('PartyService', [
-      'getParty', 'joinParty', 'leaveParty', 'connectWebsocket', 'getPartyStateUpdate'
-    ]);
+    const userServiceSpy = jasmine.createSpyObj('UserService', ['signedInUserId']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -83,16 +112,24 @@ describe('PartyComponent', () => {
         MockPartyPaymentComponent,
       ],
       providers: [
-        { provide: PartyService, useValue: partyServiceSpy },
+        { provide: PartyService, useClass: MockPartyService },
+        { provide: UserService, useValue: userServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useClass: MockActivatedRoute },
       ]
     })
       .compileComponents();
 
-    partyService = TestBed.get(PartyService);
-    partyService.getParty.and.returnValue(new Promise(r => r(mockParty)));
-    partyService.getPartyStateUpdate.and.returnValue(new EventEmitter());
+    const partyService = TestBed.get(PartyService);
+    partyServiceGetParty = spyOn(partyService, 'getParty');
+    partyServiceGetParty.and.returnValue(new Promise(r => r(mockParty)));
+    partyServiceGetPartyStateUpdate = spyOn(partyService, 'getPartyStateUpdate');
+    partyServiceGetPartyStateUpdate.and.returnValue(new EventEmitter());
+    partyServiceGetMenus = spyOn(partyService, 'getMenus');
+    partyServiceGetMenus.and.returnValue(new Promise(r => r([])));
+
+    userService = TestBed.get(UserService);
+    userService.signedInUserId.and.returnValue(1);
 
     router = TestBed.get(Router);
   }));
