@@ -5,10 +5,8 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { PartyChoosingMenuComponent } from './party-choosing-menu.component';
 
-import {
-  Menu, PartyMenu, PartyMenuUpdateRequest, PartyMenuCreateRequest
-} from '../types/menu';
-import { PartyState } from '../types/party';
+import { Menu, PartyMenuCreateRequest } from '../../types/menu';
+import { PartyState } from '../../types/party';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 
@@ -18,12 +16,12 @@ const mockMenuEntry3 = { id: 3, menuId: 3, quantity: 1, userIds: [2] };
 
 const mockMenu1 = { id: 1, name: 'Mock Menu 1', price: -120 };
 
-const mockPartyState = {
+const mockPartyState: PartyState = {
   id: 1,
   phase: 0,
-  restaurant: null,
-  members: [],
-  menus: [mockMenuEntry1, mockMenuEntry2]
+  restaurantId: null,
+  memberIds: [],
+  menuEntries: [mockMenuEntry1, mockMenuEntry2]
 };
 
 @Component({ selector: 'app-select-menu', template: '' })
@@ -79,7 +77,7 @@ describe('PartyChoosingMenuComponent', () => {
   });
 
   it('have menu entries', () => {
-    expect(component.menuEntries).toEqual(mockPartyState.menus);
+    expect(component.menuEntries).toEqual(mockPartyState.menuEntries);
   });
 
   it('getMenuNameById should return name if exist', () => {

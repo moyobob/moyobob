@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Party, PartyType } from '../types/party';
-import { PartyService } from '../services/party.service';
+import { Party, PartyType } from '../../types/party';
+import { PartyService } from '../../services/party.service';
 
 @Component({
   selector: 'app-party-create',

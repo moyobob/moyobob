@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 
 import { Menu, PartyMenu, PartyMenuUpdateRequest, PartyMenuCreateRequest } from '../types/menu';
-import { PartyState, Party } from '../types/party';
-import { User } from '../types/user';
+import { PartyState, Party } from '../../types/party';
+import { User } from '../../types/user';
 
 @Component({
   selector: 'app-party-choosing-menu',
@@ -32,7 +32,7 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.partyState) {
-      this.menuEntries = this.partyState.menus;
+      this.menuEntries = this.partyState.menuEntries;
     }
   }
 

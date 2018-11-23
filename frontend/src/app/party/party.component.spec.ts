@@ -5,10 +5,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { PartyComponent } from './party.component';
 import { PartyService } from '../services/party.service';
-import { Party, PartyType, PartyState } from '../types/party';
-import { User } from '../types/user';
-import { Menu, PartyMenuCreateRequest, PartyMenuUpdateRequest, PartyMenu } from '../types/menu';
 import { UserService } from '../services/user.service';
+
+import { Party, PartyType, PartyState, MenuEntry } from '../types/party';
+import { User } from '../types/user';
+import { Menu, PartyMenuCreateRequest, PartyMenuUpdateRequest } from '../types/menu';
 
 const mockParty: Party = {
   id: 3,

@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { PartyCreateComponent } from './party-create.component';
-import { PartyService } from '../services/party.service';
+import { PartyService } from '../../services/party.service';
 
 describe('PartyCreateComponent', () => {
   let component: PartyCreateComponent;

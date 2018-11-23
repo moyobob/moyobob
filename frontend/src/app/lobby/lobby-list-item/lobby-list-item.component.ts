@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { Party } from '../types/party';
-import { PartyService } from '../services/party.service';
+import { Party } from '../../types/party';
+import { PartyService } from '../../services/party.service';
 
 @Component({
   selector: 'app-lobby-list-item',
@@ -16,7 +16,7 @@ export class LobbyListItemComponent implements OnInit {
 
   constructor(private partyService: PartyService, private router: Router) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   routeToParty(partyId: number) {
     this.partyService.joinedPartyId = partyId;
