@@ -1,5 +1,7 @@
-import { deserialize, deserializeAs } from 'cerialize';
+import { deserialize, deserializeAs, Deserialize } from 'cerialize';
 import { PartyState } from './party';
+
+export class Nothing { }
 
 export class InvalidCommandError {
   @deserialize
@@ -51,12 +53,12 @@ export class NotVotedError {
   readonly type = 'error.not.voted';
 }
 
-export class InitiallyNotJoined {
+export class InitiallyNotJoinedEvent {
   @deserialize
   readonly type = 'initial.not.joined';
 }
 
-export class PartyJoin {
+export class PartyJoinEvent {
   @deserialize
   readonly type = 'party.join';
 
@@ -64,14 +66,15 @@ export class PartyJoin {
   userId: number;
 }
 
-export class PartyLeave {
-  @deserialize readonly type = 'party.leave';
+export class PartyLeaveEvent {
+  @deserialize
+  readonly type = 'party.leave';
 
   @deserializeAs('user_id')
   userId: number;
 }
 
-export class RestaurantVote {
+export class RestaurantVoteEvent {
   @deserialize
   readonly type = 'restaurant.vote';
 
@@ -79,7 +82,7 @@ export class RestaurantVote {
   restaurantId: number;
 }
 
-export class RestaurantUnvote {
+export class RestaurantUnvoteEvent {
   @deserialize
   readonly type = 'restaurant.unvote';
 
@@ -87,7 +90,7 @@ export class RestaurantUnvote {
   restaurantId: number;
 }
 
-export class MenuCreate {
+export class MenuCreateEvent {
   @deserialize
   readonly type = 'menu.create';
 
@@ -104,7 +107,7 @@ export class MenuCreate {
   userIds: number[];
 }
 
-export class MenuUpdate {
+export class MenuUpdateEvent {
   @deserialize
   readonly type = 'menu.update';
 
@@ -120,7 +123,7 @@ export class MenuUpdate {
   removeUserIds: number[];
 }
 
-export class MenuDelete {
+export class MenuDeleteEvent {
   @deserialize
   readonly type = 'menu.delete';
 
@@ -128,14 +131,14 @@ export class MenuDelete {
   menuEntryId: number;
 }
 
-export class StateUpdate {
+export class StateUpdateEvent {
   @deserialize
   readonly type = 'state.update';
 
   state: PartyState;
 }
 
-export class LeaderChange {
+export class LeaderChangeEvent {
   @deserialize
   readonly type = 'leader.change';
 
@@ -144,7 +147,8 @@ export class LeaderChange {
 }
 
 export type Event
-  = InvalidCommandError
+  = Nothing
+  | InvalidCommandError
   | InvalidDataError
   | InvalidUserError
   | InvalidPartyError
@@ -154,13 +158,101 @@ export type Event
   | NotJoinedError
   | AlreadyJoinedError
   | NotVotedError
-  | InitiallyNotJoined
-  | PartyJoin
-  | PartyLeave
-  | RestaurantVote
-  | RestaurantUnvote
-  | MenuCreate
-  | MenuUpdate
-  | MenuDelete
-  | StateUpdate
-  | LeaderChange;
+  | InitiallyNotJoinedEvent
+  | PartyJoinEvent
+  | PartyLeaveEvent
+  | RestaurantVoteEvent
+  | RestaurantUnvoteEvent
+  | MenuCreateEvent
+  | MenuUpdateEvent
+  | MenuDeleteEvent
+  | StateUpdateEvent
+  | LeaderChangeEvent;
+
+export function deserializeEvent(json: any): Event {
+  switch (json['type']) {
+    case 'error.invalid.command': {
+      return Deserialize(json, InvalidCommandError);
+      break;
+    }
+    case 'error.invalid.data': {
+      return Deserialize(json, InvalidDataError);
+      break;
+    }
+    case 'error.invalid.user': {
+      return Deserialize(json, InvalidUserError);
+      break;
+    }
+    case 'error.invalid.party': {
+      return Deserialize(json, InvalidPartyError);
+      break;
+    }
+    case 'error.invalid.restaurant': {
+      return Deserialize(json, InvalidRestaurantError);
+      break;
+    }
+    case 'error.invalid.menu': {
+      return Deserialize(json, InvalidMenuError);
+      break;
+    }
+    case 'error.invalid.menu.entry': {
+      return Deserialize(json, InvalidMenuEntryError);
+      break;
+    }
+    case 'error.not.joined': {
+      return Deserialize(json, NotJoinedError);
+      break;
+    }
+    case 'error.already.joined': {
+      return Deserialize(json, AlreadyJoinedError);
+      break;
+    }
+    case 'error.not.voted': {
+      return Deserialize(json, NotVotedError);
+      break;
+    }
+    case 'initial.not.joined': {
+      return Deserialize(json, InitiallyNotJoinedEvent);
+      break;
+    }
+    case 'party.join': {
+      return Deserialize(json, PartyJoinEvent);
+      break;
+    }
+    case 'party.leave': {
+      return Deserialize(json, PartyLeaveEvent);
+      break;
+    }
+    case 'restaurant.vote': {
+      return Deserialize(json, RestaurantVoteEvent);
+      break;
+    }
+    case 'restaurant.unvote': {
+      return Deserialize(json, RestaurantUnvoteEvent);
+      break;
+    }
+    case 'menu.create': {
+      return Deserialize(json, MenuCreateEvent);
+      break;
+    }
+    case 'menu.update': {
+      return Deserialize(json, MenuUpdateEvent);
+      break;
+    }
+    case 'menu.delete': {
+      return Deserialize(json, MenuDeleteEvent);
+      break;
+    }
+    case 'state.update': {
+      return Deserialize(json, StateUpdateEvent);
+      break;
+    }
+    case 'leader.change': {
+      return Deserialize(json, LeaderChangeEvent);
+      break;
+    }
+    default: {
+      return Nothing;
+    }
+  }
+}
