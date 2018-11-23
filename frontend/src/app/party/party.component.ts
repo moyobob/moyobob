@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs';
 
 import { UserService } from '../services/user.service';
 import { PartyService } from '../services/party.service';
-import { WebsocketService } from '../services/websocket.service';
 
 import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 import { Menu } from '../types/menu';
@@ -28,7 +27,6 @@ export class PartyComponent implements OnInit, OnDestroy {
   constructor(
     private partyService: PartyService,
     private userService: UserService,
-    private websocketService: WebsocketService,
     private restaurantService: RestaurantService,
     private router: Router,
   ) {
@@ -43,7 +41,7 @@ export class PartyComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.websocketService.connect();
+    this.partyService.connectWebsocket();
     this.user = { id: this.userService.signedInUserId, email: '', username: '' };
   }
 

@@ -1,9 +1,8 @@
-import { Injectable, Output, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 
-import { Menu, PartyMenuCreateRequest, PartyMenuUpdateRequest } from '../types/menu';
-import { Party, PartyState, MenuEntry } from '../types/party';
+import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 
 import { WebsocketService } from './websocket.service';
 import {
@@ -57,6 +56,10 @@ export class PartyService {
 
   async deleteParty(id: number): Promise<void> {
     await this.http.delete(`api/party/${id}/`, httpOptions).toPromise();
+  }
+
+  connectWebsocket(): void {
+    this.websocketService.connect();
   }
 
   onWebsocketEvent(rawEvent: Event): void {
@@ -137,7 +140,7 @@ export class PartyService {
     this.subscription.unsubscribe();
   }
 
-  createMenu(request: PartyMenuCreateRequest) {
+  createMenu(request: MenuEntryCreateRequest) {
     const command = new MenuCreateCommand(
       request.menuId,
       request.quantity,
@@ -146,7 +149,7 @@ export class PartyService {
     this.websocketService.send(command);
   }
 
-  updateMenu(request: PartyMenuUpdateRequest) {
+  updateMenu(request: MenuEntryUpdateRequest) {
     const command = new MenuUpdateCommand(
       request.id,
       request.quantityDelta,
