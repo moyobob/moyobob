@@ -78,7 +78,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('redis', 6379)],
         },
     },
 }
@@ -89,12 +89,12 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db/', 'db.sqlite3'),
         'OPTIONS': {
             'timeout': 30
         },
         'TEST': {
-            'NAME': os.path.join(BASE_DIR, 'testdb.sqlite3'),
+            'NAME': os.path.join(BASE_DIR, 'db/', 'testdb.sqlite3'),
         }
     }
 }
@@ -102,7 +102,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://localhost:6379/0',
+        'LOCATION': 'redis://redis:6379/0',
         'TIMEOUT': None,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
