@@ -17,8 +17,8 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   @Output() addMenu: EventEmitter<MenuEntryCreateRequest>;
   @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest>;
 
-  menuEntries: MenuEntry[];
-  showAddMenuDialog: boolean;
+  menuEntries: MenuEntry[] = [];
+  showAddMenuDialog = false;
 
   constructor() {
     this.addMenu = new EventEmitter();
@@ -26,20 +26,25 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.menuEntries = [];
-    this.showAddMenuDialog = false;
+    this.updateState();
   }
 
   ngOnChanges(changes: SimpleChanges) {
+    this.updateState();
+  }
+
+  updateState() {
     if (this.partyState) {
       this.menuEntries = this.partyState.menuEntries;
     }
   }
 
   getMenuNameById(id: number) {
-    const menu = this.menus.filter(menuor => menuor.id === id);
-    if (menu.length) {
-      return menu[0].name;
+    if (this.menus) {
+      const menu = this.menus.filter(menuor => menuor.id === id);
+      if (menu.length) {
+        return menu[0].name;
+      }
     }
     return '';
   }
