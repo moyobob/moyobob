@@ -15,7 +15,7 @@ export class LobbyComponent implements OnInit, OnDestroy {
   parties: Party[];
   joinedPartyId = -1;
   isShowingPartyCreate = false;
-  subscription: Subscription;
+  subscriptions: Subscription[] = [];
 
   constructor(
     private partyService: PartyService,
@@ -23,15 +23,18 @@ export class LobbyComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.subscription = this.partyService.partyStateUpdate.subscribe(state => {
+    const subscription = this.partyService.partyStateUpdate.subscribe(state => {
       this.joinedPartyId = state.id;
     });
+    this.subscriptions.push(subscription);
     this.getParties();
     this.partyService.connectWebsocket();
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    for (const subscription of this.subscriptions) {
+      subscription.unsubscribe();
+    }
   }
 
   getParties(): void {
@@ -57,9 +60,10 @@ export class LobbyComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.partyService.partyStateUpdate.toPromise().then(_ => {
+    const subscription = this.partyService.partyStateUpdate.subscribe(_ => {
       this.router.navigate(['/party']);
     });
+    this.subscriptions.push(subscription);
 
     this.partyService.joinParty(partyId);
   }

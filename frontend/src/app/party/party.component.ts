@@ -22,7 +22,7 @@ export class PartyComponent implements OnInit, OnDestroy {
   partyId: number;
   menus: Menu[];
 
-  subscription: Subscription;
+  subscriptions: Subscription[] = [];
 
   constructor(
     private partyService: PartyService,
@@ -32,20 +32,28 @@ export class PartyComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.subscription = this.partyService.partyStateUpdate.subscribe(state => {
+    let subscription;
+    subscription = this.partyService.partyStateUpdate.subscribe(state => {
       this.partyState = state;
       this.getParty();
       this.getMenus();
     });
-    this.partyService.initiallyNotJoined.toPromise().then(_ => {
+    this.subscriptions.push(subscription);
+    subscription = this.partyService.initiallyNotJoined.subscribe(_ => {
       this.router.navigate(['/lobby']);
     });
+    this.subscriptions.push(subscription);
+
     this.partyService.connectWebsocket();
     this.user = { id: this.userService.signedInUserId, email: '', username: '' };
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    for (const subscription of this.subscriptions) {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    }
   }
 
   getParty(): void {
