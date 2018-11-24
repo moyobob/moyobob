@@ -22,7 +22,6 @@ export class PartyService {
   public initiallyNotJoined: EventEmitter<void> = new EventEmitter();
 
   partyState: PartyState;
-  subscription: Subscription;
 
   constructor(
     private websocketService: WebsocketService,
@@ -145,8 +144,6 @@ export class PartyService {
 
     const command = new PartyLeaveCommand(this.partyState.id);
     this.websocketService.send(command);
-
-    this.subscription.unsubscribe();
   }
 
   createMenu(request: MenuEntryCreateRequest) {
