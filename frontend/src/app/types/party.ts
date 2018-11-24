@@ -80,8 +80,8 @@ export class PartyState {
   public static OnDeserialized(instance: PartyState, json: any): void {
     const menuEntries: MenuEntry[] = [];
 
-    for (const menuEntryId of Object.keys(json['state']['menu_entries'])) {
-      const [menuId, quantity, userIds] = json['state']['menu_entries'][menuEntryId];
+    for (const menuEntryId of Object.keys(json['menu_entries'])) {
+      const [menuId, quantity, userIds] = json['menu_entries'][menuEntryId];
 
       menuEntries.push({
         id: +menuEntryId,

@@ -33,6 +33,6 @@
   </ul>
 </div>
 <button (click)="toggleAddMenu();">Add Menu</button>
-<app-select-menu *ngIf="showAddMenuDialog" [menus]="menusOfRestaurant" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
+<app-select-menu *ngIf="showAddMenuDialog" [menus]="menus" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
   (cancel)="cancelAddMenu($event);">
 </app-select-menu>

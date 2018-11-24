@@ -114,6 +114,7 @@ export class MenuUpdateEvent {
   @deserializeAs('menu_entry_id')
   menuEntryId: number;
 
+  @deserialize
   quantity: number;
 
   @deserializeAs('add_user_ids')
@@ -135,7 +136,7 @@ export class StateUpdateEvent {
   @deserialize
   readonly type = 'state.update';
 
-  @deserialize
+  @deserializeAs(PartyState)
   state: PartyState;
 }
 

@@ -34,7 +34,7 @@ export class WebsocketService {
   }
 
   send(command: Command): void {
-    if (this.isConnected()) {
+    if (!this.isConnected()) {
       return;
     }
 

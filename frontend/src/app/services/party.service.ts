@@ -69,7 +69,7 @@ export class PartyService {
       this.partyStateUpdate.emit(this.partyState);
     }
 
-    if (this.partyState !== undefined) {
+    if (this.partyState === undefined) {
       return;
     }
 
