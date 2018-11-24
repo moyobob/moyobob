@@ -135,6 +135,7 @@ export class StateUpdateEvent {
   @deserialize
   readonly type = 'state.update';
 
+  @deserialize
   state: PartyState;
 }
 
