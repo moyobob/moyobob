@@ -34,9 +34,7 @@ export class PartyComponent implements OnInit, OnDestroy {
   ngOnInit() {
     let subscription;
     subscription = this.partyService.partyStateUpdate.subscribe(state => {
-      this.partyState = state;
-      this.getParty();
-      this.getMenus();
+      this.updateState(state);
     });
     this.subscriptions.push(subscription);
     subscription = this.partyService.initiallyNotJoined.subscribe(_ => {
@@ -44,6 +42,7 @@ export class PartyComponent implements OnInit, OnDestroy {
     });
     this.subscriptions.push(subscription);
 
+    this.updateState(this.partyService.partyState);
     this.partyService.connectWebsocket();
     this.user = { id: this.userService.signedInUserId, email: '', username: '' };
   }
@@ -53,6 +52,14 @@ export class PartyComponent implements OnInit, OnDestroy {
       if (subscription) {
         subscription.unsubscribe();
       }
+    }
+  }
+
+  updateState(state: PartyState): void {
+    this.partyState = state;
+    if (this.partyState) {
+      this.getParty();
+      this.getMenus();
     }
   }
 
@@ -76,7 +83,7 @@ export class PartyComponent implements OnInit, OnDestroy {
 
   leaveParty(): void {
     this.partyService.leaveParty();
-    this.router.navigate(['/lobby/']);
+    this.router.navigate(['/lobby']);
   }
 
   addMenu(req: MenuEntryCreateRequest) {

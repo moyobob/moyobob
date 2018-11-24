@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 import { PartyService } from '../services/party.service';
 
-import { Party, PartyCreateRequest } from '../types/party';
+import { Party, PartyCreateRequest, PartyState } from '../types/party';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -24,9 +24,11 @@ export class LobbyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const subscription = this.partyService.partyStateUpdate.subscribe(state => {
-      this.joinedPartyId = state.id;
+      this.updateState(state);
     });
     this.subscriptions.push(subscription);
+
+    this.updateState(this.partyService.partyState);
     this.getParties();
     this.partyService.connectWebsocket();
   }
@@ -34,6 +36,12 @@ export class LobbyComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     for (const subscription of this.subscriptions) {
       subscription.unsubscribe();
+    }
+  }
+
+  updateState(state: PartyState): void {
+    if (state) {
+      this.joinedPartyId = state.id;
     }
   }
 
