@@ -31,7 +31,7 @@ export class SignUpComponent implements OnInit {
   ngOnInit() {
     this.signUpStatus = InputStatus.HaveNotTriedSignUp;
   }
-  // TODO: 이메일 중복 체크, 비밀번호 '확인' 입력
+  // TODO: 이메일 중복 체크, 비밀번호 '확인'
   trySignUp(event) {
     if (
       this.signUpStatus !== InputStatus.TriedSignUp
@@ -46,9 +46,13 @@ export class SignUpComponent implements OnInit {
       } else {
         this.signUpStatus = InputStatus.TriedSignUp;
         this.userService.requestSignUp(this.emailInput, this.passwordInput, this.userNameInput)
-        .then(() => {
+        .then(success => {
             // console.log('signup OK');
+          if (success) {
             this.router.navigateByUrl('/sign-in/');
+          } else {
+            this.signUpStatus = InputStatus.SomethingWrong;
+          }
         });
       }
     }

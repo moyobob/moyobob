@@ -53,7 +53,8 @@ export class UserService {
       'username': username
     }).toPromise().then(() => {
       return true;
-      }, error => {
+      })
+      .catch(() => {
       return false;
       });
   }
