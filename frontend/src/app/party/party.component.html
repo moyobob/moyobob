@@ -2,7 +2,7 @@
   <div>
     <h2>{{party.name}}</h2>
     <span>{{party.location}}</span>
-    <span>{{party.members_count}}</span>
+    <span>{{party.memberCount}}</span>
   </div>
   <div [ngSwitch]="partyState.phase">
     <app-party-choosing-restaurant *ngSwitchCase="0"></app-party-choosing-restaurant>
