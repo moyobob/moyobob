@@ -81,10 +81,6 @@ export class PartyComponent implements OnInit, OnDestroy {
     }
   }
 
-  joinThisParty(): void {
-    this.partyService.joinParty(this.partyId);
-  }
-
   leaveParty(): void {
     this.partyService.leaveParty();
     this.router.navigate(['/lobby']);
