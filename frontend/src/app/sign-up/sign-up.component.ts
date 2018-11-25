@@ -21,6 +21,7 @@ export class SignUpComponent implements OnInit {
   passwordInput: string;
   userNameInput: string;
   signUpStatus: InputStatus;
+  // TODO(??) inputStatus 꼭 있어야 하나
   inputStatus = InputStatus;
 
   constructor(
