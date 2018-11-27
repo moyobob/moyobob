@@ -15,6 +15,9 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_HOST', '6379')
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
@@ -78,7 +81,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
@@ -89,12 +92,12 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db/', 'db.sqlite3'),
         'OPTIONS': {
             'timeout': 30
         },
         'TEST': {
-            'NAME': os.path.join(BASE_DIR, 'testdb.sqlite3'),
+            'NAME': os.path.join(BASE_DIR, 'db/', 'testdb.sqlite3'),
         }
     }
 }
@@ -102,7 +105,7 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://localhost:6379/0',
+        'LOCATION': 'redis://{}:{}/0'.format(REDIS_HOST, REDIS_PORT),
         'TIMEOUT': None,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
