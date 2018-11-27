@@ -50,9 +50,3 @@ def already_joined():
     return {
         'type': 'error.already.joined',
     }
-
-
-def not_voted():
-    return {
-        'type': 'error.not.voted',
-    }

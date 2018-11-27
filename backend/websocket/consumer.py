@@ -47,8 +47,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         self.commands = {
             'party.join': self.command_party_join,
             'party.leave': self.command_party_leave,
-            'restaurant.vote': self.command_restaurant_vote,
-            'restaurant.unvote': self.command_restaurant_unvote,
+            'restaurant.vote.toggle': self.command_restaurant_vote_toggle,
             'menu.create': self.command_menu_create,
             'menu.update': self.command_menu_update,
             'menu.delete': self.command_menu_delete,
@@ -186,52 +185,27 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         else:
             party.delete()
 
-    async def command_restaurant_vote(self, data):
+    async def command_restaurant_vote_toggle(self, data):
         user = self.scope['user']
         restaurant_id = data['restaurant_id']
 
         (party, state) = get_party_of_user(user.id)
         Restaurant.objects.get(id=restaurant_id)
 
-        for (i, (rid, votes)) in enumerate(state.restaurant_votes):
-            if rid == restaurant_id:
-                state.restaurant_votes[i] = (rid, votes + 1)
-                break
-        else:
-            state.restaurant_votes.append((restaurant_id, 1))
-        state.save()
-
-        await self.channel_layer.group_send(
-            'party-{}'.format(party.id),
-            event.restaurant_vote(restaurant_id),
-        )
-
-    async def command_restaurant_unvote(self, data):
-        user = self.scope['user']
-        restaurant_id = data['restaurant_id']
-
-        (party, state) = get_party_of_user(user.id)
-        Restaurant.objects.get(id=restaurant_id)
-
-        for (i, (rid, votes)) in enumerate(state.restaurant_votes):
-            if rid == restaurant_id:
-                state.restaurant_votes[i] = (rid, votes - 1)
-                break
-        else:
-            await self.send_json(
-                event.error.not_voted(),
+        try:
+            state.restaurant_votes.remove((user.id, restaurant_id))
+            await self.channel_layer.group_send(
+                'party-{}'.format(party.id),
+                event.restaurant_unvote(restaurant_id),
             )
-            return
-        state.restaurant_votes = list(filter(
-            lambda t: t[1] > 0,
-            state.restaurant_votes,
-        ))
-        state.save()
-
-        await self.channel_layer.group_send(
-            'party-{}'.format(party.id),
-            event.restaurant_unvote(restaurant_id),
-        )
+        except ValueError:
+            state.restaurant_votes.append((user.id, restaurant_id))
+            await self.channel_layer.group_send(
+                'party-{}'.format(party.id),
+                event.restaurant_vote(restaurant_id),
+            )
+        finally:
+            state.save()
 
     async def command_menu_create(self, data):
         menu_id = data['menu_id']
