@@ -1,0 +1,23 @@
+(common) {
+    gzip
+
+    #header / {
+    #    Strict-Transport-Security "max-age=15768000"
+    #    X-XSS-Protection "1; mode=block"
+    #    X-Content-Type-Options "nosniff"
+    #    X-Frame-Options "DENY"
+    #}
+}
+
+moyobob.me {
+    import common
+    root /srv/moyobob.me
+}
+
+moyobob.me/api {
+    import common
+    proxy / localhost:8000 {
+        transparent
+        header_upstream Forwarded "for={remote}; host={host}; proto={scheme}"
+    }
+}
