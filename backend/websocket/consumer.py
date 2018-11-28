@@ -417,3 +417,10 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(
             event.menu_delete(menu_entry_id)
         )
+
+    async def state_update(self, data):
+        state = data['state']
+
+        await self.send_json(
+            event.state_update_dict(state)
+        )
