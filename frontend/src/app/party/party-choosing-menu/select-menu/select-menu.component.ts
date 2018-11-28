@@ -27,12 +27,11 @@ export class SelectMenuComponent implements OnInit {
   }
 
   addRequest() {
-    const requestMenu: number = this.menuId === undefined ? undefined : +this.menuId;
-    if (requestMenu === undefined || !this.quantity) {
+    if (this.menuId === undefined || !this.quantity) {
       // TODO: showing error
     } else {
       this.request.next({
-        menuId: requestMenu,
+        menuId: this.menuId,
         quantity: this.quantity,
         users: [this.loggedInUserId]
       });
