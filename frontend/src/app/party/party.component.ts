@@ -1,58 +1,96 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
-import { Party, PartyState } from '../types/party';
 import { UserService } from '../services/user.service';
 import { PartyService } from '../services/party.service';
+import { RestaurantService } from '../services/restaurant.service';
+
+import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
+import { Menu } from '../types/menu';
+import { User } from '../types/user';
 
 @Component({
   selector: 'app-party',
   templateUrl: './party.component.html',
   styleUrls: ['./party.component.css']
 })
-export class PartyComponent implements OnInit {
+export class PartyComponent implements OnInit, OnDestroy {
   party: Party;
-  state: PartyState;
-  id: number;
+  partyState: PartyState;
+  user: User;
+  partyId: number;
+  menus: Menu[];
+
+  subscriptions: Subscription[] = [];
 
   constructor(
     private partyService: PartyService,
-    private activatedRoute: ActivatedRoute,
+    private userService: UserService,
+    private restaurantService: RestaurantService,
     private router: Router,
   ) { }
 
   ngOnInit() {
-    this.state = {
-      id: -1,
-      phase: -1,
-      restaurant: null,
-      members: [],
-      menus: []
-    };
-
-    this.joinParty();
-    this.getParty();
-    this.partyService.connectWebsocket();
-    this.partyService.getPartyStateUpdate().subscribe(state => {
-      this.state = state;
-      this.getParty();
+    let subscription;
+    subscription = this.partyService.partyStateUpdate.subscribe(state => {
+      this.updateState(state);
     });
+    this.subscriptions.push(subscription);
+    subscription = this.partyService.initiallyNotJoined.subscribe(_ => {
+      this.router.navigate(['/lobby']);
+    });
+    this.subscriptions.push(subscription);
+
+    this.updateState(this.partyService.partyState);
+    this.partyService.connectWebsocket();
+    this.user = { id: this.userService.signedInUserId, email: '', username: '' };
+  }
+
+  ngOnDestroy() {
+    for (const subscription of this.subscriptions) {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    }
+  }
+
+  updateState(state: PartyState): void {
+    this.partyState = state;
+    if (this.partyState) {
+      this.getParty();
+      this.getMenus();
+    }
   }
 
   getParty(): void {
-    this.id = this.partyService.joinedPartyId;
-    this.partyService.getParty(this.id)
+    this.partyId = this.partyState.id;
+    this.partyService.getParty(this.partyId)
       .then(party => {
         this.party = party;
       });
   }
 
-  joinParty(): void {
-    this.partyService.connectWebsocket();
+  getMenus(): void {
+    if (this.partyState.restaurantId) {
+      this.restaurantService.getMenus(this.partyState.restaurantId).then(menus => {
+        this.menus = menus;
+      });
+    } else {
+      this.menus = [];
+    }
   }
 
   leaveParty(): void {
     this.partyService.leaveParty();
-    this.router.navigate(['/lobby/']);
+    this.router.navigate(['/lobby']);
+  }
+
+  addMenu(req: MenuEntryCreateRequest) {
+    this.partyService.createMenu(req);
+  }
+
+  updateMenu(req: MenuEntryUpdateRequest) {
+    this.partyService.updateMenu(req);
   }
 }

@@ -13,9 +13,9 @@ describe('SelectMenuComponent', () => {
       imports: [
         FormsModule,
       ],
-      declarations: [ SelectMenuComponent ],
+      declarations: [SelectMenuComponent],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -44,8 +44,8 @@ describe('SelectMenuComponent', () => {
     component.quantity = 2;
     component.loggedInUserId = 3;
 
-    component.request.subscribe(partyMenuCreateRequest => {
-      expect(partyMenuCreateRequest).toEqual({
+    component.request.subscribe(req => {
+      expect(req).toEqual({
         menuId: 1,
         quantity: 2,
         users: [3]
