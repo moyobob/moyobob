@@ -3,6 +3,7 @@ from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed, HttpResponseNotFound
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.utils import IntegrityError
+from django.contrib.auth import authenticate, login, logout
 import json
 from json.decoder import JSONDecodeError
 
@@ -35,8 +36,6 @@ def signup(request: HttpRequest):
 
 
 def signin(request: HttpRequest):
-    from django.contrib.auth import authenticate, login
-
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
 
@@ -57,8 +56,6 @@ def signin(request: HttpRequest):
 
 
 def signout(request: HttpRequest):
-    from django.contrib.auth import logout
-
     if request.method != 'GET':
         return HttpResponseNotAllowed(['GET'])
     if not request.user.is_authenticated:
