@@ -63,6 +63,13 @@ def state_update(state):
     }
 
 
+def state_update_dict(state: dict):
+    return {
+        'type': 'state.update',
+        'state': state,
+    }
+
+
 def initially_not_joined():
     return {
         'type': 'initial.not.joined',
