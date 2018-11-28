@@ -30,12 +30,14 @@ class Menu(models.Model):
 class Restaurant(models.Model):
     name = models.CharField(max_length=120)
     menus = models.ManyToManyField(Menu)
+    phone_number = models.CharField(max_length=20)
 
     def as_dict(self):
         return {
             'id': self.id,
             'name': self.name,
             'menus': [menu.id for menu in self.menus.all()],
+            'phone_number': self.phone_number,
         }
 
 
