@@ -46,6 +46,12 @@ def not_joined():
     }
 
 
+def not_authorized():
+    return {
+        'type': 'error.not.authorized',
+    }
+
+
 def already_joined():
     return {
         'type': 'error.already.joined',
