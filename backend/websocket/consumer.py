@@ -3,7 +3,7 @@ from channels.layers import get_channel_layer
 from django.core.cache import cache
 import json
 
-from .models import PartyState
+from .models import PartyState, PartyPhase
 from api.models import Party, User, Restaurant, Menu
 from websocket import event
 from .exception import NotInPartyError, AlreadyJoinedError
@@ -47,6 +47,10 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         self.commands = {
             'party.join': self.command_party_join,
             'party.leave': self.command_party_leave,
+            'to.choosing.menu': self.command_to_choosing_menu,
+            'to.ordering': self.command_to_ordering,
+            'to.ordered': self.command_to_ordered,
+            'to.payment': self.command_to_payment,
             'restaurant.vote.toggle': self.command_restaurant_vote_toggle,
             'menu.create': self.command_menu_create,
             'menu.update': self.command_menu_update,
@@ -184,6 +188,90 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 )
         else:
             party.delete()
+
+    async def command_to_choosing_menu(self, data):
+        user = self.scope['user']
+        user_id = user.id
+        restaurant_id = data['restaurant_id']
+
+        (party, state) = get_party_of_user(user_id)
+        if party.leader.id != user_id:
+            await self.send_json(
+                event.error.not_authorized(),
+            )
+            return
+
+        Restaurant.objects.get(id=restaurant_id)
+
+        state.phase = PartyPhase.ChoosingMenu
+        state.restaurant_id = restaurant_id
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.state_update(state),
+        )
+
+    async def command_to_ordering(self, data):
+        user = self.scope['user']
+        user_id = user.id
+
+        (party, state) = get_party_of_user(user_id)
+        if party.leader.id != user_id:
+            await self.send_json(
+                event.error.not_authorized(),
+            )
+            return
+
+        state.phase = PartyPhase.Ordering
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.state_update(state),
+        )
+
+    async def command_to_ordered(self, data):
+        user = self.scope['user']
+        user_id = user.id
+
+        (party, state) = get_party_of_user(user_id)
+        if party.leader.id != user_id:
+            await self.send_json(
+                event.error.not_authorized(),
+            )
+            return
+
+        state.phase = PartyPhase.Ordered
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.state_update(state),
+        )
+
+    async def command_to_payment(self, data):
+        user = self.scope['user']
+        user_id = user.id
+        paid_user_id = data['paid_user_id']
+
+        (party, state) = get_party_of_user(user_id)
+        if party.leader.id != user_id:
+            await self.send_json(
+                event.error.not_authorized(),
+            )
+            return
+
+        User.objects.get(id=paid_user_id)
+
+        state.phase = PartyPhase.PaymentAndCollection
+        state.paid_user_id = paid_user_id
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.state_update(state),
+        )
 
     async def command_restaurant_vote_toggle(self, data):
         user = self.scope['user']
