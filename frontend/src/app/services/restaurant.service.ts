@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 import { Menu } from '../types/menu';
 import { Restaurant } from '../types/restaurant';
 
@@ -8,6 +7,7 @@ import { Restaurant } from '../types/restaurant';
   providedIn: 'root'
 })
 export class RestaurantService {
+
   constructor(
     private http: HttpClient,
   ) { }

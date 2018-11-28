@@ -46,4 +46,16 @@ export class UserService {
     });
   }
 
+  requestSignUp(email: string, password: string, username: string) {
+    return this.http.post<User>('/api/signup/', {
+      'email': email,
+      'password': password,
+      'username': username
+    }).toPromise().then(() => {
+      return true;
+      })
+      .catch(() => {
+      return false;
+      });
+  }
 }
