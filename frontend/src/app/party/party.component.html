@@ -2,11 +2,12 @@
   <div>
     <h2>{{party.name}}</h2>
     <span>{{party.location}}</span>
-    <span>{{party.members_count}}</span>
+    <span>{{party.memberCount}}</span>
   </div>
-  <div [ngSwitch]="state.phase">
+  <div [ngSwitch]="partyState.phase">
     <app-party-choosing-restaurant *ngSwitchCase="0"></app-party-choosing-restaurant>
-    <app-party-choosing-menu *ngSwitchCase="1"></app-party-choosing-menu>
+    <app-party-choosing-menu *ngSwitchCase="1" [partyState]="partyState" [user]="user" [menus]="menus" (addMenu)="addMenu($event);"
+      (updateMenu)="updateMenu($event);"></app-party-choosing-menu>
     <app-party-ordering *ngSwitchCase="2"></app-party-ordering>
     <app-party-ordered *ngSwitchCase="3"></app-party-ordered>
     <app-party-payment *ngSwitchCase="4"></app-party-payment>
@@ -14,7 +15,6 @@
   </div>
   <div>
     <button routerLink="/lobby/">Lobby</button>
-    <button *ngIf="partyService.joinedPartyId === 0" (click)="joinParty()">Join</button>
-    <button *ngIf="partyService.joinedPartyId === id" (click)="leaveParty()">Leave</button>
+    <button *ngIf="partyState.id === partyId" (click)="leaveParty();">Leave</button>
   </div>
 </div>
