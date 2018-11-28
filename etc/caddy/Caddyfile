@@ -14,7 +14,7 @@ moyobob.me {
     root /srv/moyobob.me
 }
 
-moyobob.api {
+moyobob.me/api {
     import common
     proxy / localhost:8000 {
         transparent
