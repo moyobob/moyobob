@@ -51,6 +51,28 @@ class PhaseTestCase1(TestCaseWithSingleWebsocket):
         self.assertEqual(state.phase, PartyPhase.PaymentAndCollection)
         self.assertEqual(state.paid_user_id, self.user.id)
 
+    @async_test
+    async def test_invalid_restaurant(self):
+        await self.join()
+
+        await self.communicator.send_json_to({
+            'command': 'to.choosing.menu',
+            'restaurant_id': 0,
+        })
+        resp = await self.communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.invalid_restaurant())
+
+    @async_test
+    async def test_invalid_user(self):
+        await self.join()
+
+        await self.communicator.send_json_to({
+            'command': 'to.payment',
+            'paid_user_id': 0,
+        })
+        resp = await self.communicator.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.invalid_user())
+
 
 class PhaseTestCase2(TestCaseWithDoubleWebsocket):
     @async_test
