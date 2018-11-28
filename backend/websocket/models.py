@@ -37,9 +37,9 @@ class PartyState(CacheModel):
 
     def __init__(self, party_id: int):
         self.id = party_id
-        # TODO: Change to ChoosingRestaurant
-        self.phase = PartyPhase.ChoosingMenu
+        self.phase = PartyPhase.ChoosingRestaurant
         self.restaurant_id = None
+        self.restaurant_votes = []
         self.member_ids = []
         self.menu_entries = MenuEntries()
 
@@ -57,9 +57,10 @@ class PartyState(CacheModel):
     def refresh_from_db(self):
         super().refresh_from_db()
         o = super().get(self.id)
-        self.phase = o['phase']
+        self.phase = o.get('phase', PartyPhase.ChoosingRestaurant)
         self.restaurant_id = o.get('restaurant_id', None)
-        self.member_ids = o['member_ids']
+        self.restaurant_votes = o.get('restaurant_votes', [])
+        self.member_ids = o.get('member_ids', [])
         self.menu_entries = MenuEntries.from_dict(o['menu_entries'])
 
     def as_dict(self):
@@ -67,6 +68,7 @@ class PartyState(CacheModel):
             'id': self.id,
             'phase': self.phase,
             'restaurant_id': self.restaurant_id,
+            'restaurant_votes': self.restaurant_votes,
             'member_ids': self.member_ids,
             'menu_entries': self.menu_entries.as_dict() if isinstance(
                 self.menu_entries, MenuEntries) else self.menu_entries,
