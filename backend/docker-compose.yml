@@ -16,6 +16,8 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      DJANGO_DEBUG: ''
+      DJANGO_ALLOWED_HOSTS: localhost
     volumes:
       - /srv/moyobob/backend/db:/app/db
 
