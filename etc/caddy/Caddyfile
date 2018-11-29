@@ -17,8 +17,12 @@ moyobob.me www.moyobob.me {
     import common
 
     root /srv/moyobob/frontend
+}
 
-    proxy /api localhost:8000 {
+api.moyobob.me {
+    import common
+
+    proxy / localhost:8000 {
         transparent
         header_upstream Forwarded "for={remote}; host={host}; proto={scheme}"
     }
