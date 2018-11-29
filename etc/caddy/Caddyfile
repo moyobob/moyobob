@@ -15,7 +15,7 @@
 
 moyobob.me www.moyobob.me {
     import common
-    root /srv/moyobob.me
+    root /srv/moyobob/frontend
 }
 
 moyobob.me/api {
