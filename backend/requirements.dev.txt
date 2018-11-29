@@ -1,4 +1,5 @@
 aioredis==1.2.0
+aiounittest==1.1.0
 astroid==2.0.4
 autopep8==1.4.2
 certifi==2018.10.15
