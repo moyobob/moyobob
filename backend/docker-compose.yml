@@ -13,11 +13,8 @@ services:
       - redis
     ports:
       - 127.0.0.1:8000:8000
-    environment:
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
-      DJANGO_DEBUG: ''
-      DJANGO_ALLOWED_HOSTS: localhost
+    env_file:
+      - /srv/moyobob/backend/env
     volumes:
       - /srv/moyobob/backend/db:/app/db
 
