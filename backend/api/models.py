@@ -106,7 +106,7 @@ class PartyRecord(models.Model):
     leader = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="record_leader_set")
     since = models.DateTimeField()
-    until = models.DateTimeField()
+    until = models.DateTimeField(auto_now=True)
     members = models.ManyToManyField(User, related_name="party_records")
     restaurant = models.ForeignKey(
         Restaurant, null=True, on_delete=models.SET_NULL)

@@ -2,6 +2,27 @@ from django.core.cache import cache
 from enum import IntEnum
 import json
 
+from api.models import Party, PartyRecord, User, Restaurant, Payment, Menu
+
+
+def make_payments(state):
+    payments = []
+    for (menu_id, quantity, user_ids) in state.menu_entries.inner.values():
+        for user_id in user_ids:
+            menu = Menu.objects.get(id=menu_id)
+            price = (menu.price * quantity) / (len(user_ids))
+            payment = Payment(
+                user_id=user_id,
+                paid_user_id=state.paid_user_id,
+                menu=menu,
+                price=price,
+                resolved=False,
+            )
+            payments.append(payment)
+    for payment in payments:
+        payment.save()
+    return payments
+
 
 class CacheModel():
     _key = 'key'
@@ -54,6 +75,24 @@ class PartyState(CacheModel):
         self.refresh_from_db()
 
         return self
+
+    def delete(self):
+        if self.phase == PartyPhase.PaymentAndCollection:
+            party = Party.objects.get(id=self.id)
+            payments = make_payments(self)
+            record = PartyRecord(
+                name=party.name,
+                type=party.type,
+                location=party.location,
+                leader=party.leader,
+                since=party.since,
+                members=User.objects.filter(id__in=self.member_ids),
+                restaurant_id=self.restaurant_id,
+                paid_user_id=self.paid_user_id,
+                payments=payments,
+            )
+            record.save()
+        super().delete()
 
     def refresh_from_db(self):
         super().refresh_from_db()
