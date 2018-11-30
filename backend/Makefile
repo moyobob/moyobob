@@ -1,5 +1,5 @@
 test:
-	coverage run --branch --source='./api,./websocket' manage.py test
+	. ./test.sh
 
 report:
 	coverage report -m
