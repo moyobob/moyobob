@@ -184,7 +184,7 @@ def payments(request: HttpRequest):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
 
-    payments = request.user.payments.all()
+    payments = request.user.payments.filter(resolved=False).all()
 
     return JsonResponse([payment.as_dict() for payment in payments], safe=False)
 
@@ -195,6 +195,6 @@ def collections(request: HttpRequest):
     if not request.user.is_authenticated:
         return HttpResponseForbidden()
 
-    collections = request.user.collections.all()
+    collections = request.user.collections.filter(resolved=False).all()
 
     return JsonResponse([payment.as_dict() for payment in collections], safe=False)
