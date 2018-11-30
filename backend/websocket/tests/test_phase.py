@@ -20,10 +20,12 @@ class PhaseTestCase1(TestCaseWithSingleWebsocket):
             'restaurant_id': restaurant.id,
         })
         resp = await self.communicator.receive_json_from(1)
+        self.party.refresh_from_db()
         state.refresh_from_db()
         self.assertDictEqual(resp, event.state_update(state))
         self.assertEqual(state.phase, PartyPhase.ChoosingMenu)
         self.assertEqual(state.restaurant_id, restaurant.id)
+        self.assertEqual(self.party.restaurant.id, restaurant.id)
 
         await self.communicator.send_json_to({
             'command': 'to.ordering',

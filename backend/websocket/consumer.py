@@ -202,6 +202,8 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         state.phase = PartyPhase.ChoosingMenu
         state.restaurant_id = restaurant_id
         state.save()
+        party.restaurant_id = restaurant_id
+        party.save()
 
         await self.channel_layer.group_send(
             'party-{}'.format(party.id),
