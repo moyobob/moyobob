@@ -165,3 +165,36 @@ def menu_detail(request: HttpRequest, menu_id: int):
         return HttpResponseNotFound()
 
     return JsonResponse(menu.as_dict())
+
+
+def party_records(request: HttpRequest):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    records = request.user.party_records.all()
+
+    return JsonResponse([record.as_dict() for record in records], safe=False)
+
+
+def payments(request: HttpRequest):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    payments = request.user.payments.all()
+
+    return JsonResponse([payment.as_dict() for payment in payments], safe=False)
+
+
+def collections(request: HttpRequest):
+    if request.method != 'GET':
+        return HttpResponseNotAllowed(['GET'])
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    collections = request.user.collections.all()
+
+    return JsonResponse([payment.as_dict() for payment in collections], safe=False)
