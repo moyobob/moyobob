@@ -78,3 +78,30 @@ class Party(models.Model):
     @property
     def state(self):
         return PartyState.get(self.id)
+
+
+class PartyRecord(models.Model):
+    name = models.CharField(max_length=120)
+    type = models.SmallIntegerField(choices=enum_to_choice(PartyType))
+    location = models.CharField(max_length=120)
+    leader = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True)
+    since = models.DateTimeField()
+    until = models.DateTimeField()
+    members = models.ManyToManyField(User)
+    restaurant = models.ForeignKey(
+        Restaurant, null=True, on_delete=models.SET_NULL)
+    paid_user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+
+    def as_dict(self):
+        return {
+            'name': self.name,
+            'type': self.type,
+            'location': self.location,
+            'leader_id': self.leader.id,
+            'since': str(self.since),
+            'until': str(self.until),
+            'member_ids': [member.id for member in self.members.all()],
+            'restaurant_id': self.restaurant.id,
+            'paid_user_id': self.paid_user.id,
+        }
