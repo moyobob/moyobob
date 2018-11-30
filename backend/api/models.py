@@ -80,18 +80,38 @@ class Party(models.Model):
         return PartyState.get(self.id)
 
 
+class Payment(models.Model):
+    user = models.ForeignKey(
+        User, null=True, on_delete=models.SET_NULL, related_name="payments")
+    paid_user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    menu = models.ForeignKey(Menu, null=True, on_delete=models.SET_NULL)
+    price = models.IntegerField(default=0)
+    resolved = models.BooleanField()
+
+    def as_dict(self):
+        return {
+            'user_id': self.user.id,
+            'paid_user_id': self.paid_user.id,
+            'menu_id': self.menu.id,
+            'price': self.price,
+            'resolved': self.resolved,
+            'party_id': self.party.id,
+        }
+
+
 class PartyRecord(models.Model):
     name = models.CharField(max_length=120)
     type = models.SmallIntegerField(choices=enum_to_choice(PartyType))
     location = models.CharField(max_length=120)
     leader = models.ForeignKey(
-        User, on_delete=models.SET_NULL, null=True)
+        User, on_delete=models.SET_NULL, null=True, related_name="record_leader_set")
     since = models.DateTimeField()
     until = models.DateTimeField()
-    members = models.ManyToManyField(User)
+    members = models.ManyToManyField(User, related_name="party_records")
     restaurant = models.ForeignKey(
         Restaurant, null=True, on_delete=models.SET_NULL)
     paid_user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    payments = models.ManyToManyField(Payment, related_name="party")
 
     def as_dict(self):
         return {
@@ -104,4 +124,5 @@ class PartyRecord(models.Model):
             'member_ids': [member.id for member in self.members.all()],
             'restaurant_id': self.restaurant.id,
             'paid_user_id': self.paid_user.id,
+            'payment_ids': [payment.id for payment in self.payments.all()],
         }
