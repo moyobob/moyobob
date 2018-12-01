@@ -87,6 +87,12 @@ export class VoteObjectCreateRequest {
   user: number;
 }
 
+export class VotingRequest {
+  restaurantId: number;
+  vote: number;
+  user: number;
+}
+
 export class PartyState {
   @deserialize
   id: number;
@@ -97,6 +103,7 @@ export class PartyState {
   @deserializeAs('restaurant_id')
   restaurantId?: number;
 
+  //User's id, Restaurant's id
   restaurantVotes: [number, number][];
 
   @deserializeAs('member_ids')
