@@ -2,13 +2,19 @@ import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Subscription } from 'rxjs';
 
+import { Deserialize } from 'cerialize';
+
 import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest, PartyCreateRequest } from '../types/party';
 
 import { WebsocketService } from './websocket.service';
 import {
   Event, PartyJoinEvent, PartyLeaveEvent, InitiallyNotJoinedEvent, StateUpdateEvent, MenuCreateEvent, MenuUpdateEvent
 } from '../types/event';
-import { PartyLeaveCommand, MenuCreateCommand, MenuUpdateCommand, PartyJoinCommand } from '../types/command';
+import {
+  PartyJoinCommand, PartyLeaveCommand,
+  MenuCreateCommand, MenuUpdateCommand,
+  ToPaymentCommand,
+} from '../types/command';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -38,14 +44,16 @@ export class PartyService {
 
   async getParty(id: number): Promise<Party> {
     if (id) {
-      return await this.http.get<Party>(`api/party/${id}/`, httpOptions).toPromise();
+      return await this.http.get<any>(`api/party/${id}/`, httpOptions).toPromise()
+      .then(json => Deserialize(json, Party));
     } else {
       return await undefined;
     }
   }
 
   async addParty(party: PartyCreateRequest): Promise<Party> {
-    return await this.http.post<Party>('api/party/', party, httpOptions).toPromise();
+    return await this.http.post<Party>('api/party/', party, httpOptions).toPromise()
+    .then(json => Deserialize(json, Party));
   }
 
   async updateParty(party: Party): Promise<Party> {
@@ -67,6 +75,8 @@ export class PartyService {
 
       this.partyState = event.state;
       this.partyStateUpdate.emit(this.partyState);
+    } else if (rawEvent instanceof InitiallyNotJoinedEvent) {
+      this.initiallyNotJoined.emit();
     }
 
     if (this.partyState === undefined) {
@@ -87,11 +97,6 @@ export class PartyService {
 
         this.partyState.memberIds = this.partyState.memberIds.filter(id => id !== event.userId);
         this.partyStateUpdate.emit(this.partyState);
-
-        break;
-      }
-      case rawEvent instanceof InitiallyNotJoinedEvent: {
-        this.initiallyNotJoined.emit();
 
         break;
       }
@@ -162,6 +167,15 @@ export class PartyService {
       request.addUserIds,
       request.removeUserIds,
     );
+    this.websocketService.send(command);
+  }
+
+  toPayment(id: number) {
+    if (this.partyState === undefined) {
+      return;
+    }
+
+    const command = new ToPaymentCommand(id);
     this.websocketService.send(command);
   }
 }
