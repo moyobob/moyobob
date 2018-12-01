@@ -18,10 +18,10 @@ import { PartyPaymentComponent } from './party/party-payment/party-payment.compo
 import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/select-menu.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { UserItemComponent } from './party/party-ordered/user-item/user-item.component';
-import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
-
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/material';
+import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
+import { AddVoteObjectComponent } from './party/party-choosing-restaurant/vote-restaurant/add-vote-object/add-vote-object.component';
 
 @NgModule({
   declarations: [
@@ -40,6 +40,7 @@ import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/mat
     SignUpComponent,
     UserItemComponent,
     VoteRestaurantComponent,
+    AddVoteObjectComponent,
   ],
   imports: [
     AppRoutingModule,

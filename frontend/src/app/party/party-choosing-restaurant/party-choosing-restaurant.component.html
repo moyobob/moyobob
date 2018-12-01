@@ -1,3 +1,6 @@
-<p>
-  party-choosing-restaurant works!
-</p>
+
+
+
+<app-vote-restaurant *ngIf="showRestaurantPolly" [menus]="menus" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
+  (cancel)="cancelAddMenu($event);">
+</app-vote-restaurant>

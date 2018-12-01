@@ -35,6 +35,8 @@ export class PartyService {
   ) {
     this.websocketService.onEvent.subscribe(event => {
       this.onWebsocketEvent(event);
+
+
     });
   }
 
