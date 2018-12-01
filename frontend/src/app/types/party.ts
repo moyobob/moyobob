@@ -82,6 +82,11 @@ export class MenuEntryUpdateRequest {
   removeUserIds: number[];
 }
 
+export class VoteObjectCreateRequest {
+  restaurantId: number;
+  user: number;
+}
+
 export class PartyState {
   @deserialize
   id: number;

@@ -1,3 +1,12 @@
-<p>
-  add-vote-object works!
-</p>
+<div>
+  <ul>
+    <li *ngFor="let restaurant of restaurants">
+      <button type="button" name="restaurant" (click)="addVoteObjectRequest(restaurant.id);">
+        {{restaurant.name}}
+      </button>
+    </li>
+  </ul>
+  <div>
+    <button (click)="cancelRequest();">Cancel</button>
+  </div>
+</div>
