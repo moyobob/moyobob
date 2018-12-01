@@ -8,16 +8,16 @@ import json
 from json.decoder import JSONDecodeError
 
 from .models import User, Party, PartyType, Restaurant, Menu
+from .decorator import allow_authenticated, allow_method
+from .decorator import get_menu, get_party, get_payment, get_restaurant
 
 
 def HttpResponseOk(*args, **kwargs):
     return HttpResponse(status=200, *args, **kwargs)
 
 
+@allow_method(['POST'])
 def signup(request: HttpRequest):
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
-
     try:
         req_data = json.loads(request.body.decode())
         username = req_data['username']
@@ -35,10 +35,8 @@ def signup(request: HttpRequest):
     return HttpResponseOk()
 
 
+@allow_method(['POST'])
 def signin(request: HttpRequest):
-    if request.method != 'POST':
-        return HttpResponseNotAllowed(['POST'])
-
     try:
         req_data = json.loads(request.body.decode())
         email = req_data['email']
@@ -55,12 +53,9 @@ def signin(request: HttpRequest):
     return JsonResponse(user.as_dict())
 
 
+@allow_method(['GET'])
+@allow_authenticated
 def signout(request: HttpRequest):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
     logout(request)
 
     return HttpResponseOk()
@@ -77,12 +72,9 @@ def verify_session(request: HttpRequest):
     return JsonResponse(request.user.as_dict())
 
 
+@allow_method(['GET', 'POST'])
+@allow_authenticated
 def party(request: HttpRequest):
-    if request.method not in ['GET', 'POST']:
-        return HttpResponseNotAllowed(['GET', 'POST'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
     if request.method == 'GET':
         party_list = [party.as_dict() for party in Party.objects.all()]
         return JsonResponse(party_list, safe=False)
@@ -102,17 +94,10 @@ def party(request: HttpRequest):
         return JsonResponse(party.as_dict(), safe=False)
 
 
-def party_detail(request: HttpRequest, party_id: int):
-    if request.method not in ['GET', 'DELETE']:
-        return HttpResponseNotAllowed(['GET', 'DELETE'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
-    try:
-        party = Party.objects.get(id=party_id)
-    except Party.DoesNotExist:
-        return HttpResponseNotFound()
-
+@allow_method(['GET', 'DELETE'])
+@allow_authenticated
+@get_party
+def party_detail(request: HttpRequest, party: Party):
     if request.method == 'GET':
         return JsonResponse(party.as_dict())
     else:  # DELETE
@@ -124,77 +109,48 @@ def party_detail(request: HttpRequest, party_id: int):
         return HttpResponseOk()
 
 
-def restaurant_detail(request: HttpRequest, restaurant_id: int):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
-    try:
-        restaurant = Restaurant.objects.get(id=restaurant_id)
-    except Restaurant.DoesNotExist:
-        return HttpResponseNotFound()
-
+@allow_method(['GET'])
+@allow_authenticated
+@get_restaurant
+def restaurant_detail(request: HttpRequest, restaurant: Restaurant):
     return JsonResponse(restaurant.as_dict())
 
 
-def menu(request: HttpRequest, restaurant_id: int):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
-    try:
-        restaurant = Restaurant.objects.get(id=restaurant_id)
-        menus = [menu.as_dict() for menu in restaurant.menus.all()]
-    except Restaurant.DoesNotExist:
-        return HttpResponseNotFound()
+@allow_method(['GET'])
+@allow_authenticated
+@get_restaurant
+def menu(request: HttpRequest, restaurant: Restaurant):
+    menus = [menu.as_dict() for menu in restaurant.menus.all()]
 
     return JsonResponse(menus, safe=False)
 
 
-def menu_detail(request: HttpRequest, menu_id: int):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
-    try:
-        menu = Menu.objects.get(id=menu_id)
-    except Menu.DoesNotExist:
-        return HttpResponseNotFound()
-
+@allow_method(['GET'])
+@allow_authenticated
+@get_menu
+def menu_detail(request: HttpRequest, menu: Menu):
     return JsonResponse(menu.as_dict())
 
 
+@allow_method(['GET'])
+@allow_authenticated
 def party_records(request: HttpRequest):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
     records = request.user.party_records.all()
 
     return JsonResponse([record.as_dict() for record in records], safe=False)
 
 
+@allow_method(['GET'])
+@allow_authenticated
 def payments(request: HttpRequest):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
     payments = request.user.payments.filter(resolved=False).all()
 
     return JsonResponse([payment.as_dict() for payment in payments], safe=False)
 
 
+@allow_method(['GET'])
+@allow_authenticated
 def collections(request: HttpRequest):
-    if request.method != 'GET':
-        return HttpResponseNotAllowed(['GET'])
-    if not request.user.is_authenticated:
-        return HttpResponseForbidden()
-
     collections = request.user.collections.filter(resolved=False).all()
 
     return JsonResponse([payment.as_dict() for payment in collections], safe=False)
