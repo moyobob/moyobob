@@ -17,7 +17,7 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-REDIS_PORT = os.getenv('REDIS_HOST', '6379')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 
 
 # Quick-start development settings - unsuitable for production
