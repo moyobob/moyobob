@@ -39,25 +39,26 @@ export class PartyService {
   }
 
   async getParties(): Promise<Party[]> {
-    return await this.http.get<Party[]>('api/party/', httpOptions).toPromise();
+    return await this.http.get<any[]>('api/party/', httpOptions).toPromise()
+      .then(jsons => jsons.map(json => Deserialize(json, Party)));
   }
 
   async getParty(id: number): Promise<Party> {
     if (id) {
       return await this.http.get<any>(`api/party/${id}/`, httpOptions).toPromise()
-      .then(json => Deserialize(json, Party));
+        .then(json => Deserialize(json, Party));
     } else {
       return await undefined;
     }
   }
 
   async addParty(party: PartyCreateRequest): Promise<Party> {
-    return await this.http.post<Party>('api/party/', party, httpOptions).toPromise()
-    .then(json => Deserialize(json, Party));
+    return await this.http.post<any>('api/party/', party, httpOptions).toPromise()
+      .then(json => Deserialize(json, Party));
   }
 
   async updateParty(party: Party): Promise<Party> {
-    return await this.http.put<Party>(`api/party/${party.id}/`, party, httpOptions)
+    return await this.http.put<any>(`api/party/${party.id}/`, party, httpOptions)
       .toPromise().then(() => party);
   }
 
