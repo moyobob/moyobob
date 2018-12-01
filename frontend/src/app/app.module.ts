@@ -16,8 +16,9 @@ import { PartyOrderingComponent } from './party/party-ordering/party-ordering.co
 import { PartyOrderedComponent } from './party/party-ordered/party-ordered.component';
 import { PartyPaymentComponent } from './party/party-payment/party-payment.component';
 import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/select-menu.component';
-import {SignUpComponent} from './sign-up/sign-up.component';
+import { SignUpComponent } from './sign-up/sign-up.component';
 import { UserItemComponent } from './party/party-ordered/user-item/user-item.component';
+import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { UserItemComponent } from './party/party-ordered/user-item/user-item.com
     SelectMenuComponent,
     SignUpComponent,
     UserItemComponent,
+    VoteRestaurantComponent,
   ],
   imports: [
     AppRoutingModule,
