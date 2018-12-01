@@ -15,4 +15,6 @@ urlpatterns = [
     path('party_records/', views.party_records, name='party_records'),
     path('payments/', views.payments, name='payments'),
     path('collections/', views.collections, name='collections'),
+    path('resolve_payment/<int:payment_id>/',
+         views.resolve_payment, name='resolve_payment'),
 ]

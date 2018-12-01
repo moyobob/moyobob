@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 import json
 from json.decoder import JSONDecodeError
 
-from .models import User, Party, PartyType, Restaurant, Menu
+from .models import User, Party, PartyType, Restaurant, Menu, Payment
 from .decorator import allow_authenticated, allow_method
 from .decorator import get_menu, get_party, get_payment, get_restaurant
 
@@ -150,3 +150,16 @@ def collections(request: HttpRequest):
     collections = request.user.collections.filter(resolved=False).all()
 
     return JsonResponse([payment.as_dict() for payment in collections], safe=False)
+
+
+@allow_method(['GET'])
+@allow_authenticated
+@get_payment
+def resolve_payment(request: HttpRequest, payment: Payment):
+    if payment.paid_user != request.user:
+        return HttpResponseForbidden()
+
+    payment.resolved = True
+    payment.save()
+
+    return HttpResponse()
