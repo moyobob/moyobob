@@ -70,7 +70,7 @@ jobs:
           working_directory: frontend
       - run:
           name: Build
-          command npm run build -- --prod
+          command: npm run build -- --prod
           working_directory: frontend
       - run:
           name: Report coverage
