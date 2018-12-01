@@ -16,6 +16,7 @@ describe('UserItemComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(UserItemComponent);
     component = fixture.componentInstance;
+    component.user = { id: 1, email: '@.', username: '' };
     fixture.detectChanges();
   });
 
