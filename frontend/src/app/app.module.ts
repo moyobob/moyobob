@@ -17,6 +17,8 @@ import { PartyOrderedComponent } from './party/party-ordered/party-ordered.compo
 import { PartyPaymentComponent } from './party/party-payment/party-payment.component';
 import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/select-menu.component';
 import { SignUpComponent } from './sign-up/sign-up.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatInputModule } from '@angular/material';
 import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
 
 @NgModule({
@@ -44,7 +46,9 @@ import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-
     HttpClientXsrfModule.withOptions({
       cookieName: 'csrftoken',
       headerName: 'X-CSRFToken'
-    })
+    }),
+    BrowserAnimationsModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]
