@@ -12,10 +12,6 @@ from .decorator import allow_authenticated, allow_method
 from .decorator import get_menu, get_party, get_payment, get_restaurant
 
 
-def HttpResponseOk(*args, **kwargs):
-    return HttpResponse(status=200, *args, **kwargs)
-
-
 @allow_method(['POST'])
 def signup(request: HttpRequest):
     try:
@@ -32,7 +28,7 @@ def signup(request: HttpRequest):
     except IntegrityError:
         return HttpResponseBadRequest()
 
-    return HttpResponseOk()
+    return HttpResponse()
 
 
 @allow_method(['POST'])
@@ -58,7 +54,7 @@ def signin(request: HttpRequest):
 def signout(request: HttpRequest):
     logout(request)
 
-    return HttpResponseOk()
+    return HttpResponse()
 
 
 @ensure_csrf_cookie
@@ -106,7 +102,7 @@ def party_detail(request: HttpRequest, party: Party):
 
         party.delete()
 
-        return HttpResponseOk()
+        return HttpResponse()
 
 
 @allow_method(['GET'])
