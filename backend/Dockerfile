@@ -12,11 +12,8 @@ COPY backend backend
 COPY api api
 COPY websocket websocket
 COPY cauth cauth
-
 RUN mkdir db
-RUN python manage.py migrate
 
 EXPOSE 8000
-VOLUME /app/db
 
-CMD gunicorn --bind 0.0.0.0:8000 backend.wsgi:application
+CMD daphne -b 0.0.0.0 -p 8000 backend.asgi:application

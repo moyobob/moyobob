@@ -9,7 +9,6 @@ constantly==15.1.0
 daphne==2.2.2
 Django==2.1.2
 django-redis==4.9.0
-gunicorn==19.9.0
 hyperlink==18.0.0
 incremental==17.5.0
 PyHamcrest==1.9.0
