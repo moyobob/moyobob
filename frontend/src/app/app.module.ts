@@ -19,6 +19,7 @@ import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/sel
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatInputModule } from '@angular/material';
+import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { MatInputModule } from '@angular/material';
     PartyPaymentComponent,
     SelectMenuComponent,
     SignUpComponent,
+    VoteRestaurantComponent,
   ],
   imports: [
     AppRoutingModule,
