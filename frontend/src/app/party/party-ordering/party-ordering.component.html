@@ -1,10 +1,10 @@
 <div>
   <div>
     <ul>
-      <li *ngFor="let menuEntry of menuEntries">
+      <li *ngFor="let menuEntry of partyState.menuEntries">
         <b>{{findMenuNameById(menuEntry.menuId)}}</b> quantity: {{menuEntry.quantity}}
       </li>
     </ul>
   </div>
-  <button (click)="toOrdered();">Ordered</button>
+  <button *ngIf="partyState.leaderId === user.id" (click)="toOrdered();">Ordered</button>
 </div>

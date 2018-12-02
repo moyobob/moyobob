@@ -11,7 +11,8 @@ import { MenuEntry } from '../../types/party';
 export class PartyOrderingComponent implements OnInit {
 
   @Input() menus: Menu[];
-  @Input() menuEntries: MenuEntry[];
+  @Input() user: User;
+  @Input() partyState: PartyState;
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
 
   constructor() { }
