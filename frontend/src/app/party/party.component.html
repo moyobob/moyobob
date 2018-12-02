@@ -6,10 +6,13 @@
   </div>
   <div [ngSwitch]="partyState.phase">
     <app-party-choosing-restaurant *ngSwitchCase="0"></app-party-choosing-restaurant>
-    <app-party-choosing-menu *ngSwitchCase="1" [partyState]="partyState" [user]="user" [menus]="menus" (addMenu)="addMenu($event);"
-      (updateMenu)="updateMenu($event);"></app-party-choosing-menu>
+    <app-party-choosing-menu *ngSwitchCase="1" [partyState]="partyState" [user]="user"
+      [menus]="menus" (addMenu)="addMenu($event);" (updateMenu)="updateMenu($event);">
+    </app-party-choosing-menu>
     <app-party-ordering *ngSwitchCase="2"></app-party-ordering>
-    <app-party-ordered *ngSwitchCase="3"></app-party-ordered>
+    <app-party-ordered *ngSwitchCase="3" [party]="party" [user]="user" [users]="users"
+      (toNextState)="toPayment($event);">
+    </app-party-ordered>
     <app-party-payment *ngSwitchCase="4"></app-party-payment>
     <div *ngSwitchDefault></div>
   </div>

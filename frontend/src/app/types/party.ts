@@ -1,4 +1,4 @@
-import { deserialize, deserializeAs } from 'cerialize';
+import { deserialize, deserializeAs, serialize, serializeAs } from 'cerialize';
 
 export enum PartyType {
   InGroup = 0,
@@ -6,26 +6,46 @@ export enum PartyType {
 }
 
 export class Party {
+  @serialize
   @deserialize
   id: number;
 
+  @serialize
   @deserialize
   name: string;
 
+  @serialize
   @deserialize
   type: PartyType;
 
+  @serialize
   @deserialize
   location: string;
 
+  @serializeAs('leader_id')
   @deserializeAs('leader_id')
   leaderId: number;
 
+  @serialize
   @deserialize
   since: string;
 
+  @serializeAs('member_count')
   @deserializeAs('member_count')
   memberCount: number;
+
+  constructor(
+    id: number, name: string, type: PartyType, location: string,
+    leaderId: number, since: string, memberCount: number
+  ) {
+    this.id = id;
+    this.name = name;
+    this.type = type;
+    this.location = location;
+    this.leaderId = leaderId;
+    this.since = since;
+    this.memberCount = memberCount;
+  }
 }
 
 export enum PartyPhase {
