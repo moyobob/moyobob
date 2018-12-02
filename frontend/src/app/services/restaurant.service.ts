@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
+import { environment } from '../../environments/environment';
+
 import { Menu } from '../types/menu';
 import { Restaurant } from '../types/restaurant';
 
@@ -14,13 +17,13 @@ export class RestaurantService {
 
   async getRestaurant(restaurant_id: number): Promise<Restaurant> {
     return await this.http.get<Restaurant>(
-      `api/restaurant/${restaurant_id}/`,
+      `${environment.apiUrl}restaurant/${restaurant_id}/`,
     ).toPromise();
   }
 
   async getMenus(restaurant_id: number): Promise<Menu[]> {
     return await this.http.get<Menu[]>(
-      `api/restaurant/${restaurant_id}/menu/`,
+      `${environment.apiUrl}restaurant/${restaurant_id}/menu/`,
     ).toPromise();
   }
 }

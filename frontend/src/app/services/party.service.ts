@@ -1,12 +1,12 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Subscription } from 'rxjs';
-
 import { Deserialize } from 'cerialize';
 
-import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest, PartyCreateRequest } from '../types/party';
+import { environment } from '../../environments/environment';
 
 import { WebsocketService } from './websocket.service';
+
+import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest, PartyCreateRequest } from '../types/party';
 import {
   Event, PartyJoinEvent, PartyLeaveEvent, InitiallyNotJoinedEvent, StateUpdateEvent, MenuCreateEvent, MenuUpdateEvent
 } from '../types/event';
@@ -39,13 +39,13 @@ export class PartyService {
   }
 
   async getParties(): Promise<Party[]> {
-    return await this.http.get<any[]>('api/party/', httpOptions).toPromise()
+    return await this.http.get<any[]>(`${environment.apiUrl}party/`, httpOptions).toPromise()
       .then(jsons => jsons.map(json => Deserialize(json, Party)));
   }
 
   async getParty(id: number): Promise<Party> {
     if (id) {
-      return await this.http.get<any>(`api/party/${id}/`, httpOptions).toPromise()
+      return await this.http.get<any>(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise()
         .then(json => Deserialize(json, Party));
     } else {
       return await undefined;
@@ -53,17 +53,17 @@ export class PartyService {
   }
 
   async addParty(party: PartyCreateRequest): Promise<Party> {
-    return await this.http.post<any>('api/party/', party, httpOptions).toPromise()
+    return await this.http.post<any>(`${environment.apiUrl}party/`, party, httpOptions).toPromise()
       .then(json => Deserialize(json, Party));
   }
 
   async updateParty(party: Party): Promise<Party> {
-    return await this.http.put<any>(`api/party/${party.id}/`, party, httpOptions)
+    return await this.http.put<any>(`${environment.apiUrl}party/${party.id}/`, party, httpOptions)
       .toPromise().then(() => party);
   }
 
   async deleteParty(id: number): Promise<void> {
-    await this.http.delete(`api/party/${id}/`, httpOptions).toPromise();
+    await this.http.delete(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise();
   }
 
   connectWebsocket(): void {

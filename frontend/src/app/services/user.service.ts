@@ -1,61 +1,71 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+
+import { environment } from '../../environments/environment';
+
 import { User } from '../types/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-
-  signedInUsername: String;
+  signedInUsername: string;
   signedInUserId: number;
 
   constructor(private http: HttpClient) {
     this.signedInUsername = null;
   }
 
-  requestSignIn(email: string, password: string) {
-    return this.http.post<User>('/api/signin/', {
-      'email': email,
-      'password': password,
-    }).toPromise().then(user => {
+  async requestSignIn(email: string, password: string): Promise<boolean> {
+    try {
+      const user = await this.http.post<User>(`${environment.apiUrl}signin/`, {
+        'email': email,
+        'password': password,
+      }).toPromise();
+
       this.signedInUsername = user.username;
       this.signedInUserId = user.id;
+
       return true;
-    }, error => {
+    } catch (error) {
       return false;
-    });
+    }
   }
 
-  getSignedInUsername() {
+  getSignedInUsername(): string {
     return this.signedInUsername;
   }
 
-  verifyUser() {
+  async verifyUser(): Promise<boolean> {
     if (this.signedInUsername !== null) {
-      return new Promise(resolve => resolve(this.signedInUsername !== undefined));
+      return this.signedInUsername !== undefined;
     }
-    return this.http.get<User>('/api/verify_session/').toPromise()
-    .then(user => {
+
+    try {
+      const user = await this.http.get<User>(`${environment.apiUrl}verify_session/`).toPromise();
+
       this.signedInUsername = user.username;
       this.signedInUserId = user.id;
+
       return true;
-    }, error => {
+    } catch (error) {
       this.signedInUsername = undefined;
+
       return false;
-    });
+    }
   }
 
-  requestSignUp(email: string, password: string, username: string) {
-    return this.http.post<User>('/api/signup/', {
-      'email': email,
-      'password': password,
-      'username': username
-    }).toPromise().then(() => {
+  async requestSignUp(email: string, password: string, username: string): Promise<boolean> {
+    try {
+      await this.http.post<User>(`${environment.apiUrl}signup/`, {
+        'email': email,
+        'password': password,
+        'username': username
+      }).toPromise();
+
       return true;
-      })
-      .catch(() => {
+    } catch (e) {
       return false;
-      });
+    }
   }
 }
