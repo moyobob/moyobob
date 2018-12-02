@@ -1,7 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Menu } from '../../types/menu';
-import { MenuEntry } from '../../types/party';
+import { User } from '../../types/user';
+import { PartyState } from '../../types/party';
 
 @Component({
   selector: 'app-party-ordering',

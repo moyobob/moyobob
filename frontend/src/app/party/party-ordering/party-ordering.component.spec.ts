@@ -16,6 +16,10 @@ describe('PartyOrderingComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PartyOrderingComponent);
     component = fixture.componentInstance;
+    component.user = { id: 1, email: '@.', username: '' };
+    component.partyState = {
+      id: 1, phase: 2, restaurantId: 1, memberIds: [], menuEntries: []
+    };
     fixture.detectChanges();
   });
 

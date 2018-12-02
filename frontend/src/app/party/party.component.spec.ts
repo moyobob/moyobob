@@ -54,7 +54,11 @@ export class MockPartyChoosingMenuComponent {
 
 @Component({ selector: 'app-party-ordering', template: '' })
 export class MockPartyOrderingComponent {
+  @Input() menus: Menu[];
+  @Input() user: User;
+  @Input() partyState: PartyState;
 
+  @Output() toNextState: EventEmitter<void> = new EventEmitter();
 }
 
 
