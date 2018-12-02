@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Menu } from '../../types/menu';
 import { User } from '../../types/user';
-import { PartyState } from '../../types/party';
+import { Party, PartyState } from '../../types/party';
 
 @Component({
   selector: 'app-party-ordering',
@@ -13,6 +13,7 @@ export class PartyOrderingComponent implements OnInit {
 
   @Input() menus: Menu[];
   @Input() user: User;
+  @Input() party: Party;
   @Input() partyState: PartyState;
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
 

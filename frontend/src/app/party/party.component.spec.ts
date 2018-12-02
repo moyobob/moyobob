@@ -56,6 +56,7 @@ export class MockPartyChoosingMenuComponent {
 export class MockPartyOrderingComponent {
   @Input() menus: Menu[];
   @Input() user: User;
+  @Input() party: Party;
   @Input() partyState: PartyState;
 
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
