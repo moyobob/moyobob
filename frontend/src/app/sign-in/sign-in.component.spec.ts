@@ -7,6 +7,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { SignInComponent } from './sign-in.component';
 import { UserService } from '../services/user.service';
+import { MatButtonModule, MatInputModule } from '@angular/material';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 class MockUserService {
   requestSignIn(email: string, password: string) { }
@@ -30,6 +32,9 @@ describe('SignInComponent', () => {
         FormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
+        MatInputModule,
+        MatButtonModule,
+        BrowserAnimationsModule
       ],
       declarations: [ SignInComponent ],
       providers: [
