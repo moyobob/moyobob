@@ -19,7 +19,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -43,9 +42,9 @@ except NameError:
             to generate your secret key!' % SECRET_FILE)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(os.getenv('DJANGO_DEBUG', True))
+DEBUG = bool(os.getenv('DEBUG', True))
 
-ALLOWED_HOSTS = [os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost')]
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST', 'localhost')]
 
 
 # Application definition
