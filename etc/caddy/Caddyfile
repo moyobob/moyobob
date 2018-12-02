@@ -16,14 +16,14 @@
 moyobob.me www.moyobob.me {
     import common
 
-    root /srv/moyobob/frontend
-}
-
-api.moyobob.me {
-    import common
-
-    proxy / localhost:8000 {
+    proxy /ws/ localhost:8000/ws/ {
+        websocket
+        transparent
+    }
+    proxy /api/ localhost:8000/api/ {
         transparent
         header_upstream Forwarded "for={remote}; host={host}; proto={scheme}"
     }
+
+    root /srv/moyobob/frontend
 }
