@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
+import { environment } from '../../environments/environment';
+
 import { User } from '../types/user';
 
 @Injectable({
@@ -16,7 +18,7 @@ export class UserService {
 
   async requestSignIn(email: string, password: string): Promise<boolean> {
     try {
-      const user = await this.http.post<User>('/api/signin/', {
+      const user = await this.http.post<User>(`${environment.apiUrl}signin/`, {
         'email': email,
         'password': password,
       }).toPromise();
@@ -40,7 +42,7 @@ export class UserService {
     }
 
     try {
-      const user = await this.http.get<User>('/api/verify_session/').toPromise();
+      const user = await this.http.get<User>(`${environment.apiUrl}verify_session/`).toPromise();
 
       this.signedInUsername = user.username;
       this.signedInUserId = user.id;
@@ -55,7 +57,7 @@ export class UserService {
 
   async requestSignUp(email: string, password: string, username: string): Promise<boolean> {
     try {
-      await this.http.post<User>('/api/signup/', {
+      await this.http.post<User>(`${environment.apiUrl}signup/`, {
         'email': email,
         'password': password,
         'username': username

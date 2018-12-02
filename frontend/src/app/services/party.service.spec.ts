@@ -1,10 +1,12 @@
 import { TestBed, inject, async } from '@angular/core/testing';
-
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { Serialize } from 'cerialize';
 
+import { environment } from '../../environments/environment';
+
 import { PartyService } from './party.service';
+
 import { Party, PartyType } from '../types/party';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 const mockParties: Party[] = [
   new Party(1, 'Name 1', PartyType.InGroup, 'Location 1', 1, 'Since 1', 1),
@@ -18,7 +20,9 @@ const mockParty: Party = new Party(
 describe('PartyService', () => {
   let httpTestingController: HttpTestingController;
   let partyService: PartyService;
-  const partyApi = 'api/party/';
+
+  const partyApi = environment.apiUrl + 'party/';
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],

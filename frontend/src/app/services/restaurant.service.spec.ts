@@ -1,7 +1,10 @@
 import { TestBed, async } from '@angular/core/testing';
+import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
+
+import { environment } from '../../environments/environment';
 
 import { RestaurantService } from './restaurant.service';
-import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
+
 import { Restaurant } from '../types/restaurant';
 import { Menu } from '../types/menu';
 
@@ -46,7 +49,7 @@ describe('RestaurantService', () => {
       expect(restaurant).toEqual(mockRestaurant);
     });
 
-    const req = httpTestingController.expectOne(`api/restaurant/${mockRestaurant.id}/`);
+    const req = httpTestingController.expectOne(`${environment.apiUrl}restaurant/${mockRestaurant.id}/`);
     expect(req.request.method).toEqual('GET');
     req.flush(mockRestaurant);
   }));
@@ -56,7 +59,7 @@ describe('RestaurantService', () => {
       expect(menus).toEqual(mockMenus);
     });
 
-    const req = httpTestingController.expectOne(`api/restaurant/${mockRestaurant.id}/menu/`);
+    const req = httpTestingController.expectOne(`${environment.apiUrl}restaurant/${mockRestaurant.id}/menu/`);
     expect(req.request.method).toEqual('GET');
     req.flush(mockMenus);
   }));

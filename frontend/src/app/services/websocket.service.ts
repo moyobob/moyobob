@@ -1,5 +1,8 @@
 import { Injectable, EventEmitter } from '@angular/core';
 import { WebSocketSubject } from 'rxjs/webSocket';
+
+import { environment } from '../../environments/environment';
+
 import { Command, serializeCommand } from '../types/command';
 import { Event, deserializeEvent } from '../types/event';
 
@@ -13,13 +16,13 @@ export class WebsocketService {
 
   constructor() { }
 
-  isConnected() {
+  isConnected(): boolean {
     return this.websocket$ !== undefined && !this.websocket$.closed;
   }
 
-  connect() {
+  connect(): void {
     if (this.websocket$ === undefined) {
-      this.websocket$ = new WebSocketSubject('ws://localhost:8000/ws/party/');
+      this.websocket$ = new WebSocketSubject(`${environment.wsUrl}party/`);
       this.websocket$.subscribe(json => this.receive(json));
     }
   }

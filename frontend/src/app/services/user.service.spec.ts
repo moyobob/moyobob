@@ -1,6 +1,8 @@
 import { TestBed, async } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
+import { environment } from '../../environments/environment';
+
 import { UserService } from './user.service';
 
 describe('UserService', () => {
@@ -9,8 +11,8 @@ describe('UserService', () => {
   const mockEmail = 'k2pa00@gmail.com';
   const mockUsername = 'kipa00';
   const mockPassword = 'aSimpleYetStrongMockP@ssw0rd';
-  const mockEmail_signup = 'hemhem@gmail.com';
-  const mockUsername_signup = 'hem';
+  const mockEmailSignup = 'hemhem@gmail.com';
+  const mockUsernameSignup = 'hem';
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -29,12 +31,12 @@ describe('UserService', () => {
   it('should send request when approved sign in', async(() => {
     const service: UserService = TestBed.get(UserService);
     service.requestSignIn(mockEmail, mockPassword)
-    .then(success => {
-      expect(success).toBeTruthy();
-      expect(service.signedInUsername).toEqual(mockUsername);
-    });
+      .then(success => {
+        expect(success).toBeTruthy();
+        expect(service.signedInUsername).toEqual(mockUsername);
+      });
 
-    const request = httpTestingController.expectOne('/api/signin/');
+    const request = httpTestingController.expectOne(environment.apiUrl + 'signin/');
     expect(request.request.method).toEqual('POST');
     expect(request.request.body).toEqual({
       'email': mockEmail,
@@ -50,11 +52,11 @@ describe('UserService', () => {
   it('should not react when denied sign in', async(() => {
     const service: UserService = TestBed.get(UserService);
     service.requestSignIn(mockEmail, mockPassword)
-    .then(success => {
-      expect(success).toBeFalsy();
-    });
+      .then(success => {
+        expect(success).toBeFalsy();
+      });
 
-    const request = httpTestingController.expectOne('/api/signin/');
+    const request = httpTestingController.expectOne(environment.apiUrl + 'signin/');
     expect(request.request.method).toEqual('POST');
     request.flush({}, {
       status: 403,
@@ -85,7 +87,7 @@ describe('UserService', () => {
         expect(success).toBeTruthy();
       });
 
-    const request = httpTestingController.expectOne('/api/verify_session/');
+    const request = httpTestingController.expectOne(environment.apiUrl + 'verify_session/');
     expect(request.request.method).toEqual('GET');
     request.flush({
       id: 1,
@@ -100,7 +102,7 @@ describe('UserService', () => {
         expect(success).toBeFalsy();
       });
 
-    const request = httpTestingController.expectOne('/api/verify_session/');
+    const request = httpTestingController.expectOne(environment.apiUrl + 'verify_session/');
     expect(request.request.method).toEqual('GET');
     request.flush({}, {
       status: 403,
@@ -110,33 +112,33 @@ describe('UserService', () => {
 
   it('should send request when sign up', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.requestSignUp(mockEmail_signup, mockPassword, mockUsername_signup)
+    service.requestSignUp(mockEmailSignup, mockPassword, mockUsernameSignup)
       .then(success => {
         expect(success).toBeTruthy();
       });
 
-    const request = httpTestingController.expectOne('/api/signup/');
+    const request = httpTestingController.expectOne(environment.apiUrl + 'signup/');
     expect(request.request.method).toEqual('POST');
     expect(request.request.body).toEqual({
-      'email': mockEmail_signup,
+      'email': mockEmailSignup,
       'password': mockPassword,
-      'username': mockUsername_signup
+      'username': mockUsernameSignup
     });
     request.flush({
       id: 2,
-      email: mockEmail_signup,
-      username: mockUsername_signup
+      email: mockEmailSignup,
+      username: mockUsernameSignup
     });
   }));
 
   it('should not react when denied sign up', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.requestSignUp(mockEmail_signup, mockPassword, mockUsername_signup)
-    .then(success => {
-      expect(success).toBeFalsy();
-    });
+    service.requestSignUp(mockEmailSignup, mockPassword, mockUsernameSignup)
+      .then(success => {
+        expect(success).toBeFalsy();
+      });
 
-    const request = httpTestingController.expectOne('/api/signup/');
+    const request = httpTestingController.expectOne(environment.apiUrl + 'signup/');
     expect(request.request.method).toEqual('POST');
     request.flush({}, {
       status: 403,
