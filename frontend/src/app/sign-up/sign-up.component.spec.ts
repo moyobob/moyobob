@@ -5,22 +5,22 @@ import { of } from 'rxjs';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { SignInComponent } from './sign-in.component';
+import { SignUpComponent } from './sign-up.component';
 import { UserService } from '../services/user.service';
 
 class MockUserService {
-  requestSignIn(email: string, password: string) { }
+  requestSignUp(email: string, password: string, username: string) { }
 }
-
-describe('SignInComponent', () => {
-  let component: SignInComponent;
-  let fixture: ComponentFixture<SignInComponent>;
+describe('SignUpComponent', () => {
+  let component: SignUpComponent;
+  let fixture: ComponentFixture<SignUpComponent>;
 
   let mockUserService: jasmine.SpyObj<UserService>;
   let router: jasmine.SpyObj<Router>;
   let spy: jasmine.Spy;
 
-  const mockEmail = 'kipa00';
+  const mockEmail = 'tori@gmail.com';
+  const mockUsername = 'hemtori';
   const mockPassword = 'aSimpleYetStrongMockP@ssw0rd';
 
   beforeEach(async(() => {
@@ -31,7 +31,7 @@ describe('SignInComponent', () => {
         HttpClientTestingModule,
         RouterTestingModule,
       ],
-      declarations: [ SignInComponent ],
+      declarations: [ SignUpComponent ],
       providers: [
         {
           provide: UserService,
@@ -46,12 +46,12 @@ describe('SignInComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SignInComponent);
+    fixture = TestBed.createComponent(SignUpComponent);
     component = fixture.componentInstance;
     mockUserService = TestBed.get(UserService);
     router = TestBed.get(Router);
-    spy = spyOn(mockUserService, 'requestSignIn');
-    component.logInStatus = component.inputStatus.HaveNotTriedSignIn;
+    spy = spyOn(mockUserService, 'requestSignUp');
+    component.signUpStatus = component.inputStatus.HaveNotTriedSignUp;
     fixture.detectChanges();
   });
 
@@ -61,7 +61,8 @@ describe('SignInComponent', () => {
 
   it('should not call anything if email empty', () => {
     component.passwordInput = mockPassword;
-    component.trySignIn(undefined);
+    component.userNameInput = mockUsername;
+    component.trySignUp(undefined);
 
     expect(spy).toHaveBeenCalledTimes(0);
     expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
@@ -69,73 +70,36 @@ describe('SignInComponent', () => {
 
   it('should not call anything if password empty', async(() => {
     component.emailInput = mockEmail;
-    component.trySignIn(undefined);
+    component.userNameInput = mockUsername;
+    component.trySignUp(undefined);
 
     expect(spy).toHaveBeenCalledTimes(0);
     expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
   }));
 
-  it('should call requestSignIn if both filled', async(() => {
+  it('should not call anything if username empty', async(() => {
+    component.emailInput = mockEmail;
+    component.passwordInput = mockPassword;
+    component.trySignUp(undefined);
+
+    expect(spy).toHaveBeenCalledTimes(0);
+    expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
+  }));
+
+  it('should call requestSignUp if three things filled', async(() => {
     spy.and.returnValue(of(true).toPromise());
 
     component.emailInput = mockEmail;
     component.passwordInput = mockPassword;
-    component.trySignIn(undefined);
+    component.userNameInput = mockUsername;
+    component.trySignUp(undefined);
 
     fixture.whenStable().then(() => {
       expect(spy).toHaveBeenCalledWith(
-        mockEmail, mockPassword
+        mockEmail, mockPassword, mockUsername
       );
 
-      expect(router.navigateByUrl).toHaveBeenCalledWith('lobby');
+      expect(router.navigateByUrl).toHaveBeenCalledWith('/sign-in/');
     });
   }));
-
-  it('should call requestSignIn but not route if both filled but wrong',
-    async(() => {
-      spy.and.returnValue(of(false).toPromise());
-
-      component.emailInput = mockEmail;
-      component.passwordInput = mockPassword;
-      component.trySignIn(undefined);
-
-      fixture.whenStable().then(() => {
-        expect(spy).toHaveBeenCalledWith(
-          mockEmail, mockPassword
-        );
-
-        expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
-      });
-    }
-  ));
-
-  it('should call requestSignIn if both filled and enter', async(() => {
-    spy.and.returnValue(of(true).toPromise());
-
-    component.emailInput = mockEmail;
-    component.passwordInput = mockPassword;
-    component.trySignIn({'key': 'Enter'});
-
-    fixture.whenStable().then(() => {
-      expect(spy).toHaveBeenCalledWith(
-        mockEmail, mockPassword
-      );
-
-      expect(router.navigateByUrl).toHaveBeenCalledWith('lobby');
-    });
-  }));
-
-  it('should call anything if both filled but not enter', async(() => {
-    spy.and.returnValue(of(true).toPromise());
-
-    component.emailInput = mockEmail;
-    component.passwordInput = mockPassword;
-    component.trySignIn({'key': 'a'});
-
-    fixture.whenStable().then(() => {
-      expect(spy).toHaveBeenCalledTimes(0);
-      expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
-    });
-  }));
-
 });

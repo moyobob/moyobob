@@ -1,14 +1,15 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { LobbyComponent } from './lobby.component';
-import { Party, PartyType } from '../types/party';
 import { PartyService } from '../services/party.service';
-import { User } from '../types/user';
 import { UserService } from '../services/user.service';
+
+import { Party, PartyType, PartyCreateRequest, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
+import { User } from '../types/user';
 
 const mockUser: User = {
   id: 1,
@@ -43,15 +44,37 @@ class MockLobbyListItemComponent {
   @Input() joinedPartyId;
 }
 
+@Component({ selector: 'app-party-create', template: '' })
+class MockPartyCreateComponent {
+  @Output() createParty: EventEmitter<PartyCreateRequest> = new EventEmitter();
+  @Output() cancel: EventEmitter<void> = new EventEmitter();
+}
+
+class MockPartyService {
+  public partyStateUpdate: EventEmitter<PartyState> = new EventEmitter();
+  public initiallyNotJoined: EventEmitter<void> = new EventEmitter();
+  public partyState: PartyState;
+
+  connectWebsocket(): void { }
+  getParties() {
+    return undefined;
+  }
+  addParty(_: PartyCreateRequest) {
+    return undefined;
+  }
+  joinParty(_: number): void { }
+}
+
 describe('LobbyComponent', () => {
   let component: LobbyComponent;
   let fixture: ComponentFixture<LobbyComponent>;
-  let partyService: jasmine.SpyObj<PartyService>;
   let userService: jasmine.SpyObj<UserService>;
   let router: jasmine.SpyObj<Router>;
 
+  let getPartiesSpy: jasmine.Spy;
+  let addPartySpy: jasmine.Spy;
+
   beforeEach(async(() => {
-    const partySpy = jasmine.createSpyObj('PartyService', ['getParties', 'connectWebsocket']);
     const userSpy = jasmine.createSpyObj('UserService', ['getSignedInUsername']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -62,18 +85,26 @@ describe('LobbyComponent', () => {
       declarations: [
         LobbyComponent,
         MockLobbyListItemComponent,
+        MockPartyCreateComponent,
       ],
       providers: [
-        { provide: PartyService, useValue: partySpy },
+        { provide: PartyService, useClass: MockPartyService },
         { provide: UserService, useValue: userSpy },
         { provide: Router, useValue: routerSpy },
-      ]
+      ],
     }).compileComponents();
 
-    partyService = TestBed.get(PartyService);
-    partyService.getParties.and.returnValue(new Promise(resolve => resolve(mockParties)));
+    const partyService = TestBed.get(PartyService);
+
+    getPartiesSpy = spyOn(partyService, 'getParties');
+    getPartiesSpy.and.returnValue(new Promise(r => r(mockParties)));
+
+    addPartySpy = spyOn(partyService, 'addParty');
+    addPartySpy.and.returnValue(new Promise(r => r(mockParties[0])));
+
     userService = TestBed.get(UserService);
     userService.getSignedInUsername.and.returnValue(mockUser.username);
+
     router = TestBed.get(Router);
   }));
 
@@ -89,9 +120,9 @@ describe('LobbyComponent', () => {
 
   it('should get parties', async(() => {
     component.ngOnInit();
-    fixture.whenStable().then( () => {
+    fixture.whenStable().then(() => {
       fixture.detectChanges();
-      expect(partyService.getParties).toHaveBeenCalled();
+      expect(getPartiesSpy).toHaveBeenCalled();
       expect(component.parties).toEqual(mockParties);
     });
   }));

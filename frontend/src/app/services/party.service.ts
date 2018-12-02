@@ -1,13 +1,20 @@
-import { Injectable, Output, EventEmitter } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Deserialize } from 'cerialize';
 
+import { environment } from '../../environments/environment';
+
+import { WebsocketService } from './websocket.service';
+
+import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest, PartyCreateRequest } from '../types/party';
 import {
-  Menu, PartyMenu, PartyMenuCreateRequest, PartyMenuUpdateRequest
-} from '../types/menu';
-import { Party, PartyState } from '../types/party';
-
-import { Observable, of, Subscription } from 'rxjs';
-import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
+  Event, PartyJoinEvent, PartyLeaveEvent, InitiallyNotJoinedEvent, StateUpdateEvent, MenuCreateEvent, MenuUpdateEvent
+} from '../types/event';
+import {
+  PartyJoinCommand, PartyLeaveCommand,
+  MenuCreateCommand, MenuUpdateCommand,
+  ToPaymentCommand,
+} from '../types/command';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -17,176 +24,159 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class PartyService {
+  public partyStateUpdate: EventEmitter<PartyState> = new EventEmitter();
+  public initiallyNotJoined: EventEmitter<void> = new EventEmitter();
 
-  webSocket$: WebSocketSubject<any>;
-  subscription: Subscription;
-
-  isJoined: boolean;
-  joinedPartyId: number;
   partyState: PartyState;
 
-  @Output() partyJoin: EventEmitter<number>;
-  @Output() partyLeave: EventEmitter<number>;
-  @Output() partyNotJoined: EventEmitter<void>;
-  @Output() partyStateUpdate: EventEmitter<PartyState>;
-  @Output() partyMenuCreate: EventEmitter<PartyMenu[]>;
-  @Output() partyMenuUpdate: EventEmitter<PartyMenu[]>;
-
-  constructor(private http: HttpClient) {
-    this.webSocket$ = undefined;
-    this.joinedPartyId = undefined;
-    this.isJoined = undefined;
-
-    this.partyJoin = new EventEmitter();
-    this.partyLeave = new EventEmitter();
-    this.partyNotJoined = new EventEmitter();
-    this.partyStateUpdate = new EventEmitter();
-    this.partyMenuCreate = new EventEmitter();
-    this.partyMenuUpdate = new EventEmitter();
+  constructor(
+    private websocketService: WebsocketService,
+    private http: HttpClient,
+  ) {
+    this.websocketService.onEvent.subscribe(event => {
+      this.onWebsocketEvent(event);
+    });
   }
 
   async getParties(): Promise<Party[]> {
-    return await this.http.get<Party[]>('api/party/', httpOptions).toPromise();
+    return await this.http.get<any[]>(`${environment.apiUrl}party/`, httpOptions).toPromise()
+      .then(jsons => jsons.map(json => Deserialize(json, Party)));
   }
 
   async getParty(id: number): Promise<Party> {
     if (id) {
-      return await this.http.get<Party>(`api/party/${id}/`, httpOptions).toPromise();
+      return await this.http.get<any>(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise()
+        .then(json => Deserialize(json, Party));
     } else {
       return await undefined;
     }
   }
 
-  async addParty(party: Partial<Party>): Promise<Party> {
-    return await this.http.post<Party>('api/party/', party, httpOptions).toPromise();
+  async addParty(party: PartyCreateRequest): Promise<Party> {
+    return await this.http.post<any>(`${environment.apiUrl}party/`, party, httpOptions).toPromise()
+      .then(json => Deserialize(json, Party));
   }
 
   async updateParty(party: Party): Promise<Party> {
-    return await this.http.put<Party>(`api/party/${party.id}/`, party, httpOptions)
+    return await this.http.put<any>(`${environment.apiUrl}party/${party.id}/`, party, httpOptions)
       .toPromise().then(() => party);
   }
 
   async deleteParty(id: number): Promise<void> {
-    await this.http.delete(`api/party/${id}/`, httpOptions).toPromise();
-  }
-
-  async getMenus(): Promise<Menu[]> {
-    return await this.http.get<Menu[]>(
-      `api/restaurant/${this.partyState.restaurant}/menu/`
-    ).toPromise();
-  }
-
-  handleWebsocket(json: any): void {
-    console.log('ws:', json);
-    if (json['type'] === 'party.join') {
-      this.partyJoin.emit(json['user_id']);
-    } else if (json['type'] === 'party.leave') {
-      this.partyLeave.emit(json['user_id']);
-    } else if (json['type'] === 'initial.not.joined') {
-      this.isJoined = false;
-      if (this.joinedPartyId) {
-        this.webSocket$.next({
-          'command': 'party.join',
-          'party_id': this.joinedPartyId
-        });
-      } else {
-        this.partyNotJoined.emit();
-      }
-    } else if (json['type'] === 'state.update') {
-      this.isJoined = true;
-      json['state']['restaurant'] = 1;
-      const menus = [];
-      for (const menuEntryId of Object.keys(json['state']['menus'])) {
-        const [menuId, quantity, userIds] = json['state']['menus'][menuEntryId];
-        menus.push({
-          id: +menuEntryId,
-          menuId: menuId,
-          quantity: quantity,
-          userIds: userIds
-        });
-      }
-      this.partyState = {
-        id: json['state']['id'],
-        phase: json['state']['phase'],
-        restaurant: json['state']['restaurant'],
-        members: json['state']['members'],
-        menus: menus
-      };
-      this.joinedPartyId = json['state']['id'];
-      console.log(this.partyState);
-      this.partyStateUpdate.emit(this.partyState);
-    } else if (json['type'] === 'menu.create') {
-      this.partyState.menus.push({
-        id: json['menu_entry_id'],
-        menuId: json['menu_id'],
-        quantity: json['quantity'],
-        userIds: json['users']
-      });
-      this.partyMenuCreate.emit(this.partyState.menus);
-    } else if (json['type'] === 'menu.update') {
-      const menu_entries = this.partyState.menus.filter(
-        partyMenu => partyMenu.menuId === json['menu_entry_id']
-      );
-      if (menu_entries.length > 0) {
-        const menu_entry = menu_entries[0];
-        menu_entry.quantity += json['quantity'];
-        menu_entry.userIds = menu_entry.userIds
-          .concat(json['add_user_ids'])
-          .filter(userId => json['remove_user_ids'].every(
-            targetUserId => userId !== targetUserId
-          ));
-      }
-    }
+    await this.http.delete(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise();
   }
 
   connectWebsocket(): void {
-    if (this.webSocket$ === undefined) {
-      console.log('ws connected!');
-      this.webSocket$ = new WebSocketSubject('ws://localhost:8000/ws/party/');
-      this.subscription = this.webSocket$.subscribe(json => this.handleWebsocket(json));
-      this.isJoined = undefined;
-    } else if (this.isJoined === false && this.joinedPartyId) {
-      this.webSocket$.next({
-        'command': 'party.join',
-        'party_id': this.joinedPartyId
-      });
-      this.isJoined = undefined;
+    this.websocketService.connect();
+  }
+
+  onWebsocketEvent(rawEvent: Event): void {
+    if (rawEvent instanceof StateUpdateEvent) {
+      const event = <StateUpdateEvent>rawEvent;
+
+      this.partyState = event.state;
+      this.partyStateUpdate.emit(this.partyState);
+    } else if (rawEvent instanceof InitiallyNotJoinedEvent) {
+      this.initiallyNotJoined.emit();
+    }
+
+    if (this.partyState === undefined) {
+      return;
+    }
+
+    switch (true) {
+      case rawEvent instanceof PartyJoinEvent: {
+        const event = <PartyJoinEvent>rawEvent;
+
+        this.partyState.memberIds.push(event.userId);
+        this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
+      case rawEvent instanceof PartyLeaveEvent: {
+        const event = <PartyLeaveEvent>rawEvent;
+
+        this.partyState.memberIds = this.partyState.memberIds.filter(id => id !== event.userId);
+        this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
+      case rawEvent instanceof MenuCreateEvent: {
+        const event = <MenuCreateEvent>rawEvent;
+
+        this.partyState.menuEntries.push({
+          id: event.menuEntryId,
+          menuId: event.menuId,
+          quantity: event.quantity,
+          userIds: event.userIds,
+        });
+        this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
+      case rawEvent instanceof MenuUpdateEvent: {
+        const event = <MenuUpdateEvent>rawEvent;
+
+        this.partyState.menuEntries = this.partyState.menuEntries
+          .map(entry => {
+            if (entry.id === event.menuEntryId) {
+              entry.quantity += event.quantity;
+              entry.userIds = entry.userIds
+                .concat(event.addUserIds)
+                .filter(id => !event.removeUserIds.includes(id));
+            }
+            return entry;
+          });
+        this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
     }
   }
 
+  joinParty(partyId: number): void {
+    if (this.partyState !== undefined) {
+      return;
+    }
+
+    const command = new PartyJoinCommand(partyId);
+    this.websocketService.send(command);
+  }
+
   leaveParty(): void {
-    this.webSocket$.next({
-      'command': 'party.leave',
-      'party_id': this.joinedPartyId
-    });
-    this.joinedPartyId = 0;
+    if (this.partyState === undefined) {
+      return;
+    }
 
-    this.subscription.unsubscribe();
-    this.webSocket$ = undefined;
+    const command = new PartyLeaveCommand(this.partyState.id);
+    this.websocketService.send(command);
   }
 
-  getPartyStateUpdate() {
-    return this.partyStateUpdate;
+  createMenu(request: MenuEntryCreateRequest) {
+    const command = new MenuCreateCommand(
+      request.menuId,
+      request.quantity,
+      request.users,
+    );
+    this.websocketService.send(command);
   }
 
-  createMenu(request: PartyMenuCreateRequest) {
-    this.webSocket$.next({
-      'command': 'menu.create',
-      'menu_id': request.menuId,
-      'quantity': request.quantity,
-      'users': request.users
-    });
+  updateMenu(request: MenuEntryUpdateRequest) {
+    const command = new MenuUpdateCommand(
+      request.id,
+      request.quantityDelta,
+      request.addUserIds,
+      request.removeUserIds,
+    );
+    this.websocketService.send(command);
   }
 
-  updateMenu(request: PartyMenuUpdateRequest) {
-    this.webSocket$.next({
-      'command': 'menu.update',
-      'menu_entry_id': request.id,
-      'quantity': request.quantityDelta,
-      'add_user_ids': request.addUserIds,
-      'remove_user_ids': request.removeUserIds,
-    });
-    console.log(request);
-  }
+  toPayment(id: number) {
+    if (this.partyState === undefined) {
+      return;
+    }
 
+    const command = new ToPaymentCommand(id);
+    this.websocketService.send(command);
+  }
 }

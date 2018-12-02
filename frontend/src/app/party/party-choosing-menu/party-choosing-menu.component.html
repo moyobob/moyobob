@@ -1,0 +1,38 @@
+<div>
+  <ul>
+    <li *ngFor="let menuEntry of menuEntries">
+      {{getMenuNameById(menuEntry.menuId)}}, Count: {{menuEntry.quantity}}
+      <span *ngIf="isAssigned(menuEntry.userIds)">
+        <button *ngIf="menuEntry.userIds.length <= menuEntry.quantity" (click)="updatePartyMenu(menuEntry, -1, true);">
+          Remove
+        </button>
+        <button *ngIf="menuEntry.userIds.length > menuEntry.quantity" (click)="updatePartyMenu(menuEntry, 0, true);">
+          Unassign
+        </button>
+      </span>
+      <span *ngIf="!isAssigned(menuEntry.userIds)">
+        <button *ngIf="(menuEntry.userIds.length == 1 &&
+            menuEntry.quantity == 1) ||
+          menuEntry.userIds.length <= menuEntry.quantity"
+          (click)="updatePartyMenu(menuEntry, 1, false);">
+          Add
+        </button>
+        <button *ngIf="(menuEntry.userIds.length == 1 &&
+            menuEntry.quantity == 1) ||
+          menuEntry.userIds.length > menuEntry.quantity"
+          (click)="updatePartyMenu(menuEntry, 0, false);">
+          Assign
+        </button>
+      </span>
+      <ul>
+        <li *ngFor="let assignee of menuEntry.userIds">
+          user id {{assignee}}
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>
+<button (click)="toggleAddMenu();">Add Menu</button>
+<app-select-menu *ngIf="showAddMenuDialog" [menus]="menus" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
+  (cancel)="cancelAddMenu($event);">
+</app-select-menu>

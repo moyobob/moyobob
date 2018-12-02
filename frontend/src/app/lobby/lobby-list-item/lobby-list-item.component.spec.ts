@@ -4,7 +4,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { LobbyListItemComponent } from './lobby-list-item.component';
-import { Party, PartyType } from '../types/party';
+import { Party, PartyType } from '../../types/party';
 
 const mockLobbyListItem: Party = {
   id: 1,

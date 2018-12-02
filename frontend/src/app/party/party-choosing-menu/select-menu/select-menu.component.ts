@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-import { Menu, PartyMenuCreateRequest } from '../../types/menu';
+import { Menu } from '../../../types/menu';
+import { MenuEntryCreateRequest } from '../../../types/party';
 
 @Component({
   selector: 'app-select-menu',
@@ -11,7 +12,7 @@ export class SelectMenuComponent implements OnInit {
 
   @Input() menus: Menu[];
   @Input() loggedInUserId: number;
-  @Output() request: EventEmitter<PartyMenuCreateRequest>;
+  @Output() request: EventEmitter<MenuEntryCreateRequest>;
   @Output() cancel: EventEmitter<void>;
 
   menuId: number;
@@ -26,12 +27,11 @@ export class SelectMenuComponent implements OnInit {
   }
 
   addRequest() {
-    const requestMenu: number = this.menuId === undefined ? undefined : +this.menuId;
-    if (requestMenu === undefined || !this.quantity) {
+    if (this.menuId === undefined || !this.quantity) {
       // TODO: showing error
     } else {
       this.request.next({
-        menuId: requestMenu,
+        menuId: this.menuId,
         quantity: this.quantity,
         users: [this.loggedInUserId]
       });

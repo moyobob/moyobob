@@ -1,13 +1,16 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, EventEmitter } from '@angular/core';
-
-import { Observable, of } from 'rxjs';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { PartyComponent } from './party.component';
 import { PartyService } from '../services/party.service';
-import { Party, PartyType } from '../types/party';
+import { UserService } from '../services/user.service';
+import { RestaurantService } from '../services/restaurant.service';
+
+import { Party, PartyType, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
+import { User } from '../types/user';
+import { Menu } from '../types/menu';
 
 const mockParty: Party = {
   id: 3,
@@ -41,7 +44,12 @@ export class MockPartyChoosingRestaurantComponent {
 
 @Component({ selector: 'app-party-choosing-menu', template: '' })
 export class MockPartyChoosingMenuComponent {
+  @Input() partyState: PartyState;
+  @Input() user: User;
+  @Input() menus: Menu[];
 
+  @Output() addMenu: EventEmitter<MenuEntryCreateRequest> = new EventEmitter();
+  @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest> = new EventEmitter();
 }
 
 @Component({ selector: 'app-party-ordering', template: '' })
@@ -52,7 +60,9 @@ export class MockPartyOrderingComponent {
 
 @Component({ selector: 'app-party-ordered', template: '' })
 export class MockPartyOrderedComponent {
-
+  @Input() party: Party;
+  @Input() user: User;
+  @Input() users: User[];
 }
 
 @Component({ selector: 'app-party-payment', template: '' })
@@ -60,17 +70,30 @@ export class MockPartyPaymentComponent {
 
 }
 
+class MockPartyService {
+  public partyStateUpdate: EventEmitter<PartyState> = new EventEmitter();
+  public initiallyNotJoined: EventEmitter<void> = new EventEmitter();
+
+  connectWebsocket(): void { }
+  getParty(_: number) {
+    return undefined;
+  }
+  leaveParty(): void { }
+  createMenu(_: MenuEntryCreateRequest): void { }
+  updateMenu(_: MenuEntryUpdateRequest): void { }
+}
 
 describe('PartyComponent', () => {
   let component: PartyComponent;
   let fixture: ComponentFixture<PartyComponent>;
-  let partyService: jasmine.SpyObj<PartyService>;
+  let partyServiceGetParty: jasmine.Spy;
+  let userService: jasmine.SpyObj<UserService>;
+  let restaurantService: jasmine.SpyObj<RestaurantService>;
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
-    const partyServiceSpy = jasmine.createSpyObj('PartyService', [
-      'getParty', 'joinParty', 'leaveParty', 'connectWebsocket', 'getPartyStateUpdate'
-    ]);
+    const userServiceSpy = jasmine.createSpyObj('UserService', ['signedInUserId']);
+    const restaurantServiceSpy = jasmine.createSpyObj('RestaurantService', ['getMenus']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -83,16 +106,24 @@ describe('PartyComponent', () => {
         MockPartyPaymentComponent,
       ],
       providers: [
-        { provide: PartyService, useValue: partyServiceSpy },
+        { provide: PartyService, useClass: MockPartyService },
+        { provide: UserService, useValue: userServiceSpy },
+        { provide: RestaurantService, useValue: restaurantServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useClass: MockActivatedRoute },
       ]
     })
       .compileComponents();
 
-    partyService = TestBed.get(PartyService);
-    partyService.getParty.and.returnValue(new Promise(r => r(mockParty)));
-    partyService.getPartyStateUpdate.and.returnValue(new EventEmitter());
+    const partyService = TestBed.get(PartyService);
+    partyServiceGetParty = spyOn(partyService, 'getParty');
+    partyServiceGetParty.and.returnValue(new Promise(r => r(mockParty)));
+
+    userService = TestBed.get(UserService);
+    userService.signedInUserId.and.returnValue(1);
+
+    restaurantService = TestBed.get(RestaurantService);
+    restaurantService.getMenus.and.returnValue([]);
 
     router = TestBed.get(Router);
   }));

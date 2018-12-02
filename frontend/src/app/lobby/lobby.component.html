@@ -1,12 +1,14 @@
 <div>
   <div>
     <li *ngFor="let party of parties">
-      <app-lobby-list-item [party]="party"
-        [joinedPartyId]="partyService.joinedPartyId">
+      <app-lobby-list-item [party]="party" [joinedPartyId]="joinedPartyId" (joinParty)="joinParty($event);"
+        (navigateToParty)="navigateToParty();">
       </app-lobby-list-item>
     </li>
   </div>
   <div>
-    <button *ngIf="!partyService.joinedPartyId" (click)="createParty();">Create Party</button>
+    <button *ngIf="!joinedPartyId" (click)="showPartyCreate();">Create Party</button>
   </div>
+  <app-party-create *ngIf="isShowingPartyCreate" (createParty)="createParty($event);" (cancel)="hidePartyCreate();">
+  </app-party-create>
 </div>

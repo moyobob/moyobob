@@ -72,11 +72,46 @@ jobs:
           name: Report coverage
           command: bash <(curl -s https://codecov.io/bash) -c -F frontend
 
+  frontend_build:
+    docker:
+      - image: circleci/node:10-stretch
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - frontend-0-{{ .Branch }}-{{ checksum "frontend/package-lock.json" }}
+            - frontend-0-{{ .Branch }}-
+            - frontend-0-
+      - run:
+          name: Installing dependencies
+          command: npm install
+          working_directory: frontend
+      - run:
+          name: Building
+          command: npm run build -- --prod
+          working_directory: frontend
+      - run:
+          name: Archiving build
+          command: tar czvf frontend.tar.gz frontend --remove-files
+          working_directory: frontend/dist
+      - store_artifacts:
+          path: frontend/dist
+          destination: .
+
 workflows:
   version: 2
   flow:
     jobs:
       - frontend_test:
+          filters:
+            branches:
+              only:
+                - master
+                - frontend
+                - /^frontend-.*/
+      - frontend_build:
+          requires:
+            - frontend_test
           filters:
             branches:
               only:

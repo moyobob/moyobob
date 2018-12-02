@@ -48,7 +48,7 @@ export class SignInComponent implements OnInit {
         this.userService.requestSignIn(this.emailInput, this.passwordInput)
         .then(success => {
           if (success) {
-            this.router.navigateByUrl('/lobby/');
+            this.router.navigateByUrl('lobby');
           } else {
             this.logInStatus = InputStatus.EmailOrPasswordWrong;
           }

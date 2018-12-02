@@ -5,17 +5,23 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing/app-routing.module';
-import { LobbyListItemComponent } from './lobby-list-item/lobby-list-item.component';
+import { LobbyListItemComponent } from './lobby/lobby-list-item/lobby-list-item.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { LobbyComponent } from './lobby/lobby.component';
-import { PartyCreateComponent } from './party-create/party-create.component';
+import { PartyCreateComponent } from './lobby//party-create/party-create.component';
 import { PartyComponent } from './party/party.component';
-import { PartyChoosingMenuComponent } from './party-choosing-menu/party-choosing-menu.component';
-import { PartyChoosingRestaurantComponent } from './party-choosing-restaurant/party-choosing-restaurant.component';
-import { PartyOrderingComponent } from './party-ordering/party-ordering.component';
-import { PartyOrderedComponent } from './party-ordered/party-ordered.component';
-import { PartyPaymentComponent } from './party-payment/party-payment.component';
-import { SelectMenuComponent } from './party-choosing-menu/select-menu/select-menu.component';
+import { PartyChoosingMenuComponent } from './party/party-choosing-menu/party-choosing-menu.component';
+import { PartyChoosingRestaurantComponent } from './party/party-choosing-restaurant/party-choosing-restaurant.component';
+import { PartyOrderingComponent } from './party/party-ordering/party-ordering.component';
+import { PartyOrderedComponent } from './party/party-ordered/party-ordered.component';
+import { PartyPaymentComponent } from './party/party-payment/party-payment.component';
+import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/select-menu.component';
+import { SignUpComponent } from './sign-up/sign-up.component';
+import { UserItemComponent } from './party/party-ordered/user-item/user-item.component';
+import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatInputModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -31,6 +37,9 @@ import { SelectMenuComponent } from './party-choosing-menu/select-menu/select-me
     PartyOrderedComponent,
     PartyPaymentComponent,
     SelectMenuComponent,
+    SignUpComponent,
+    UserItemComponent,
+    VoteRestaurantComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -40,7 +49,9 @@ import { SelectMenuComponent } from './party-choosing-menu/select-menu/select-me
     HttpClientXsrfModule.withOptions({
       cookieName: 'csrftoken',
       headerName: 'X-CSRFToken'
-    })
+    }),
+    BrowserAnimationsModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]
