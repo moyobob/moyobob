@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
+import { MatSnackBar } from '@angular/material';
 
 enum InputStatus {
   HaveNotTriedSignIn,
@@ -26,7 +27,8 @@ export class SignInComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    public snackBar: MatSnackBar
   ) { }
 
   ngOnInit() {
@@ -48,6 +50,9 @@ export class SignInComponent implements OnInit {
             this.router.navigateByUrl('lobby');
           } else {
             this.logInStatus = InputStatus.EmailOrPasswordWrong;
+            this.emailInput = null;
+            this.passwordInput = null;
+            this.snackBar.open('Wrong Email or Password', '', {duration: 500});
           }
         });
       }

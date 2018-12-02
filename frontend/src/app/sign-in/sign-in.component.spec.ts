@@ -7,7 +7,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { SignInComponent } from './sign-in.component';
 import { UserService } from '../services/user.service';
-import { MatButtonModule, MatInputModule } from '@angular/material';
+import {MatButtonModule, MatInputModule, MatSnackBarModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 class MockUserService {
@@ -27,6 +27,7 @@ describe('SignInComponent', () => {
 
   beforeEach(async(() => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
+
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
@@ -34,7 +35,8 @@ describe('SignInComponent', () => {
         RouterTestingModule,
         MatInputModule,
         MatButtonModule,
-        BrowserAnimationsModule
+        BrowserAnimationsModule,
+        MatSnackBarModule
       ],
       declarations: [ SignInComponent ],
       providers: [
