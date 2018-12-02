@@ -5,6 +5,8 @@
         dns cloudflare
     }
 
+    log stdout
+
     #header / {
     #    Strict-Transport-Security "max-age=15768000"
     #    X-XSS-Protection "1; mode=block"
@@ -13,17 +15,29 @@
     #}
 }
 
+moyobob.me/api www.moyobob.me/api {
+    import common
+
+    proxy / localhost:8000/api/ {
+        transparent
+        header_upstream Forwarded "for={remote}; host={host}; proto={scheme}"
+    }
+}
+
+moyobob.me/ws www.moyobob.me/ws {
+    import common
+
+    proxy / localhost:8000/ws/ {
+        transparent
+        websocket
+    }
+}
+
 moyobob.me www.moyobob.me {
     import common
 
     root /srv/moyobob/frontend
-}
-
-api.moyobob.me {
-    import common
-
-    proxy / localhost:8000 {
-        transparent
-        header_upstream Forwarded "for={remote}; host={host}; proto={scheme}"
+    rewrite {
+        to {path} {path}/ /index.html
     }
 }
