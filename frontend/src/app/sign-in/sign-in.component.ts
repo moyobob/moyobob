@@ -4,8 +4,7 @@ import { UserService } from '../services/user.service';
 
 enum InputStatus {
   HaveNotTriedSignIn,
-  EmailNoInput,
-  PasswordNoInput,
+  NoInput,
   TriedSignIn,
   EmailOrPasswordWrong,
 }
@@ -39,10 +38,8 @@ export class SignInComponent implements OnInit {
       this.logInStatus !== InputStatus.TriedSignIn
       && (!event || event.key === 'Enter')
     ) {
-      if (!this.emailInput) {
-        this.logInStatus = InputStatus.EmailNoInput;
-      } else if (!this.passwordInput) {
-        this.logInStatus = InputStatus.PasswordNoInput;
+      if (!this.emailInput || !this.passwordInput) {
+        this.logInStatus = InputStatus.NoInput;
       } else {
         this.logInStatus = InputStatus.TriedSignIn;
         this.userService.requestSignIn(this.emailInput, this.passwordInput)
