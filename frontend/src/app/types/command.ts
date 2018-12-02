@@ -120,6 +120,18 @@ export class ToOrderedCommand implements Command {
   constructor() { }
 }
 
+export class ToPaymentCommand implements Command {
+  @serialize
+  readonly command = 'to.payment';
+
+  @serializeAs('paid_user_id')
+  paidUserId: number;
+
+  constructor(paidUserId: number) {
+    this.paidUserId = paidUserId;
+  }
+}
+
 export function serializeCommand(command: Command): any {
   switch (command.command) {
     case 'party.join': {
@@ -152,6 +164,10 @@ export function serializeCommand(command: Command): any {
     }
     case 'to.ordered': {
       return Serialize(command, ToOrderedCommand);
+      break;
+    }
+    case 'to.payment': {
+      return Serialize(command, ToPaymentCommand);
       break;
     }
     default: {

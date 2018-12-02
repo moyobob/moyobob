@@ -1,28 +1,25 @@
 <div>
   <div>
     <label>
-      <input type="text" [(ngModel)]="emailInput" (keypress)="trySignUp($event);"
-        placeholder="email" autofocus />
+      <input type="text" [(ngModel)]="emailInput" (keypress)="trySignUp($event);" placeholder="email" autofocus />
       <span *ngIf="signUpStatus === inputStatus.EmailNoInput">
         please enter your email here.
       </span>
     </label>
   </div>
   <div>
-    <input type="password" [(ngModel)]="passwordInput" (keypress)="trySignUp($event);"
-      placeholder="password" />
+    <input type="password" [(ngModel)]="passwordInput" (keypress)="trySignUp($event);" placeholder="password" />
     <span *ngIf="signUpStatus === inputStatus.PasswordNoInput">
       please enter your password here.
     </span>
   </div>
   <div>
-    <input type="text" [(ngModel)]="userNameInput" (keypress)="trySignUp($event);"
-      placeholder="username" />
+    <input type="text" [(ngModel)]="userNameInput" (keypress)="trySignUp($event);" placeholder="username" />
     <span *ngIf="signUpStatus === inputStatus.UserNameNoInput">
       please enter your username here.
     </span>
   </div>
   <div>
-    <button (click)="trySignUp();">Sign Up</button>
+    <button (click)="trySignUp(undefined);">Sign Up</button>
   </div>
 </div>

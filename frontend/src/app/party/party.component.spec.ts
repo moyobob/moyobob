@@ -64,7 +64,9 @@ export class MockPartyOrderingComponent {
 
 @Component({ selector: 'app-party-ordered', template: '' })
 export class MockPartyOrderedComponent {
-
+  @Input() party: Party;
+  @Input() user: User;
+  @Input() users: User[];
 }
 
 @Component({ selector: 'app-party-payment', template: '' })

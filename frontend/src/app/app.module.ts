@@ -16,7 +16,12 @@ import { PartyOrderingComponent } from './party/party-ordering/party-ordering.co
 import { PartyOrderedComponent } from './party/party-ordered/party-ordered.component';
 import { PartyPaymentComponent } from './party/party-payment/party-payment.component';
 import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/select-menu.component';
-import {SignUpComponent} from './sign-up/sign-up.component';
+import { SignUpComponent } from './sign-up/sign-up.component';
+import { UserItemComponent } from './party/party-ordered/user-item/user-item.component';
+import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
+
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatInputModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -33,6 +38,8 @@ import {SignUpComponent} from './sign-up/sign-up.component';
     PartyPaymentComponent,
     SelectMenuComponent,
     SignUpComponent,
+    UserItemComponent,
+    VoteRestaurantComponent,
   ],
   imports: [
     AppRoutingModule,
@@ -42,7 +49,9 @@ import {SignUpComponent} from './sign-up/sign-up.component';
     HttpClientXsrfModule.withOptions({
       cookieName: 'csrftoken',
       headerName: 'X-CSRFToken'
-    })
+    }),
+    BrowserAnimationsModule,
+    MatInputModule
   ],
   providers: [],
   bootstrap: [AppComponent]

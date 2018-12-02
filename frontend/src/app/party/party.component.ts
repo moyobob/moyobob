@@ -19,6 +19,7 @@ export class PartyComponent implements OnInit, OnDestroy {
   party: Party;
   partyState: PartyState;
   user: User;
+  users: User[];
   partyId: number;
   menus: Menu[];
 
@@ -96,5 +97,9 @@ export class PartyComponent implements OnInit, OnDestroy {
 
   toOrdered() {
     this.partyService.toOrdered();
+  }
+
+  toPayment(user: User) {
+    this.partyService.toPayment(user.id);
   }
 }

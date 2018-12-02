@@ -1,3 +1,13 @@
-<p>
-  party-ordered works!
-</p>
+<div>
+  <h3>Ordered!</h3>
+  <button *ngIf="isPartyLeader" (click)="showFoodArrived();">Food Arrived</button>
+  <div *ngIf="foodArrived">
+    <ul>
+      <li *ngFor="let user of users">
+        <app-user-item [user]="user" (userSelected)="goNextState($event);">
+        </app-user-item>
+      </li>
+    </ul>
+    <button (click)="cancelFoodArrived();">Cancel</button>
+  </div>
+</div>

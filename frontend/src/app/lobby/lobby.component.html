@@ -7,7 +7,7 @@
     </li>
   </div>
   <div>
-    <button *ngIf="!partyService.joinedPartyId" (click)="showPartyCreate();">Create Party</button>
+    <button *ngIf="!joinedPartyId" (click)="showPartyCreate();">Create Party</button>
   </div>
   <app-party-create *ngIf="isShowingPartyCreate" (createParty)="createParty($event);" (cancel)="hidePartyCreate();">
   </app-party-create>
