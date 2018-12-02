@@ -1,3 +1,10 @@
-<p>
-  party-ordering works!
-</p>
+<div>
+  <div>
+    <ul>
+      <li *ngFor="let menuEntry of menuEntries">
+        <b>{{findMenuNameById(menuEntry.menuId)}}</b> quantity: {{menuEntry.quantity}}
+      </li>
+    </ul>
+  </div>
+  <button (click)="toOrdered();">Ordered</button>
+</div>

@@ -8,7 +8,11 @@ import { WebsocketService } from './websocket.service';
 import {
   Event, PartyJoinEvent, PartyLeaveEvent, InitiallyNotJoinedEvent, StateUpdateEvent, MenuCreateEvent, MenuUpdateEvent
 } from '../types/event';
-import { PartyLeaveCommand, MenuCreateCommand, MenuUpdateCommand, PartyJoinCommand } from '../types/command';
+import {
+  PartyJoinCommand, PartyLeaveCommand,
+  MenuCreateCommand, MenuUpdateCommand,
+  ToOrderedCommand,
+} from '../types/command';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -162,6 +166,11 @@ export class PartyService {
       request.addUserIds,
       request.removeUserIds,
     );
+    this.websocketService.send(command);
+  }
+
+  toOrdered() {
+    const command = new ToOrderedCommand();
     this.websocketService.send(command);
   }
 }
