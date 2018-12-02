@@ -55,6 +55,12 @@ class PartyState(CacheModel):
 
         return self
 
+    def delete(self):
+        if self.phase == PartyPhase.PaymentAndCollection:
+            from api.util import make_record
+            make_record(self)
+        super().delete()
+
     def refresh_from_db(self):
         super().refresh_from_db()
         o = super().get(self.id)
