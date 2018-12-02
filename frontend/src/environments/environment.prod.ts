@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://localhost/api/',
-  wsUrl: 'wss://localhost/ws/',
+  apiUrl: 'https://moyobob.me/api/',
+  wsUrl: 'wss://moyobob.me/ws/',
 };
