@@ -1,6 +1,7 @@
-from . import TestCaseWithHttp
+from django.test import Client
 
-from api.models import User, Party, PartyType, Restaurant, Menu, PartyRecord
+from . import TestCaseWithHttp
+from api.models import User, Party, PartyType, Restaurant, Menu, PartyRecord, Payment
 from websocket.models import PartyState, PartyPhase
 
 
@@ -136,3 +137,30 @@ class RecordTestCase(TestCaseWithHttp):
             [payment.id for payment in record.payments.filter(
                 paid_user_id=self.user1.id).all()],
         )
+
+    def test_resolve_payment(self):
+        self.party.state.delete()
+        record = PartyRecord.objects.all()[0]
+
+        super().login(email="pbzweihander@rustaceans.org", password="iluvrust2")
+
+        resp = self.get('/api/resolve_payment/0/')
+        self.assertEqual(resp.status_code, 404)
+
+        for payment in record.payments.all():
+            resp = self.get('/api/resolve_payment/{}/'.format(payment.id))
+            self.assertEqual(resp.status_code, 200)
+
+        self.assertFalse(Payment.objects.filter(resolved=False).exists())
+
+        resp = self.get('/api/collections/')
+        self.assertListEqual(resp.json(), [])
+
+        client = Client()
+        client.login(email="ferris@rustaceans.org", password="iluvrust")
+        resp = client.get('/api/payments/')
+        self.assertListEqual(resp.json(), [])
+
+        resp = client.get(
+            '/api/resolve_payment/{}/'.format(record.payments.all()[0].id))
+        self.assertEqual(resp.status_code, 403)
