@@ -37,11 +37,12 @@ class PartyState(CacheModel):
 
     def __init__(self, party_id: int):
         self.id = party_id
-        # TODO: Change to ChoosingRestaurant
-        self.phase = PartyPhase.ChoosingMenu
-        self.restaurant = None
-        self.members = []
-        self.menus = MenuEntries()
+        self.phase = PartyPhase.ChoosingRestaurant
+        self.restaurant_id = None
+        self.restaurant_votes = []
+        self.member_ids = []
+        self.paid_user_id = []
+        self.menu_entries = MenuEntries()
 
     @classmethod
     def get(cls, id: int):
@@ -54,21 +55,32 @@ class PartyState(CacheModel):
 
         return self
 
+    def delete(self):
+        if self.phase == PartyPhase.PaymentAndCollection:
+            from api.util import make_record
+            make_record(self)
+        super().delete()
+
     def refresh_from_db(self):
         super().refresh_from_db()
         o = super().get(self.id)
-        self.phase = o['phase']
-        self.restaurant = o.get('restaurant', None)
-        self.members = o['members']
-        self.menus = MenuEntries.from_dict(o['menus'])
+        self.phase = o.get('phase', PartyPhase.ChoosingRestaurant)
+        self.restaurant_id = o.get('restaurant_id', None)
+        self.restaurant_votes = o.get('restaurant_votes', [])
+        self.member_ids = o.get('member_ids', [])
+        self.paid_user_id = o.get('paid_user_id', None)
+        self.menu_entries = MenuEntries.from_dict(o['menu_entries'])
 
     def as_dict(self):
         return {
             'id': self.id,
             'phase': self.phase,
-            'restaurant': self.restaurant,
-            'members': self.members,
-            'menus': self.menus.as_dict() if isinstance(self.menus, MenuEntries) else self.menus,
+            'restaurant_id': self.restaurant_id,
+            'restaurant_votes': self.restaurant_votes,
+            'member_ids': self.member_ids,
+            'paid_user_id': self.paid_user_id,
+            'menu_entries': self.menu_entries.as_dict() if isinstance(
+                self.menu_entries, MenuEntries) else self.menu_entries,
         }
 
 
@@ -91,9 +103,9 @@ class MenuEntries:
     def as_dict(self):
         return self.inner
 
-    def add(self, menu_id: int, quantity: int, users: list):
+    def add(self, menu_id: int, quantity: int, user_ids: list):
         id = self.last_id + 1
-        self.inner[id] = ((menu_id, quantity, users))
+        self.inner[id] = ((menu_id, quantity, user_ids))
         self.last_id = id
         return id
 
@@ -103,11 +115,11 @@ class MenuEntries:
     def get(self, menu_entry_id: int, default=None):
         return self.inner.get(menu_entry_id, default)
 
-    def update(self, menu_entry_id: int, quantity: int, add_users=[], remove_users=[]):
+    def update(self, menu_entry_id: int, quantity: int, add_user_ids=[], remove_user_ids=[]):
         (m, q, ul) = self.inner[menu_entry_id]
         q += quantity
-        ul.extend(add_users)
-        for u in remove_users:
+        ul.extend(add_user_ids)
+        for u in remove_user_ids:
             ul.remove(u)
         self.inner[menu_entry_id] = (m, q, ul)
         return self.inner[menu_entry_id]

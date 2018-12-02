@@ -11,21 +11,40 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '^fb%ytfad_e(s&k68rgvn+atjfcv&1%axa-mhd$!@cd4r_cfb%'
+# SECRET_KEY = '^fb%ytfad_e(s&k68rgvn+atjfcv&1%axa-mhd$!@cd4r_cfb%'
+try:
+    SECRET_KEY
+except NameError:
+    SECRET_FILE = os.path.join(BASE_DIR, 'secret.txt')
+    try:
+        SECRET_KEY = open(SECRET_FILE).read().strip()
+    except IOError:
+        try:
+            import random
+            SECRET_KEY = ''.join([random.SystemRandom().choice(
+                'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)') for i in range(50)])
+            with open(SECRET_FILE, 'w') as secret:
+                secret.write(SECRET_KEY)
+        except IOError:
+            raise ImproperlyConfigured('Please create a %s file with random characters \
+            to generate your secret key!' % SECRET_FILE)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = bool(os.getenv('DEBUG', True))
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = list(os.getenv('ALLOWED_HOSTS', 'localhost').split(','))
 
 
 # Application definition
@@ -78,7 +97,7 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
@@ -89,12 +108,12 @@ CHANNEL_LAYERS = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, 'db/', 'db.sqlite3'),
         'OPTIONS': {
             'timeout': 30
         },
         'TEST': {
-            'NAME': os.path.join(BASE_DIR, 'testdb.sqlite3'),
+            'NAME': os.path.join(BASE_DIR, 'db/', 'testdb.sqlite3'),
         }
     }
 }
@@ -102,13 +121,16 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://localhost:6379/0',
+        'LOCATION': 'redis://{}:{}/0'.format(REDIS_HOST, REDIS_PORT),
         'TIMEOUT': None,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
     }
 }
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

@@ -3,10 +3,9 @@ from channels.layers import get_channel_layer
 from django.core.cache import cache
 import json
 
-from .models import PartyState
-from api.models import Party, User
-from websocket import event
-from .exception import NotInPartyError, AlreadyJoinedError
+from .models import PartyState, PartyPhase
+from api.models import Party, User, Restaurant, Menu
+from websocket import event, exception
 
 WEBSOCKET_REJECT_UNAUTHORIZED = 4000
 WEBSOCKET_REJECT_DUPLICATE = 4001
@@ -15,12 +14,15 @@ WEBSOCKET_DISCONNECT_DUPLICATE = 4011
 
 
 def get_party(party_id: int):
-    party = Party.objects.get(id=party_id)
+    try:
+        party = Party.objects.get(id=party_id)
+    except Party.DoesNotExist:
+        raise exception.InvalidPartyError
     state = party.state
 
     if state is None:
         party.delete()
-        raise Party.DoesNotExist
+        raise exception.InvalidPartyError
 
     return (party, state)
 
@@ -29,11 +31,11 @@ def get_party_of_user(user_id: int):
     party_id = cache.get('user-party:{}'.format(user_id))
 
     if party_id is None:
-        raise NotInPartyError
+        raise exception.NotJoinedError
 
     try:
         (party, state) = get_party(party_id)
-    except Party.DoesNotExist:
+    except exception.InvalidPartyError:
         cache.delete('user-party:{}'.format(user_id))
         raise
 
@@ -47,6 +49,11 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         self.commands = {
             'party.join': self.command_party_join,
             'party.leave': self.command_party_leave,
+            'to.choosing.menu': self.command_to_choosing_menu,
+            'to.ordering': self.command_to_ordering,
+            'to.ordered': self.command_to_ordered,
+            'to.payment': self.command_to_payment,
+            'restaurant.vote.toggle': self.command_restaurant_vote_toggle,
             'menu.create': self.command_menu_create,
             'menu.update': self.command_menu_update,
             'menu.delete': self.command_menu_delete,
@@ -62,7 +69,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         try:
             (party, state) = get_party_of_user(user.id)
-        except NotInPartyError:
+        except exception.NotJoinedError:
             await self.send_json(
                 event.initially_not_joined()
             )
@@ -95,28 +102,30 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             await self.close(WEBSOCKET_DISCONNECT_UNAUTHORIZED)
             return
 
+        try:
+            await self.handle_command(msg)
+        except exception.ConsumerException as e:
+            await self.send_json(
+                e.as_dict(),
+            )
+
+    async def handle_command(self, msg):
         command = self.commands.get(msg.get('command', None), None)
 
-        if command is not None:
-            try:
-                await command(msg)
-            except KeyError:
-                await self.send_json(event.error.invalid_data())
-            except Party.DoesNotExist:
-                await self.send_json(event.error.invalid_party())
-            except NotInPartyError:
-                await self.send_json(event.error.not_joined())
-            except AlreadyJoinedError:
-                await self.send_json(event.error.already_joined())
-        else:
-            await self.send_json(event.error.invalid_command())
+        if command is None:
+            raise exception.InvalidCommandError
+
+        try:
+            await command(msg)
+        except KeyError:
+            raise exception.InvalidDataError
 
     async def command_party_join(self, msg):
         user = self.scope['user']
         user_id = user.id
 
         if cache.get('user-party:{}'.format(user_id)) is not None:
-            raise AlreadyJoinedError
+            raise exception.AlreadyJoinedError
 
         party_id = msg['party_id']
 
@@ -124,7 +133,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         # TODO: Check party permission
 
-        state.members.append(user_id)
+        state.member_ids.append(user_id)
         party.member_count += 1
         state.save()
         party.save()
@@ -149,7 +158,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(user_id)
         party_id = party.id
 
-        state.members.remove(user_id)
+        state.member_ids.remove(user_id)
         party.member_count -= 1
         state.save()
         party.save()
@@ -167,7 +176,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             )
 
             if party.leader.id == user_id:
-                next_user_id = state.members[0]
+                next_user_id = state.member_ids[0]
                 user = User.objects.get(id=next_user_id)
                 party.leader = user
                 party.save()
@@ -178,19 +187,124 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         else:
             party.delete()
 
-    async def command_menu_create(self, data):
-        menu_id = data['menu_id']
-        quantity = data['quantity']
-        users = data['users']
+    async def command_to_choosing_menu(self, data):
+        user = self.scope['user']
+        user_id = user.id
+        restaurant_id = data['restaurant_id']
 
-        (party, state) = get_party_of_user(self.scope['user'].id)
+        (party, state) = get_party_of_user(user_id)
+        if party.leader.id != user_id:
+            raise exception.NotAuthorizedError
 
-        menu_entry_id = state.menus.add(menu_id, quantity, users)
+        if not Restaurant.objects.filter(id=restaurant_id).exists():
+            raise exception.InvalidRestaurantError
+
+        state.phase = PartyPhase.ChoosingMenu
+        state.restaurant_id = restaurant_id
+        state.save()
+        party.restaurant_id = restaurant_id
+        party.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.state_update(state),
+        )
+
+    async def command_to_ordering(self, data):
+        user = self.scope['user']
+        user_id = user.id
+
+        (party, state) = get_party_of_user(user_id)
+        if party.leader.id != user_id:
+            raise exception.NotAuthorizedError
+
+        state.phase = PartyPhase.Ordering
         state.save()
 
         await self.channel_layer.group_send(
             'party-{}'.format(party.id),
-            event.menu_create(menu_entry_id, menu_id, quantity, users),
+            event.state_update(state),
+        )
+
+    async def command_to_ordered(self, data):
+        user = self.scope['user']
+        user_id = user.id
+
+        (party, state) = get_party_of_user(user_id)
+        if party.leader.id != user_id:
+            raise exception.NotAuthorizedError
+
+        state.phase = PartyPhase.Ordered
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.state_update(state),
+        )
+
+    async def command_to_payment(self, data):
+        user = self.scope['user']
+        user_id = user.id
+        paid_user_id = data['paid_user_id']
+
+        (party, state) = get_party_of_user(user_id)
+        if party.leader.id != user_id:
+            raise exception.NotAuthorizedError
+
+        if not User.objects.filter(id=paid_user_id):
+            raise exception.InvalidUserError
+
+        state.phase = PartyPhase.PaymentAndCollection
+        state.paid_user_id = paid_user_id
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.state_update(state),
+        )
+
+    async def command_restaurant_vote_toggle(self, data):
+        user = self.scope['user']
+        restaurant_id = data['restaurant_id']
+
+        (party, state) = get_party_of_user(user.id)
+
+        if not Restaurant.objects.filter(id=restaurant_id).exists():
+            raise exception.InvalidRestaurantError
+
+        try:
+            state.restaurant_votes.remove((user.id, restaurant_id))
+            await self.channel_layer.group_send(
+                'party-{}'.format(party.id),
+                event.restaurant_unvote(restaurant_id),
+            )
+        except ValueError:
+            state.restaurant_votes.append((user.id, restaurant_id))
+            await self.channel_layer.group_send(
+                'party-{}'.format(party.id),
+                event.restaurant_vote(restaurant_id),
+            )
+        finally:
+            state.save()
+
+    async def command_menu_create(self, data):
+        menu_id = data['menu_id']
+        quantity = data['quantity']
+        user_ids = data['user_ids']
+
+        (party, state) = get_party_of_user(self.scope['user'].id)
+
+        if not Menu.objects.filter(id=menu_id).exists():
+            raise exception.InvalidMenuError
+        if User.objects.filter(id__in=user_ids).count() != len(user_ids):
+            raise exception.InvalidUserError
+
+        menu_entry_id = state.menu_entries.add(menu_id, quantity, user_ids)
+        state.save()
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party.id),
+            event.menu_create(menu_entry_id, menu_id, quantity, user_ids),
         )
 
     async def command_menu_update(self, data):
@@ -201,14 +315,16 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         (party, state) = get_party_of_user(self.scope['user'].id)
 
+        if User.objects.filter(id__in=add_user_ids).count() != len(add_user_ids):
+            raise exception.InvalidUserError
+        if User.objects.filter(id__in=remove_user_ids).count() != len(remove_user_ids):
+            raise exception.InvalidUserError
+
         try:
-            state.menus.update(
-                menu_entry_id, quantity, add_users=add_user_ids, remove_users=remove_user_ids)
+            state.menu_entries.update(
+                menu_entry_id, quantity, add_user_ids=add_user_ids, remove_user_ids=remove_user_ids)
         except KeyError:
-            await self.send_json(
-                event.error.invalid_menu_entry()
-            )
-            return
+            raise exception.InvalidMenuEntryError
         state.save()
 
         await self.channel_layer.group_send(
@@ -223,12 +339,9 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         (party, state) = get_party_of_user(self.scope['user'].id)
 
         try:
-            state.menus.delete(menu_entry_id)
+            state.menu_entries.delete(menu_entry_id)
         except KeyError:
-            await self.send_json(
-                event.error.invalid_menu_entry()
-            )
-            return
+            raise exception.InvalidMenuEntryError
         state.save()
 
         await self.channel_layer.group_send(
@@ -250,14 +363,28 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             event.party_leave(user_id)
         )
 
+    async def restaurant_vote(self, data):
+        restaurant_id = data['restaurant_id']
+
+        await self.send_json(
+            event.restaurant_vote(restaurant_id),
+        )
+
+    async def restaurant_unvote(self, data):
+        restaurant_id = data['restaurant_id']
+
+        await self.send_json(
+            event.restaurant_unvote(restaurant_id),
+        )
+
     async def menu_create(self, data):
         menu_entry_id = data['menu_entry_id']
         menu_id = data['menu_id']
         quantity = data['quantity']
-        users = data['users']
+        user_ids = data['user_ids']
 
         await self.send_json(
-            event.menu_create(menu_entry_id, menu_id, quantity, users)
+            event.menu_create(menu_entry_id, menu_id, quantity, user_ids)
         )
 
     async def menu_update(self, data):
@@ -276,4 +403,11 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         await self.send_json(
             event.menu_delete(menu_entry_id)
+        )
+
+    async def state_update(self, data):
+        state = data['state']
+
+        await self.send_json(
+            event.state_update_dict(state)
         )

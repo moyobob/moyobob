@@ -15,13 +15,27 @@ def party_leave(user_id: int):
     }
 
 
-def menu_create(menu_entry_id: int, menu_id: int, quantity: int, users: list):
+def restaurant_vote(restaurant_id: int):
+    return {
+        'type': 'restaurant.vote',
+        'restaurant_id': restaurant_id,
+    }
+
+
+def restaurant_unvote(restaurant_id: int):
+    return {
+        'type': 'restaurant.unvote',
+        'restaurant_id': restaurant_id,
+    }
+
+
+def menu_create(menu_entry_id: int, menu_id: int, quantity: int, user_ids: list):
     return {
         'type': 'menu.create',
         'menu_entry_id': menu_entry_id,
         'menu_id': menu_id,
         'quantity': quantity,
-        'users': users,
+        'user_ids': user_ids,
     }
 
 
@@ -46,6 +60,13 @@ def state_update(state):
     return {
         'type': 'state.update',
         'state': state.as_dict(),
+    }
+
+
+def state_update_dict(state: dict):
+    return {
+        'type': 'state.update',
+        'state': state,
     }
 
 
