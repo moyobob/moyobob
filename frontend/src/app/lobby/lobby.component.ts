@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
 })
 export class LobbyComponent implements OnInit, OnDestroy {
   parties: Party[];
-  joinedPartyId = 0;
+  joinedPartyId = undefined;
   isShowingPartyCreate = false;
   subscriptions: Subscription[] = [];
 
@@ -42,6 +42,8 @@ export class LobbyComponent implements OnInit, OnDestroy {
   updateState(state: PartyState): void {
     if (state) {
       this.joinedPartyId = state.id;
+    } else {
+      this.joinedPartyId = undefined;
     }
   }
 
