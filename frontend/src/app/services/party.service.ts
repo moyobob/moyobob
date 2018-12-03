@@ -13,7 +13,7 @@ import {
 import {
   PartyJoinCommand, PartyLeaveCommand,
   MenuCreateCommand, MenuUpdateCommand,
-  ToPaymentCommand,
+  ToOrderedCommand, ToPaymentCommand,
 } from '../types/command';
 
 const httpOptions = {
@@ -168,6 +168,11 @@ export class PartyService {
       request.addUserIds,
       request.removeUserIds,
     );
+    this.websocketService.send(command);
+  }
+
+  toOrdered() {
+    const command = new ToOrderedCommand();
     this.websocketService.send(command);
   }
 

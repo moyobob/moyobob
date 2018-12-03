@@ -113,6 +113,13 @@ export class MenuDeleteCommand implements Command {
   }
 }
 
+export class ToOrderedCommand implements Command {
+  @serialize
+  readonly command = 'to.ordered';
+
+  constructor() { }
+}
+
 export class ToPaymentCommand implements Command {
   @serialize
   readonly command = 'to.payment';
@@ -153,6 +160,10 @@ export function serializeCommand(command: Command): any {
     }
     case 'menu.delete': {
       return Serialize(command, MenuDeleteCommand);
+      break;
+    }
+    case 'to.ordered': {
+      return Serialize(command, ToOrderedCommand);
       break;
     }
     case 'to.payment': {

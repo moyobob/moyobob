@@ -95,6 +95,10 @@ export class PartyComponent implements OnInit, OnDestroy {
     this.partyService.updateMenu(req);
   }
 
+  toOrdered() {
+    this.partyService.toOrdered();
+  }
+
   toPayment(user: User) {
     this.partyService.toPayment(user.id);
   }
