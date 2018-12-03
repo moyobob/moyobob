@@ -22,7 +22,9 @@ export class WebsocketService {
 
   connect(): void {
     if (this.websocket$ === undefined) {
-      this.websocket$ = new WebSocketSubject(`${environment.wsUrl}party/`);
+      const protocol = window.location.protocol.replace('http', 'ws');
+      const host = window.location.host;
+      this.websocket$ = new WebSocketSubject(`${protocol}//${host}${environment.wsUrl}party/`);
       this.websocket$.subscribe(json => this.receive(json));
     }
   }
