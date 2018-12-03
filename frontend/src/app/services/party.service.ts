@@ -150,6 +150,9 @@ export class PartyService {
 
     const command = new PartyLeaveCommand(this.partyState.id);
     this.websocketService.send(command);
+
+    this.partyState = undefined;
+    this.partyStateUpdate.emit(this.partyState);
   }
 
   createMenu(request: MenuEntryCreateRequest) {
