@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
+import { MatSnackBar } from '@angular/material';
 
 enum InputStatus {
   HaveNotTriedSignIn,
-  EmailNoInput,
-  PasswordNoInput,
+  NoInput,
   TriedSignIn,
   EmailOrPasswordWrong,
 }
@@ -27,7 +27,8 @@ export class SignInComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    public snackBar: MatSnackBar,
   ) { }
 
   ngOnInit() {
@@ -39,10 +40,8 @@ export class SignInComponent implements OnInit {
       this.logInStatus !== InputStatus.TriedSignIn
       && (!event || event.key === 'Enter')
     ) {
-      if (!this.emailInput) {
-        this.logInStatus = InputStatus.EmailNoInput;
-      } else if (!this.passwordInput) {
-        this.logInStatus = InputStatus.PasswordNoInput;
+      if (!this.emailInput || !this.passwordInput) {
+        this.logInStatus = InputStatus.NoInput;
       } else {
         this.logInStatus = InputStatus.TriedSignIn;
         this.userService.requestSignIn(this.emailInput, this.passwordInput)
@@ -51,6 +50,9 @@ export class SignInComponent implements OnInit {
             this.router.navigateByUrl('lobby');
           } else {
             this.logInStatus = InputStatus.EmailOrPasswordWrong;
+            this.emailInput = null;
+            this.passwordInput = null;
+            this.snackBar.open('Wrong Email or Password', '', {duration: 500});
           }
         });
       }

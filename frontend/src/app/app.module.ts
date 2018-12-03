@@ -21,7 +21,7 @@ import { UserItemComponent } from './party/party-ordered/user-item/user-item.com
 import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatInputModule } from '@angular/material';
+import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -51,7 +51,9 @@ import { MatInputModule } from '@angular/material';
       headerName: 'X-CSRFToken'
     }),
     BrowserAnimationsModule,
-    MatInputModule
+    MatInputModule,
+    MatButtonModule,
+    MatSnackBarModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

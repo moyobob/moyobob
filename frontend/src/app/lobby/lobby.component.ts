@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
 })
 export class LobbyComponent implements OnInit, OnDestroy {
   parties: Party[];
-  joinedPartyId = -1;
+  joinedPartyId = 0;
   isShowingPartyCreate = false;
   subscriptions: Subscription[] = [];
 
