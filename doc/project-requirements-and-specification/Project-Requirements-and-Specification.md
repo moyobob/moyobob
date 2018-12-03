@@ -17,8 +17,8 @@ header-includes:
     ```
 ---
 
-2018-11-19,
-version 4.0
+2018-12-03,
+version 5.0
 
 ## Revisions
 
@@ -26,7 +26,8 @@ version 4.0
 - 2.0 2018-10-23 - Sprint 2
 - 3.0 2018-11-05 - Sprint 3
 - 4.0 2018-11-19 - Sprint 4
-  - Updated User Stories
+- 5.0 2018-12-03 - Sprint 5
+  - Nothing changed
 
 ## Project Abstract
 
@@ -60,7 +61,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 - MessengerApp (e.g.KakaoTalk, Slack)
   - differentiated by giving functions for decision making and collecting a bill.
 
-## [User Stories]{.important}
+## User Stories
 
 ### Sign Up
 
@@ -122,7 +123,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the other people open Moyobob
 1. And they join the Party
 
-### [Joining a Group-Opened Party]{.important}
+### Joining a Group-Opened Party
 
 - As a Group member, I want to join a Party, so that I can eat delivery food with them
 
@@ -149,7 +150,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. Then the system fixes the Restaurant to our Party
 1. And the system leads the Party's state to Choosing Menu
 
-### [Choosing Menus (add a menu)]{.important}
+### Choosing Menus (add a menu)
 
 - As a Party member, I want to select a Menu for myself
 1. Given that I'm a Party member already participating in Party
@@ -167,7 +168,7 @@ Web service __Moyobob__ aims to offer services that ease the procedure of gather
 1. The system leads me Party Page
 ErrorCase If I choose wrong menu. or just want to select another menu, I can cancel it in PartyPage(not MenuListPage).
 
-### [Choosing Menus (modify an assigned menu)]{.important}
+### Choosing Menus (modify an assigned menu)
 
 - As a Party member, I want to modify an assigend Menu
 1. Given that I'm a party member, the party is in the state of Choosing Menu
@@ -178,7 +179,7 @@ ErrorCase If I choose wrong menu. or just want to select another menu, I can can
 6. When I finish modifying the menu and click OK button
 7. The system closes the pop-up
 
-### [Finishing Choosing Menu state - Party Leader]{.important}
+### Finishing Choosing Menu state - Party Leader
 
 - As a Party Leader, I want to finish Choosing Menu state, so that the Party moves on to the next state
 
