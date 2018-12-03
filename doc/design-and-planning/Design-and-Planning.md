@@ -19,24 +19,21 @@ header-includes:
     ```
 ---
 
-2018-11-05,
-version 3.0
+2018-12-03,
+version 4.0
 
 ## Revision
 
 - 1.0 2018-10-22 - initial document :tada:
 - 2.0 2018-11-05 - Sprint 3
-  - Model Design has been updated
-  - View Design has been updated
-  - Chagned parts are marked as [blue]{.important}
 - 3.0 2018-11-19 - Sprint 4
-  - Model Design has been updated
-  - View Design has been updated
-  - Chagned parts are marked as [blue]{.important}
+- 4.0 2018-12-03 - Sprint 5
+  - Deployment Architecture has been updated
+  - Backend Design Detail has been updated
 
-## System Architecture
+## [System Architecture]{.important}
 
-### Deployment Architecture
+### [Deployment Architecture]{.important}
 
 ![Deployment Architecture](deployment-architecture.png)\
 
@@ -65,33 +62,33 @@ We decided to show information like party status, which needs to interact and be
 - Websocket with rxjs
 - Angular's Service-Component system
 
-## [Design Detail]{.important}
+## Design Detail
 
-### [Frontend Design Detail]{.important}
+### Frontend Design Detail
 
 ![View Design](view-design.png)\
 
-#### [Common]{.important}
+#### Common
 
 This will be shown in every page.
 
 - Top Bar Component
 - Side Bar Component
 
-##### [Top Bar Component]{.important}
+##### Top Bar Component
 
 Vertical Scrolling should hide this component in mobile landscape.
 - Logo
 - Side Bar Button : when pressed, shows the [Side Bar].
 - My Info Button : when pressed, moves to [User Info].
 
-##### [Side Bar Component]{.important}
+##### Side Bar Component
 
 Shown when pressing Side Bar Button in [Top Bar] Component.
 
 - Payment List Button : when pressed, moves to [Payment List].
 
-#### [Lobby]{.important} (`/party`)
+#### Lobby (`/party`)
 
 The Main Page.
 
@@ -104,7 +101,7 @@ The Main Page.
     - etc
   - Make Party Button : when pressed, moves to [Create Party].
 
-##### [Create Party]{.important} (`/party/create`)
+##### Create Party (`/party/create`)
 
 Can create [Party].
 
@@ -119,7 +116,7 @@ Can create [Party].
 - etc
 - Submit Button : when pressed, creates a [Party], and moves to [the page of that Party](#Party).
 
-#### [Party]{.important} (`/party/:id`)
+#### Party (`/party/:id`)
 
 Provides the main features such as choosing menus. Different infos are shown with respect to participation status and party status.
 
@@ -143,7 +140,7 @@ Provides the main features such as choosing menus. Different infos are shown wit
   - [Payment]
   - [End]
 
-##### [Selecting Restaurant Component]{.important}
+##### Selecting Restaurant Component
 
 - Search Restaurant : search with restaurant name and/or restaurant category.
   - Search Button : when pressed, moves to [Restaurant List]
@@ -151,27 +148,27 @@ Provides the main features such as choosing menus. Different infos are shown wit
   - Pressing the restaurant votes for that restaurant.
   - Proceed Button : shown only to Party Leader, when pressed, restaurant selection is complete and moves to [Selecting Menu]
 
-##### [Selecting Menu Component]{.important}
+##### Selecting Menu Component
 
 - User List : Users and their menus are shown, and mine should be the top. Pressing my list moves to [Menu List].
   - User Name
   - Menu : if no menus are chosen, shows the ? icon
   - Proceed Button : When every user presses the Proceed Button then the party status changes to [Ordering]
 
-##### [Ordering Component]{.important}
+##### Ordering Component
 
 - Payment Info
   - Users' name and price are shown for each menu
 - Phone number for restaurant
 - Ordered Button : shown only to Party Leader, when pressed, moves to [Ordered]
 
-##### [Ordered Component]{.important}
+##### Ordered Component
 
 - A message is shown to notify that the order is complete.
 - Expected Time : Party Leader can put this. If not put, not shown.
 - Payment Complete : shown only to Party Leader, when pressed, User List is shown, and selecting who paid for the meal moves to [Payment].
 
-##### [Payment Component]{.important}
+##### Payment Component
 
 Shows the required amount of money to pay.
 
@@ -181,7 +178,7 @@ Shows the required amount of money to pay.
   - Account Number etc; retrieved from user info or can register when the case is the user registered only for this party.
 - menu one picked and the price
 
-#### [Menu List]{.important}
+#### Menu List
 
 Every user can select his or her menu.
 
@@ -191,7 +188,7 @@ Every user can select his or her menu.
   - when pressed, shows the list of all menus of the restaurant.
   - Selecting one or more menus, selecting assignees (can be none) and pressing Add Button adds the menu with corresponding information.
 
-#### [User Info]{.important} (`/user/:username`)
+#### User Info (`/user/:username`)
 
 Shows or modifies user information.
 
@@ -201,7 +198,7 @@ Shows or modifies user information.
 - Payment Info
 - Modify Button
 
-#### [Restaurant List Component]{.important}
+#### Restaurant List Component
 
 List all restaurants or search for the specific restaurant.
 
@@ -211,7 +208,7 @@ List all restaurants or search for the specific restaurant.
   - Restaurant Name
   - Restaurant Category
 
-#### [Payment List]{.important} (`/payment`)
+#### Payment List (`/payment`)
 
 Shows every payment one made, either should pay or should be paid.
 
@@ -227,8 +224,6 @@ Models stored in SQL Database
 #### User
 
 User object is provided by Django for authentication.
-
-[Reference](https://docs.djangoproject.com/en/2.1/ref/contrib/auth/#django.contrib.auth.models.User)
 
 Use email and password for authentication and username as nickname.
 
@@ -298,6 +293,28 @@ extends Enum
 - bank: string (Nullable)
 - account: string (Nullable)
 
+#### [Payment]{.important}
+
+- user: ForeignKey of User
+- paid_user: ForeignKey of User
+- menu: ForeignKey of Menu
+- price: IntegerField
+- resolved: BooleanField
+- party_record: ForeignKey of PartyRecord
+
+#### [PartyRecord]{.important}
+
+- name: CharField
+- type: SmallIntegerField
+- location: CharField
+- leader: ForeignKey of User
+- since: DateTimeField
+- until: DateTimeField
+- members: ManyToManyField of User
+- restaurant: ForeignKey of Restaurant
+- paid_user: ForeignKey of User
+- payments: related name of Payment
+
 ### [In Cache]{.important}
 
 Models stored in Redis Cache
@@ -310,11 +327,13 @@ cache key: `party:{id}`
 
 - id: integer, same as Party's id
 - phase: PartyPhase
-- restaurant: id of Restaurant (Nullable)
-- members: list of User's id
-- menus: list of tuple (Menu's id, quantity: integer, list of User's id)
+- restaurant_id: id of Restaurant (Nullable)
+- restaurant_votes: list of tuple (User's id, Restaurant's id)
+- member_ids: list of User's id
+- paid_user_id: id of User (Nullable)
+- menu_entries: MenuEntries
 
-##### [PartyPhase]{.important}
+##### PartyPhase
 
 extends integer, and works like enum
 
@@ -324,6 +343,10 @@ extends integer, and works like enum
   - `2`: Ordering
   - `3`: Ordered
   - `4`: PaymentAndCollection
+
+##### [MenuEntries]{.important}
+
+list of tuple (id: integer, Menu's id, quantity: integer, list of User's id)
 
 ### [API]{.important}
 
@@ -416,7 +439,22 @@ extends integer, and works like enum
   - `DELETE`: Delete menu
     - Request: Empty
     - Response: Empty
-
+- `/api/party_records/`
+  - `GET`: Get list of the user's party records
+    - Request: Empty
+    - Response: list of PartyRecord
+- `/api/payments/`
+  - `GET`: Get list of the user's unresolved payments
+    - Request: Empty
+    - Response: list of Payment
+- `/api/collections/`
+  - `GET`: Get list of the user's unresolved collections
+    - Request: Empty
+    - Response: list of Payment
+- `/api/resolve_payment/<int:payment_id>/`
+  - `GET`: Resolve the payment if the user is the paid user of the payment
+    - Request: Empty
+    - Response: Empty
 
 #### [Websocket API]{.important}
 
@@ -438,13 +476,36 @@ Command is an action from frontend to backend
   - `party_id`: integer
   - Response: Nothing
   - Error: InvalidDataError, InvalidPartyError, NotJoinedError
+- ToChoosingMenu
+  - `command`: `"to.choosing.menu"`
+  - `restaurant_id`: integer
+  - Response: StateUpdate
+  - Error: InvalidDataError, NotJoinedError, InvalidRestaurantError
+- ToOrdering
+  - `command`: `"to.ordering"`
+  - Response: StateUpdate
+  - Error: InvalidDataError, NotJoinedError
+- ToOrdered
+  - `command`: `"to.ordered"`
+  - Response: StateUpdate
+  - Error: InvalidDataError, NotJoinedError
+- ToPayment
+  - `command`: `"to.payment"`
+  - `paid_user_id`: integer
+  - Response: StateUpdate
+  - Error: InvalidDataError, NotJoinedError, InvalidUserError
+- RestaurantVoteToggle
+  - `command`: `"restaurant.vote.toggle"`
+  - `restaurant_id`: integer
+  - Response: RestaurantVote, RestaurantUnvote
+  - Error: InvalidDataError, NotJoinedError, InvalidRestaurantError
 - MenuCreate
   - `command`: `"menu.create"`
   - `menu_id`: integer
   - `quantity`: integer
-  - `users`: list of integer
+  - `user_ids`: list of integer
   - Response: MenuCreate
-  - Error: InvalidDataError, NotJoinedError
+  - Error: InvalidDataError, NotJoinedError, InvalidMenuError, InvalidUserError
 - MenuUpdate
   - `command`: `"menu.update"`
   - `menu_entry_id`: integer
@@ -452,7 +513,7 @@ Command is an action from frontend to backend
   - `add_user_ids`: list of integer
   - `remove_user_ids`: list of integer
   - Response: MenuUpdate
-  - Error: InvalidDataError, NotJoinedError, InvalidMenuEntryError
+  - Error: InvalidDataError, NotJoinedError, InvalidMenuEntryError, InvalidUserError
 - MenuDelete
   - `command`: `"menu.delete"`
   - `menu_entry_id`: integer
@@ -467,14 +528,22 @@ Event is an reply from backend to frontend and a communication in-between backen
   - `type`: `"error.invalid.command"`
 - InvalidDataError
   - `type`: `"error.invalid.data"`
+- InvalidUserError
+  - `type`: `"error.invalid.user"`
 - InvalidPartyError
   - `type`: `"error.invalid.party"`
+- InvalidRestaurantError
+  - `type`: `"error.invalid.restaurant"`
+- InvalidMenuError
+  - `type`: `"error.invalid.menu"`
 - InvalidMenuEntryError
   - `type`: `"error.invalid.menu.entry"`
 - NotJoinedError
   - `type`: `"error.not.joined"`
 - AlreadyJoinedError
   - `type`: `"error.already.joined"`
+- NotAuthorizedError
+  - `type`: `"error.not.authorized"`
 - InitiallyNotJoined
   - `type`: `"initial.not.joined"`
 - PartyJoin
@@ -483,20 +552,26 @@ Event is an reply from backend to frontend and a communication in-between backen
 - PartyLeave
   - `type`: `"party.leave"`
   - `user_id`: integer
+- RestaurantVote
+  - `type`: `"restaurant.vote"`
+  - `restaurant_id`: integer
+- RestaurantUnvote
+  - `type`: `"restaurant.unvote"`
+  - `restaurant_id`: integer
 - MenuCreate
-  - `command`: `"menu.create"`
+  - `type`: `"menu.create"`
   - `menu_entry_id`: integer
   - `menu_id`: integer
   - `quantity`: integer
-  - `users`: list of integer
+  - `user_ids`: list of integer
 - MenuUpdate
-  - `command`: `"menu.update"`
+  - `type`: `"menu.update"`
   - `menu_entry_id`: integer
   - `quantity`: integer
   - `add_user_ids`: list of integer
   - `remove_user_ids`: list of integer
 - MenuDelete
-  - `command`: `"menu.delete"`
+  - `type`: `"menu.delete"`
   - `menu_entry_id`: integer
 - StateUpdate
   - `type`: `"state.update"`
