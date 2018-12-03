@@ -7,8 +7,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 
 import { SignInComponent } from './sign-in.component';
 import { UserService } from '../services/user.service';
-import {MatButtonModule, MatInputModule, MatSnackBarModule} from '@angular/material';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 class MockUserService {
   requestSignIn(email: string, password: string) { }
@@ -36,7 +36,7 @@ describe('SignInComponent', () => {
         MatInputModule,
         MatButtonModule,
         BrowserAnimationsModule,
-        MatSnackBarModule
+        MatSnackBarModule,
       ],
       declarations: [ SignInComponent ],
       providers: [
@@ -46,7 +46,7 @@ describe('SignInComponent', () => {
         }, {
           provide: Router,
           useValue: routerSpy
-        }
+        },
       ]
     })
     .compileComponents();

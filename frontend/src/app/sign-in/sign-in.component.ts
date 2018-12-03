@@ -28,7 +28,7 @@ export class SignInComponent implements OnInit {
   constructor(
     private userService: UserService,
     private router: Router,
-    public snackBar: MatSnackBar
+    public snackBar: MatSnackBar,
   ) { }
 
   ngOnInit() {
