@@ -41,7 +41,7 @@ jobs:
           working_directory: backend
       - run:
           name: Report coverage
-          command: bash <(curl -s https://codecov.io/bash) -c -F backend
+          command: bash <(curl -s https://codecov.io/bash) -F backend
           working_directory: backend
 
   frontend_test:
@@ -72,7 +72,7 @@ jobs:
           working_directory: frontend
       - run:
           name: Report coverage
-          command: bash <(curl -s https://codecov.io/bash) -c -F frontend
+          command: bash <(curl -s https://codecov.io/bash) -F frontend
 
   frontend_build:
     docker:
