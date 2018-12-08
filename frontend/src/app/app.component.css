@@ -29,3 +29,7 @@
 .is-mobile .sidenav-container {
   flex: 1 0 auto;
 }
+
+.fill {
+  flex: 1 1 auto;
+}

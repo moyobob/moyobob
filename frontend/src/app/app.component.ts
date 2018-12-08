@@ -1,5 +1,8 @@
 import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
+import { Router } from '@angular/router';
+
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +18,8 @@ export class AppComponent implements OnDestroy {
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
+    private userService: UserService,
+    private router: Router,
     media: MediaMatcher) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this.mobileQueryListener = () => {
@@ -31,5 +36,13 @@ export class AppComponent implements OnDestroy {
   toggleSidebar(): void {
     this.isSidebarOpened = !this.isSidebarOpened;
     this.changeDetectorRef.detectChanges();
+  }
+
+  signOut(): void {
+    console.log('foo');
+    this.userService.signOut().then(_ => {
+      console.log('bar');
+      this.router.navigate(['/sign-in']);
+    });
   }
 }
