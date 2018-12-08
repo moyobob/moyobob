@@ -1,3 +1,33 @@
-<span id="party-id">{{party.id}}</span> <span id="party-name">{{party.name}}</span>
-<button *ngIf="!this.joinedPartyId" (click)="joinPartyButton(party.id);">Join</button>
-<button *ngIf="this.joinedPartyId === this.party.id" (click)="navigateToPartyButton();">Join</button>
+<button mat-button
+        *ngIf="this.joinedPartyId != this.party.id"
+        (click)="joinPartyButton(party.id);">
+  <div class="container">
+    <div class="left">
+      {{party.name}}
+    </div>
+    <div class="right">
+      <div class="member-count">
+        <mat-icon color="primary">account_circle</mat-icon>
+        <span>{{party.memberCount}}</span>
+      </div>
+      <span>@{{party.location}}</span>
+    </div>
+  </div>
+</button>
+<button mat-button
+        *ngIf="this.joinedPartyId === this.party.id"
+        (click)="navigateToPartyButton();">
+  <div class="container">
+    <div class="left">
+      <span matBadge="My" matBadgeOverlap="false" matBadgeColor="accent">{{party.name}}</span>
+    </div>
+    <div class="right">
+      <div class="member-count">
+        <mat-icon>account_circle</mat-icon>
+        <span>{{party.memberCount}}</span>
+      </div>
+      <span>@{{party.location}}</span>
+    </div>
+  </div>
+</button>
+

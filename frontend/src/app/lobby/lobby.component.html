@@ -1,13 +1,16 @@
 <div>
-  <div>
-    <li *ngFor="let party of parties">
+  <mat-list>
+    <mat-list-item *ngFor="let party of parties; last as last">
       <app-lobby-list-item [party]="party" [joinedPartyId]="joinedPartyId" (joinParty)="joinParty($event);"
-        (navigateToParty)="navigateToParty();">
+                           (navigateToParty)="navigateToParty();">
       </app-lobby-list-item>
-    </li>
-  </div>
-  <div>
-    <button *ngIf="!joinedPartyId" (click)="showPartyCreate();">Create Party</button>
+      <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+    </mat-list-item>
+  </mat-list>
+  <div class="fixed">
+    <button mat-mini-fab color="accent" *ngIf="!joinedPartyId" (click)="showPartyCreate();">
+      <mat-icon>add</mat-icon>
+    </button>
   </div>
   <app-party-create *ngIf="isShowingPartyCreate" (createParty)="createParty($event);" (cancel)="hidePartyCreate();">
   </app-party-create>

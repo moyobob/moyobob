@@ -10,8 +10,9 @@
   font-size: xx-large;
 }
 
-.full-width {
+mat-form-field {
   width: 100%;
+  margin-top: 20px;
 }
 
 .sign-up {
