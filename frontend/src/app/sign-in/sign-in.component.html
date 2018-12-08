@@ -1,13 +1,11 @@
 <div class="main">
   <span class="title">Moyobob</span>
   <mat-form-field class="full-width">
-    <input matInput type="text" [(ngModel)]="emailInput" (keypress)="trySignIn($event);"
-           placeholder="email" autofocus />
+    <input matInput type="text" [(ngModel)]="emailInput" (keypress)="trySignIn($event);" placeholder="email" autofocus />
   </mat-form-field>
 
   <mat-form-field class="full-width">
-    <input matInput type="password" [(ngModel)]="passwordInput" (keypress)="trySignIn($event);"
-           placeholder="password" />
+    <input matInput type="password" [(ngModel)]="passwordInput" (keypress)="trySignIn($event);" placeholder="password" />
   </mat-form-field>
   <div>
     <button mat-raised-button color="primary" (click)="trySignIn(undefined);">Sign In</button>
@@ -16,4 +14,3 @@
     <button mat-raised-button color="primary" (click)="navigateToSignUp()">Sign Up</button>
   </div>
 </div>
-
