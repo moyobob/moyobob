@@ -19,7 +19,7 @@ export class AppComponent implements OnDestroy {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this.mobileQueryListener = () => {
       this.isSidebarOpened = !this.mobileQuery.matches;
-      this.changeDetectorRef.detectChanges()
+      this.changeDetectorRef.detectChanges();
     };
     this.mobileQuery.addListener(this.mobileQueryListener);
   }
