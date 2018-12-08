@@ -265,24 +265,26 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
     async def command_restaurant_vote_toggle(self, data):
         user = self.scope['user']
+        user_id = user.id
         restaurant_id = data['restaurant_id']
 
-        (party, state) = get_party_of_user(user.id)
+        (party, state) = get_party_of_user(user_id)
+        party_id = party.id
 
         if not Restaurant.objects.filter(id=restaurant_id).exists():
             raise exception.InvalidRestaurantError
 
         try:
-            state.restaurant_votes.remove((user.id, restaurant_id))
+            state.restaurant_votes.remove((user_id, restaurant_id))
             await self.channel_layer.group_send(
-                'party-{}'.format(party.id),
-                event.restaurant_unvote(restaurant_id),
+                'party-{}'.format(party_id),
+                event.restaurant_unvote(user_id, restaurant_id),
             )
         except ValueError:
-            state.restaurant_votes.append((user.id, restaurant_id))
+            state.restaurant_votes.append((user_id, restaurant_id))
             await self.channel_layer.group_send(
-                'party-{}'.format(party.id),
-                event.restaurant_vote(restaurant_id),
+                'party-{}'.format(party_id),
+                event.restaurant_vote(user_id, restaurant_id),
             )
         finally:
             state.save()
@@ -364,17 +366,19 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def restaurant_vote(self, data):
+        user_id = data['user_id']
         restaurant_id = data['restaurant_id']
 
         await self.send_json(
-            event.restaurant_vote(restaurant_id),
+            event.restaurant_vote(user_id, restaurant_id),
         )
 
     async def restaurant_unvote(self, data):
+        user_id = data['user_id']
         restaurant_id = data['restaurant_id']
 
         await self.send_json(
-            event.restaurant_unvote(restaurant_id),
+            event.restaurant_unvote(user_id, restaurant_id),
         )
 
     async def menu_create(self, data):
