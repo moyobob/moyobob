@@ -23,7 +23,7 @@ import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {
   MatBadgeModule,
-  MatButtonModule, MatCheckboxModule,
+  MatButtonModule,
   MatDialogModule,
   MatIconModule,
   MatInputModule,
