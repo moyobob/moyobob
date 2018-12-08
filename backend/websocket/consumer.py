@@ -159,6 +159,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         party_id = party.id
 
         state.member_ids.remove(user_id)
+        state.menu_entries.remove_user(user_id)
         party.member_count -= 1
         state.save()
         party.save()

@@ -119,6 +119,12 @@ class MenuEntries:
     def get(self, menu_entry_id: int, default=None):
         return self.inner.get(menu_entry_id, default)
 
+    def remove_user(self, user_id: int):
+        for k in self.inner:
+            (m, q, ul) = self.inner[k]
+            ul = [u for u in ul if u != user_id]
+            self.inner[k] = (m, q, ul)
+
     def update(self, menu_entry_id: int, quantity: int, add_user_ids=[], remove_user_ids=[]):
         (m, q, ul) = self.inner[menu_entry_id]
         q += quantity
