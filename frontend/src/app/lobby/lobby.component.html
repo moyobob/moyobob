@@ -8,10 +8,12 @@
     </mat-list-item>
   </mat-list>
   <div class="fixed">
-    <button mat-mini-fab color="accent" *ngIf="!joinedPartyId" (click)="showPartyCreate();">
+    <button mat-mini-fab color="accent" *ngIf="!joinedPartyId" (click)="showPartyCreateDialog();">
       <mat-icon>add</mat-icon>
     </button>
   </div>
+  <!--
   <app-party-create *ngIf="isShowingPartyCreate" (createParty)="createParty($event);" (cancel)="hidePartyCreate();">
   </app-party-create>
+  -->
 </div>

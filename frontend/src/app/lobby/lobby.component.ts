@@ -5,6 +5,8 @@ import { PartyService } from '../services/party.service';
 
 import { Party, PartyCreateRequest, PartyState } from '../types/party';
 import { Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material';
+import { PartyCreateComponent } from './party-create/party-create.component';
 
 @Component({
   selector: 'app-lobby',
@@ -14,12 +16,12 @@ import { Subscription } from 'rxjs';
 export class LobbyComponent implements OnInit, OnDestroy {
   parties: Party[];
   joinedPartyId = undefined;
-  isShowingPartyCreate = false;
   subscriptions: Subscription[] = [];
 
   constructor(
     private partyService: PartyService,
     private router: Router,
+    public dialog: MatDialog,
   ) { }
 
   ngOnInit() {
@@ -51,12 +53,17 @@ export class LobbyComponent implements OnInit, OnDestroy {
     this.partyService.getParties().then(parties => this.parties = parties);
   }
 
-  showPartyCreate(): void {
-    this.isShowingPartyCreate = true;
-  }
+  showPartyCreateDialog(): void {
+    const dialogRef = this.dialog.open(PartyCreateComponent, {
+      width: '90%',
+      maxWidth: '350px'
+    });
 
-  hidePartyCreate(): void {
-    this.isShowingPartyCreate = false;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result != null) {
+        this.createParty(result);
+      }
+    });
   }
 
   createParty(req: PartyCreateRequest): void {
