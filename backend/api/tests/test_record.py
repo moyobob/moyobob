@@ -170,3 +170,12 @@ class RecordTestCase(TestCaseWithHttp):
 
         for payment in payments:
             self.assertEqual(payment.paid_user, None)
+
+    def test_create_record_with_api(self):
+        super().login(email="ferris@rustaceans.org", password="iluvrust")
+
+        records_length = PartyRecord.objects.all().count()
+
+        self.delete('/api/party/{}/'.format(self.party.id))
+
+        self.assertEqual(PartyRecord.objects.all().count() - records_length, 1)
