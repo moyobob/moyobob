@@ -151,7 +151,7 @@ class PartyTestCase(TestCaseWithHttp):
         self.assertDictEqual(resp_json, self.party1.as_dict())
 
     def test_party_restaurant_field(self):
-        self.assertEqual(self.party1.as_dict()['restaurant_id'], 0)
+        self.assertEqual(self.party1.as_dict()['restaurant_id'], None)
 
         restaurant = Restaurant(name="Rustaurant")
         restaurant.save()
