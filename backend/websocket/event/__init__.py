@@ -15,16 +15,18 @@ def party_leave(user_id: int):
     }
 
 
-def restaurant_vote(restaurant_id: int):
+def restaurant_vote(user_id: int, restaurant_id: int):
     return {
         'type': 'restaurant.vote',
+        'user_id': user_id,
         'restaurant_id': restaurant_id,
     }
 
 
-def restaurant_unvote(restaurant_id: int):
+def restaurant_unvote(user_id: int, restaurant_id: int):
     return {
         'type': 'restaurant.unvote',
+        'user_id': user_id,
         'restaurant_id': restaurant_id,
     }
 

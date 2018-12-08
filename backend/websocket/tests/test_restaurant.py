@@ -24,7 +24,8 @@ class RestaurantTestCase(TestCaseWithSingleWebsocket):
             'restaurant_id': self.restaurant1.id,
         })
         resp = await self.communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.restaurant_vote(self.restaurant1.id))
+        self.assertDictEqual(resp, event.restaurant_vote(
+            self.user.id, self.restaurant1.id))
         state.refresh_from_db()
         self.assertListEqual(
             state.restaurant_votes,
@@ -38,7 +39,8 @@ class RestaurantTestCase(TestCaseWithSingleWebsocket):
             'restaurant_id': self.restaurant2.id,
         })
         resp = await self.communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.restaurant_vote(self.restaurant2.id))
+        self.assertDictEqual(resp, event.restaurant_vote(
+            self.user.id, self.restaurant2.id))
         state.refresh_from_db()
         self.assertListEqual(
             state.restaurant_votes,
@@ -55,7 +57,7 @@ class RestaurantTestCase(TestCaseWithSingleWebsocket):
         resp = await self.communicator.receive_json_from(1)
         state.refresh_from_db()
         self.assertDictEqual(
-            resp, event.restaurant_unvote(self.restaurant2.id))
+            resp, event.restaurant_unvote(self.user.id, self.restaurant2.id))
         self.assertListEqual(
             state.restaurant_votes,
             [
@@ -70,7 +72,7 @@ class RestaurantTestCase(TestCaseWithSingleWebsocket):
         resp = await self.communicator.receive_json_from(1)
         state.refresh_from_db()
         self.assertDictEqual(
-            resp, event.restaurant_unvote(self.restaurant1.id))
+            resp, event.restaurant_unvote(self.user.id, self.restaurant1.id))
         self.assertListEqual(
             state.restaurant_votes,
             [],
