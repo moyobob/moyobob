@@ -41,7 +41,8 @@ class PartyState(CacheModel):
         self.restaurant_id = None
         self.restaurant_votes = []
         self.member_ids = []
-        self.paid_user_id = []
+        self.member_ids_backup = []
+        self.paid_user_id = None
         self.menu_entries = MenuEntries()
 
     @classmethod
@@ -56,8 +57,9 @@ class PartyState(CacheModel):
         return self
 
     def delete(self):
-        if self.phase == PartyPhase.PaymentAndCollection:
+        if self.phase >= PartyPhase.Ordering:
             from api.util import make_record
+            self.member_ids = self.member_ids_backup[:]
             make_record(self)
         super().delete()
 
@@ -68,6 +70,7 @@ class PartyState(CacheModel):
         self.restaurant_id = o.get('restaurant_id', None)
         self.restaurant_votes = o.get('restaurant_votes', [])
         self.member_ids = o.get('member_ids', [])
+        self.member_ids_backup = o.get('member_ids_backup', [])
         self.paid_user_id = o.get('paid_user_id', None)
         self.menu_entries = MenuEntries.from_dict(o['menu_entries'])
 
@@ -78,6 +81,7 @@ class PartyState(CacheModel):
             'restaurant_id': self.restaurant_id,
             'restaurant_votes': self.restaurant_votes,
             'member_ids': self.member_ids,
+            'member_ids_backup': self.member_ids_backup,
             'paid_user_id': self.paid_user_id,
             'menu_entries': self.menu_entries.as_dict() if isinstance(
                 self.menu_entries, MenuEntries) else self.menu_entries,

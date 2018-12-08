@@ -12,11 +12,13 @@ def make_payments(state: PartyState, record: PartyRecord):
             price = (menu.price * quantity) / (len(user_ids))
             payment = Payment(
                 user_id=user_id,
-                paid_user_id=state.paid_user_id,
                 menu=menu,
                 price=price,
                 party_record_id=record.id,
             )
+            if state.paid_user_id:
+                payment.paid_user_id = state.paid_user_id
+            payment.save()
             payments.append(payment)
     for payment in payments:
         payment.save()
@@ -32,8 +34,9 @@ def make_record(state: PartyState):
         leader_id=party.leader_id,
         since=party.since,
         restaurant_id=state.restaurant_id,
-        paid_user_id=state.paid_user_id,
     )
+    if state.paid_user_id:
+        record.paid_user_id = state.paid_user_id
     record.save()
     record.members.set(User.objects.filter(id__in=state.member_ids))
     record.save()

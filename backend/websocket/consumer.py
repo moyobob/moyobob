@@ -219,6 +219,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             raise exception.NotAuthorizedError
 
         state.phase = PartyPhase.Ordering
+        state.member_ids_backup = state.member_ids[:]
         state.save()
 
         await self.channel_layer.group_send(
