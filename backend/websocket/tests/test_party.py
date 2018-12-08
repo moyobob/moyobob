@@ -101,7 +101,6 @@ class PartyTestCase1(TestCaseWithSingleWebsocket):
 
     @async_test
     async def test_party_leave_deleted_state(self):
-        party = self.party
         state = self.state
         communicator = self.communicator
 

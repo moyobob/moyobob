@@ -68,7 +68,7 @@ class UtilTestCase(TestCaseWithCache):
         cache.delete('user-party:{}'.format(self.user.id))
 
         with self.assertRaises(NotJoinedError):
-            state = get_party_state_of_user(self.user.id)
+            get_party_state_of_user(self.user.id)
 
     def test_get_party_of_user_invalid(self):
         cache.set('user-party:{}'.format(self.user.id), 0)
@@ -80,4 +80,4 @@ class UtilTestCase(TestCaseWithCache):
         cache.set('user-party:{}'.format(self.user.id), 0)
 
         with self.assertRaises(InvalidPartyError):
-            state = get_party_state_of_user(self.user.id)
+            get_party_state_of_user(self.user.id)
