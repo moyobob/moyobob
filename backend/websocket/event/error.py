@@ -56,3 +56,9 @@ def already_joined():
     return {
         'type': 'error.already.joined',
     }
+
+
+def command_not_allowed():
+    return {
+        'type': 'error.command.not.allowed'
+    }
