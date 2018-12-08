@@ -3,14 +3,14 @@
         (click)="joinPartyButton(party.id);">
   <div class="container">
     <div class="left">
-      <span>{{party.name}}</span>
+      <span id="party-name">{{party.name}}</span>
     </div>
     <div class="right">
       <div class="member-count">
         <mat-icon color="primary">account_circle</mat-icon>
-        <span>{{party.memberCount}}</span>
+        <span id="party-member-count">{{party.memberCount}}</span>
       </div>
-      <span>@{{party.location}}</span>
+      <span id="party-location">@{{party.location}}</span>
     </div>
   </div>
 </button>
@@ -19,14 +19,14 @@
         (click)="navigateToPartyButton();">
   <div class="container">
     <div class="left">
-      <span matBadge="My" matBadgeOverlap="false" matBadgeColor="accent">{{party.name}}</span>
+      <span matBadge="My" matBadgeOverlap="false" matBadgeColor="accent" id="selected-party-name">{{party.name}}</span>
     </div>
     <div class="right">
       <div class="member-count">
         <mat-icon color="primary">account_circle</mat-icon>
-        <span>{{party.memberCount}}</span>
+        <span id="selected-party-member-count">{{party.memberCount}}</span>
       </div>
-      <span>@{{party.location}}</span>
+      <span id="selected-party-location">@{{party.location}}</span>
     </div>
   </div>
 </button>
