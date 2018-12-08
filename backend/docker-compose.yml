@@ -1,16 +1,24 @@
 version: '3'
 
 services:
+  postgres:
+    image: postgres:11-alpine
+    restart: unless-stopped
+    env_file:
+      - /srv/moyobob/backend/env
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
   redis:
     image: redis:4-alpine
-    command: redis-server --appendonly yes
-    volumes:
-      - redis-data:/data
+    restart: unless-stopped
 
   backend:
     build: .
+    restart: unless-stopped
     depends_on:
       - redis
+      - postgres
     ports:
       - 127.0.0.1:8000:8000
     env_file:
@@ -19,4 +27,4 @@ services:
       - /srv/moyobob/backend/db:/app/db
 
 volumes:
-  redis-data:
+  postgres-data:
