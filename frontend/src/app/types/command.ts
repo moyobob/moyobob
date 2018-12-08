@@ -113,6 +113,17 @@ export class MenuDeleteCommand implements Command {
   }
 }
 
+export class RestaurantSelectCommand implements  Command {
+  @serialize
+  readonly command = '';
+
+  @serializeAs('restaurant_id')
+  restaurantId: number;
+  constructor(restaurantId: number){
+    this.restaurantId = restaurantId;
+  }
+}
+
 export class ToOrderedCommand implements Command {
   @serialize
   readonly command = 'to.ordered';

@@ -6,7 +6,13 @@ import { UserService } from '../services/user.service';
 import { PartyService } from '../services/party.service';
 import { RestaurantService } from '../services/restaurant.service';
 
-import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
+import {
+  Party,
+  PartyState,
+  MenuEntryCreateRequest,
+  MenuEntryUpdateRequest,
+  RestaurantSelectRequest
+} from '../types/party';
 import { Menu } from '../types/menu';
 import { User } from '../types/user';
 import {Restaurant} from "../types/restaurant";
@@ -87,6 +93,10 @@ export class PartyComponent implements OnInit, OnDestroy {
   leaveParty(): void {
     this.partyService.leaveParty();
     this.router.navigate(['/lobby']);
+  }
+
+  toChoosingMenu(req: RestaurantSelectRequest){
+    this.partyService.toChoosingMenu(req);
   }
 
   addMenu(req: MenuEntryCreateRequest) {

@@ -93,6 +93,10 @@ export class VotingRequest {
   user: number;
 }
 
+export class RestaurantSelectRequest{
+  restaurantId: number;
+}
+
 export class PartyState {
   @deserialize
   id: number;
