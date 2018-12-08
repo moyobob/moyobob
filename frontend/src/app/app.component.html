@@ -1,1 +1,21 @@
-<router-outlet></router-outlet>
+<mat-toolbar color="primary">
+  <span>
+    <button class="side-nav-button" (click)="sidebar.toggle()" mat-icon-button>
+      <mat-icon aria-label="open side navigation">menu</mat-icon>
+    </button>
+  </span>
+  <span>{{ title }}</span>
+</mat-toolbar>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidebar mode="side">
+    <mat-nav-list class="navlist">
+      <a mat-list-item routerLink="/lobby">Lobby</a>
+      <a mat-list-item routerLink="/party">Party</a>
+      <a mat-list-item routerLink="/payment">Payment</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content class="sidenav-container-content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

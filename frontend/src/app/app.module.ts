@@ -1,7 +1,18 @@
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClientXsrfModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
+
+import {
+  MatButtonModule,
+  MatInputModule,
+  MatSnackBarModule,
+  MatToolbarModule,
+  MatSidenavModule,
+  MatIconModule,
+  MatListModule,
+} from '@angular/material';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing/app-routing.module';
@@ -19,9 +30,6 @@ import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/sel
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { UserItemComponent } from './party/party-ordered/user-item/user-item.component';
 import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
-
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -54,6 +62,10 @@ import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/mat
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
