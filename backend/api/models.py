@@ -36,7 +36,7 @@ class Restaurant(models.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'menus': [menu.id for menu in self.menus.all()],
+            'menus': list(self.menus.values_list('id', flat=True).all()),
             'phone_number': self.phone_number,
         }
 
@@ -57,10 +57,10 @@ class Party(models.Model):
             'name': self.name,
             'type': self.type,
             'location': self.location,
-            'leader_id': self.leader.id,
+            'leader_id': self.leader_id,
             'since': str(self.since),
             'member_count': self.member_count,
-            'restaurant_id': self.restaurant.id if self.restaurant is not None else 0,
+            'restaurant_id': self.restaurant_id,
         }
 
     def save(self, *args, **kwargs):
@@ -98,13 +98,13 @@ class PartyRecord(models.Model):
             'name': self.name,
             'type': self.type,
             'location': self.location,
-            'leader_id': self.leader.id,
+            'leader_id': self.leader_id,
             'since': str(self.since),
             'until': str(self.until),
-            'member_ids': [member.id for member in self.members.all()],
-            'restaurant_id': self.restaurant.id,
-            'paid_user_id': self.paid_user.id,
-            'payment_ids': [payment.id for payment in self.payments.all()],
+            'member_ids': list(self.members.values_list('id', flat=True).all()),
+            'restaurant_id': self.restaurant_id,
+            'paid_user_id': self.paid_user_id,
+            'payment_ids': list(self.payments.values_list('id', flat=True).all()),
         }
 
 
@@ -122,10 +122,10 @@ class Payment(models.Model):
     def as_dict(self):
         return {
             'id': self.id,
-            'user_id': self.user.id,
-            'paid_user_id': self.paid_user.id,
-            'menu_id': self.menu.id,
+            'user_id': self.user_id,
+            'paid_user_id': self.paid_user_id,
+            'menu_id': self.menu_id,
             'price': self.price,
             'resolved': self.resolved,
-            'party_record_id': self.party_record.id,
+            'party_record_id': self.party_record_id,
         }
