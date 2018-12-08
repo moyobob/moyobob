@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Restaurant} from "../../../../types/restaurant";
-import {VoteObjectCreateRequest} from "../../../../types/party";
+import {Restaurant} from "../../../types/restaurant";
+import {RestaurantSelectRequest, VoteObjectCreateRequest} from "../../../types/party";
 
 @Component({
   selector: 'app-add-vote-object',
@@ -10,7 +10,9 @@ import {VoteObjectCreateRequest} from "../../../../types/party";
 export class AddVoteObjectComponent implements OnInit {
   @Input() restaurants: Restaurant[];
   @Input() loggedInUserId: number;
+  @Input() confirmMode: boolean;
   @Output() request: EventEmitter<VoteObjectCreateRequest>;
+  @Output() confirmRestaurantEvent: EventEmitter<number>
   @Output() cancel: EventEmitter<void>;
 
   constructor() {
@@ -26,6 +28,10 @@ export class AddVoteObjectComponent implements OnInit {
       restaurantId: id,
       user: this.loggedInUserId
     });
+  }
+
+  confirmRestaurant(targetRestaurantId: number) {
+    this.confirmRestaurantEvent.emit(targetRestaurantId);
   }
 
   cancelRequest() {

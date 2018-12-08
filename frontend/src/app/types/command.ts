@@ -28,21 +28,47 @@ export class PartyLeaveCommand implements Command {
   }
 }
 
-export class RestaurantVoteCommand implements Command {
+export class ToChoosingMenuCommand implements  Command {
   @serialize
-  readonly command = 'restaurant.vote';
+  readonly command = 'to.choosing.menu';
 
   @serializeAs('restaurant_id')
   restaurantId: number;
 
-  constructor(restaurantId: number) {
+  constructor(restaurantId: number){
     this.restaurantId = restaurantId;
   }
 }
 
-export class RestaurantUnvoteCommand implements Command {
+export class ToOrderingCommand implements Command {
   @serialize
-  readonly command = 'restaurant.unvote';
+  readonly command = 'to.choosing.menu';
+
+  constructor() { }
+}
+
+export class ToOrderedCommand implements Command {
+  @serialize
+  readonly command = 'to.ordered';
+
+  constructor() { }
+}
+
+export class ToPaymentCommand implements Command {
+  @serialize
+  readonly command = 'to.payment';
+
+  @serializeAs('paid_user_id')
+  paidUserId: number;
+
+  constructor(paidUserId: number) {
+    this.paidUserId = paidUserId;
+  }
+}
+
+export class RestaurantVoteToggleCommand implements Command {
+  @serialize
+  readonly command = 'restaurant.vote.toggle';
 
   @serializeAs('restaurant_id')
   restaurantId: number;
@@ -113,36 +139,6 @@ export class MenuDeleteCommand implements Command {
   }
 }
 
-export class RestaurantSelectCommand implements  Command {
-  @serialize
-  readonly command = '';
-
-  @serializeAs('restaurant_id')
-  restaurantId: number;
-  constructor(restaurantId: number){
-    this.restaurantId = restaurantId;
-  }
-}
-
-export class ToOrderedCommand implements Command {
-  @serialize
-  readonly command = 'to.ordered';
-
-  constructor() { }
-}
-
-export class ToPaymentCommand implements Command {
-  @serialize
-  readonly command = 'to.payment';
-
-  @serializeAs('paid_user_id')
-  paidUserId: number;
-
-  constructor(paidUserId: number) {
-    this.paidUserId = paidUserId;
-  }
-}
-
 export function serializeCommand(command: Command): any {
   switch (command.command) {
     case 'party.join': {
@@ -153,12 +149,24 @@ export function serializeCommand(command: Command): any {
       return Serialize(command, PartyLeaveCommand);
       break;
     }
-    case 'restaurant.vote': {
-      return Serialize(command, RestaurantVoteCommand);
+     case 'to.choosing.menu': {
+      return Serialize(command, ToChoosingMenuCommand);
+      break
+    }
+    case 'to.ordering': {
+      return Serialize(command, ToOrderingCommand);
+      break
+    }
+    case 'to.ordered': {
+      return Serialize(command, ToOrderedCommand);
       break;
     }
-    case 'restaurant.unvote': {
-      return Serialize(command, RestaurantUnvoteCommand);
+    case 'to.payment': {
+      return Serialize(command, ToPaymentCommand);
+      break;
+    }
+    case 'restaurant.vote.toggle': {
+      return Serialize(command, RestaurantVoteToggleCommand);
       break;
     }
     case 'menu.create': {
@@ -173,14 +181,7 @@ export function serializeCommand(command: Command): any {
       return Serialize(command, MenuDeleteCommand);
       break;
     }
-    case 'to.ordered': {
-      return Serialize(command, ToOrderedCommand);
-      break;
-    }
-    case 'to.payment': {
-      return Serialize(command, ToPaymentCommand);
-      break;
-    }
+
     default: {
       return {};
     }

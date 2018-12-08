@@ -1,7 +1,10 @@
 <div>
   <ul>
     <li *ngFor="let restaurant of restaurants">
-      <button type="button" name="restaurant" (click)="addVoteObjectRequest(restaurant.id);">
+      <button *ngIf="!confirmMode" type="button" name="restaurant" (click)="addVoteObjectRequest(restaurant.id);">
+        {{restaurant.name}}
+      </button>
+      <button *ngIf="confirmMode" type="button" name="restaurant" (click)="confirmRestaurant(restaurant.id);">
         {{restaurant.name}}
       </button>
     </li>

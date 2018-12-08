@@ -75,6 +75,7 @@ export class PartyLeaveEvent {
 }
 
 export class RestaurantVoteEvent {
+  //TODO: add user
   @deserialize
   readonly type = 'restaurant.vote';
 

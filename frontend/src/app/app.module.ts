@@ -21,7 +21,7 @@ import { UserItemComponent } from './party/party-ordered/user-item/user-item.com
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/material';
 import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
-import { AddVoteObjectComponent } from './party/party-choosing-restaurant/vote-restaurant/add-vote-object/add-vote-object.component';
+import { AddVoteObjectComponent } from './party/party-choosing-restaurant/add-vote-object/add-vote-object.component';
 
 @NgModule({
   declarations: [

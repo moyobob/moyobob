@@ -1,6 +1,27 @@
-
-
-
-<app-vote-restaurant *ngIf="showRestaurantPolly" [menus]="menus" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
-  (cancel)="cancelAddMenu($event);">
-</app-vote-restaurant>
+<div>
+  <ul>
+    <li *ngFor="let vote of votedRestaurants">
+      RestaurantName: {{vote[1]}}, Vote: {{vote[2]}}
+      <span *ngIf="confirmMode">
+        <button (click)="confirmRestaurant(vote[0]);">
+          confirm
+        </button>
+      </span>
+      <span *ngIf="isVoted(vote[0]) && !confirmMode">
+        <button (click)="votingRestaurant(vote[0],-1);">
+          UNVOTE
+        </button>
+        </span>
+      <span *ngIf="!isVoted(vote[0]) && !confirmMode">
+        <button (click)="votingRestaurant(vote[0],1);">
+          VOTE
+        </button>
+      </span>
+    </li>
+  </ul>
+</div>
+<button *ngIf="amIPartyLeader" (click)="toggleConfirmMode();">Confirm</button>
+<button (click)="toggleAddObject();">Add Survey Component</button>
+<app-add-vote-object *ngIf="showAddObjectDialog" [restaurants]="restaurants" [loggedInUserId]="user.id" [confirmMode] = "confirmMode"
+                     (addVoteObjectRequest)="requestAddObject($event);" (confirmRestaurantEvent)="confirmRestaurant($event)" (cancelRequest)="cancelAddObject();">
+</app-add-vote-object>
