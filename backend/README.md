@@ -3,7 +3,6 @@
 ## Using Docker Compose
 
 ```bash
-$ sudo mkdir -p /srv/moyobob/backend/db
 $ sudo nano /srv/moyobob/backend/env
 
 REDIS_HOST=redis
