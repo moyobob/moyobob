@@ -1,13 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {
-  MenuEntry,
-  MenuEntryCreateRequest,
-  MenuEntryUpdateRequest, Party,
-  PartyState, RestaurantSelectRequest,
-  VoteObjectCreateRequest, VotingRequest
-} from "../../types/party";
-import {User} from "../../types/user";
-import {Restaurant} from "../../types/restaurant";
+import {Party, PartyState} from '../../types/party';
+import {User} from '../../types/user';
+import {Restaurant} from '../../types/restaurant';
 
 @Component({
   selector: 'app-party-choosing-restaurant',
@@ -20,19 +14,18 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
   @Input() partyState: PartyState;
   @Input() user: User;
   @Input() restaurants: Restaurant[];
-  @Output() addVoteObject: EventEmitter<VoteObjectCreateRequest>;
-  @Output() voting: EventEmitter<VotingRequest>;
-  @Output() toNextState: EventEmitter<RestaurantSelectRequest>;
+  @Output() votingEvent: EventEmitter<number>;
+  @Output() toNextState: EventEmitter<number>;
 
-  votedRestaurants: [number, string, number][] = []; //restaurantId, restaurantName, voteNumber
-  myVoting: number[]; //votedRestaurantIds
+  votedRestaurants: [number, string, number][] = []; //restaurantId, restaurantName, voteNumber. Restaurants whose voteNumber >= 1
+  myVoting: number[]; //list of restaurants' Id I voted for
   showAddObjectDialog = false;
   amIPartyLeader = false;
   confirmMode = false;
 
   constructor() {
-    this.addVoteObject = new EventEmitter();
-    this.voting = new EventEmitter();
+    this.votingEvent = new EventEmitter();
+    this.toNextState = new EventEmitter();
   }
 
   ngOnInit() {
@@ -44,73 +37,58 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
     this.updateState();
   }
 
-  updateState(){
-    if(this.partyState){
-      for (const vote of this.partyState.restaurantVotes) {
-        if(this.user.id === vote[0]){
-          this.myVoting.push(vote[1])
-        }
+  updateState(): void {
+    if (this.partyState === undefined) {
+      return
+    }
 
-        if(this.votedRestaurants){
-          const updateTarget = this.votedRestaurants.filter(list =>  list[0] === vote[1]);
-          if(updateTarget.length) {
-            updateTarget[0][2]++;
-          } else {
-            this.votedRestaurants.push([vote[1], this.getRestaurantNameById(vote[1]), 1])
-          }
-        }
+    for (const vote of this.partyState.restaurantVotes) {
+      if (this.user.id === vote[0]) {
+        this.myVoting.push(vote[1])
+      }
+
+      const updateTarget = this.votedRestaurants.filter(x => x[0] === vote[1]);
+      if (updateTarget.length) {
+        updateTarget[0][2]++;
+      } else {
+        this.votedRestaurants.push([vote[1], this.getRestaurantNameById(vote[1]), 1])
       }
     }
   }
 
-  getRestaurantNameById(id: number):string{
-    if(this.restaurants){
+  isVoted(restaurantId: number): boolean {
+    return this.myVoting.includes(restaurantId);
+  }
+
+  partyLeaderChecker() {
+    if (this.user.id === this.party.leaderId) {
+      this.amIPartyLeader = true;
+    }
+  }
+
+  getRestaurantNameById(id: number): string {
+    if (this.restaurants) {
       const restaurant = this.restaurants.filter(restaurant => restaurant.id === id);
-      if(restaurant.length) {
+      if (restaurant.length) {
         return restaurant[0].name;
       }
     }
     return '';
   }
 
-  isVoted(RestaurantId: number) {
-    return this.myVoting.some(x => x === RestaurantId);
-  }
-
-  partyLeaderChecker(){
-    if(this.user.id === this.party.leaderId) {
-      this.amIPartyLeader = true;
-    }
-  }
-
   toggleConfirmMode() {
     this.confirmMode = !this.confirmMode;
-  }
-
-  requestAddObject(event) {
-    this.addVoteObject.emit(event);
-    this.showAddObjectDialog = false;
-  }
-
-  cancelAddObject() {
-    this.showAddObjectDialog = false;
   }
 
   toggleAddObject() {
     this.showAddObjectDialog = !this.showAddObjectDialog;
   }
 
-  votingRestaurant(targetRestaurantId, vote) {
-    this.voting.emit({
-      restaurantId: targetRestaurantId,
-      vote: vote,
-      user: this.user.id
-    });
-  }
-
-  confirmRestaurant(targetRestaurantId: number){
-    this.toNextState.emit({
-      restaurantId: targetRestaurantId
-    });
+  clickRestaurant(restaurantId: number) : void{
+    if (this.confirmMode) {
+      this.toNextState.emit(restaurantId);
+    } else {
+      this.votingEvent.emit(restaurantId);
+    }
   }
 }

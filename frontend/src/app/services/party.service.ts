@@ -12,7 +12,6 @@ import {
   MenuEntryCreateRequest,
   MenuEntryUpdateRequest,
   PartyCreateRequest,
-  RestaurantSelectRequest
 } from '../types/party';
 import {
   Event, PartyJoinEvent, PartyLeaveEvent, InitiallyNotJoinedEvent, StateUpdateEvent, MenuCreateEvent, MenuUpdateEvent
@@ -20,7 +19,7 @@ import {
 import {
   PartyJoinCommand, PartyLeaveCommand,
   MenuCreateCommand, MenuUpdateCommand,
-  ToOrderedCommand, ToPaymentCommand, ToChoosingMenuCommand,
+  ToOrderedCommand, ToPaymentCommand, ToChoosingMenuCommand, RestaurantVoteToggleCommand,
 } from '../types/command';
 
 const httpOptions = {
@@ -183,10 +182,13 @@ export class PartyService {
     this.websocketService.send(command);
   }
 
-  toChoosingMenu(request: RestaurantSelectRequest) {
-    const command = new ToChoosingMenuCommand(
-      request.restaurantId
-    );
+  voteToggleRestaurant(restaurantId: number){
+    const command = new RestaurantVoteToggleCommand(restaurantId);
+    this.websocketService.send(command);
+  }
+
+  toChoosingMenu(restaurantId: number) {
+    const command = new ToChoosingMenuCommand(restaurantId);
     this.websocketService.send(command);
   }
 

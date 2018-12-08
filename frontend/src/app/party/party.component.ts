@@ -11,7 +11,6 @@ import {
   PartyState,
   MenuEntryCreateRequest,
   MenuEntryUpdateRequest,
-  RestaurantSelectRequest
 } from '../types/party';
 import { Menu } from '../types/menu';
 import { User } from '../types/user';
@@ -95,8 +94,12 @@ export class PartyComponent implements OnInit, OnDestroy {
     this.router.navigate(['/lobby']);
   }
 
-  toChoosingMenu(req: RestaurantSelectRequest){
-    this.partyService.toChoosingMenu(req);
+  voteRestaurant(restaurantId:number) {
+    this.partyService.voteToggleRestaurant(restaurantId);
+  }
+
+  toChoosingMenu(restaurantId:number){
+    this.partyService.toChoosingMenu(restaurantId);
   }
 
   addMenu(req: MenuEntryCreateRequest) {

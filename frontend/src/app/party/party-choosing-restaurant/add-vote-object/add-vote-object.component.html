@@ -1,15 +1,12 @@
 <div>
   <ul>
     <li *ngFor="let restaurant of restaurants">
-      <button *ngIf="!confirmMode" type="button" name="restaurant" (click)="addVoteObjectRequest(restaurant.id);">
-        {{restaurant.name}}
-      </button>
-      <button *ngIf="confirmMode" type="button" name="restaurant" (click)="confirmRestaurant(restaurant.id);">
+      <button type="button" name="restaurant" (click)="onClickRestaurant(restaurant.id);">
         {{restaurant.name}}
       </button>
     </li>
   </ul>
   <div>
-    <button (click)="cancelRequest();">Cancel</button>
+    <button (click)="onCancelButtonClick();">Cancel</button>
   </div>
 </div>
