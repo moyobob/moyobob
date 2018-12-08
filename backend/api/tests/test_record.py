@@ -36,6 +36,7 @@ class RecordTestCase(TestCaseWithHttp):
 
         state = self.party.state
         state.member_ids = [self.user1.id, self.user2.id, self.user3.id]
+        state.member_ids_backup = [self.user1.id, self.user2.id, self.user3.id]
         state.menu_entries.add(
             self.menu1.id, 3, [self.user1.id, self.user2.id, self.user3.id])
         state.menu_entries.add(
@@ -70,7 +71,7 @@ class RecordTestCase(TestCaseWithHttp):
         payments = record.payments.all()
 
         for payment in payments:
-            self.assertTrue(payment.user.id in [self.user1.id, self.user3.id])
+            self.assertTrue(payment.user_id in [self.user1.id, self.user3.id])
             self.assertEqual(payment.paid_user.id, self.user2.id)
             if payment.menu.id == self.menu1.id:
                 self.assertEqual(payment.price, self.menu1.price)
