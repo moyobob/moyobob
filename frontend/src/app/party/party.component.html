@@ -5,7 +5,8 @@
     <span>{{party.memberCount}}</span>
   </div>
   <div [ngSwitch]="partyState.phase">
-    <app-party-choosing-restaurant *ngSwitchCase="0"></app-party-choosing-restaurant>
+    <app-party-choosing-restaurant *ngSwitchCase="0" [partyState]="partyState" [user]="user" [restaurants]="restaurants"
+    (toNextState)="toChoosingMenu($event);"></app-party-choosing-restaurant>
     <app-party-choosing-menu *ngSwitchCase="1" [partyState]="partyState" [user]="user" [menus]="menus" (addMenu)="addMenu($event);"
       (updateMenu)="updateMenu($event);"></app-party-choosing-menu>
     <app-party-ordering *ngSwitchCase="2" [party]="party" [menus]="menus" [user]="user" [partyState]="partyState"

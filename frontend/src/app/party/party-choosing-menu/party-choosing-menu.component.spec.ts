@@ -19,6 +19,7 @@ const mockMenu1 = { id: 1, name: 'Mock Menu 1', price: -120 };
 const mockPartyState: PartyState = {
   id: 1,
   phase: 0,
+  restaurantVotes: [],
   restaurantId: null,
   memberIds: [],
   menuEntries: [mockMenuEntry1, mockMenuEntry2]

@@ -9,6 +9,7 @@ import { RestaurantService } from '../services/restaurant.service';
 import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 import { Menu } from '../types/menu';
 import { User } from '../types/user';
+import {Restaurant} from "../types/restaurant";
 
 @Component({
   selector: 'app-party',
@@ -22,6 +23,7 @@ export class PartyComponent implements OnInit, OnDestroy {
   users: User[];
   partyId: number;
   menus: Menu[];
+  restaurants: Restaurant[];
 
   subscriptions: Subscription[] = [];
 
