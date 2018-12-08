@@ -22,7 +22,7 @@ class UtilTestCase(TestCaseWithCache):
             leader=self.user,
         )
         self.party.save()
-        self.state = self.party.state
+        self.state = self.party.get_state()
 
         cache.set('user-party:{}'.format(self.user.id), self.party.id)
 

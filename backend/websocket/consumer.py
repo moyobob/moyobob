@@ -25,8 +25,8 @@ def get_party(party_id: int):
         party = Party.objects.get(id=party_id)
     except Party.DoesNotExist:
         raise exception.InvalidPartyError
-    state = party.state
 
+    state = PartyState.get(party_id)
     if state is None:
         party.delete()
         raise exception.InvalidPartyError

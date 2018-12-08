@@ -15,7 +15,7 @@ class RestaurantTestCase(TestCaseWithSingleWebsocket):
 
     @async_test
     async def test_retaurant_vote(self):
-        state = self.party.state
+        state = self.state
 
         await self.join()
 

@@ -18,6 +18,7 @@ class PartyTestCase(TestCaseWithHttp):
             leader=self.user,
         )
         self.party1.save()
+        self.state1 = self.party1.get_state()
 
         self.party2 = Party(
             name="party 2 name",
@@ -26,6 +27,7 @@ class PartyTestCase(TestCaseWithHttp):
             leader=self.user,
         )
         self.party2.save()
+        self.state2 = self.party2.get_state()
 
     def login(self):
         super().login(email='ferris@rustacean.org', password='iluvrust')
@@ -55,9 +57,9 @@ class PartyTestCase(TestCaseWithHttp):
         self.assertEqual(self.delete('/api/party/0/').status_code, 404)
 
     def test_get_party_state(self):
-        state1 = self.party1.state
+        state1 = self.state1
         self.assertIsNotNone(state1)
-        state2 = self.party2.state
+        state2 = self.state2
         self.assertIsNotNone(state2)
 
     def test_get_party(self):
@@ -113,7 +115,7 @@ class PartyTestCase(TestCaseWithHttp):
         id = party.id
 
         self.assertIsNotNone(cache.get('party:{}'.format(id)))
-        state = party.state
+        state = party.get_state()
         self.assertIsNotNone(state)
 
         self.login()
@@ -135,7 +137,7 @@ class PartyTestCase(TestCaseWithHttp):
         resp = self.delete('/api/party/{}/'.format(party.id))
         self.assertEqual(resp.status_code, 403)
 
-        state = party.state
+        state = party.get_state()
         state.delete()
         party.delete()
 
