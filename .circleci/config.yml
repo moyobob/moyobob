@@ -5,6 +5,7 @@ jobs:
     docker:
       - image: circleci/python:3.6-stretch
       - image: circleci/redis:4-alpine
+      - image: circleci/postgres:11-alpine
     steps:
       - checkout
       - run:
