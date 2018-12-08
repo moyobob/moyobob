@@ -69,10 +69,10 @@ class RecordTestCase(TestCaseWithHttp):
 
         for payment in payments:
             self.assertTrue(payment.user_id in [self.user1.id, self.user3.id])
-            self.assertEqual(payment.paid_user.id, self.user2.id)
-            if payment.menu.id == self.menu1.id:
+            self.assertEqual(payment.paid_user_id, self.user2.id)
+            if payment.menu_id == self.menu1.id:
                 self.assertEqual(payment.price, self.menu1.price)
-            elif payment.menu.id == self.menu2.id:
+            elif payment.menu_id == self.menu2.id:
                 self.assertEqual(payment.price, self.menu2.price / 3)
             else:
                 self.assertEqual(payment.price, self.menu3.price * 2)
@@ -145,7 +145,7 @@ class RecordTestCase(TestCaseWithHttp):
             resp = self.get('/api/resolve_payment/{}/'.format(payment.id))
             self.assertEqual(resp.status_code, 200)
 
-        self.assertFalse(Payment.objects.filter(resolved=False).exists())
+        self.assertFalse(record.payments.filter(resolved=False).exists())
 
         resp = self.get('/api/collections/')
         self.assertListEqual(resp.json(), [])
@@ -158,3 +158,15 @@ class RecordTestCase(TestCaseWithHttp):
         resp = client.get(
             '/api/resolve_payment/{}/'.format(record.payments.all()[0].id))
         self.assertEqual(resp.status_code, 403)
+
+    def test_create_record_without_paid_user(self):
+        state = self.party.state
+        state.paid_user_id = None
+        record = make_record(state)
+
+        self.assertEqual(record.paid_user, None)
+
+        payments = record.payments.all()
+
+        for payment in payments:
+            self.assertEqual(payment.paid_user, None)
