@@ -56,13 +56,6 @@ class PartyState(CacheModel):
 
         return self
 
-    def delete(self):
-        if self.phase >= PartyPhase.Ordering:
-            from api.util import make_record
-            self.member_ids = self.member_ids_backup[:]
-            make_record(self)
-        super().delete()
-
     def refresh_from_db(self):
         super().refresh_from_db()
         o = super().get(self.id)

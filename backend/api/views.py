@@ -10,6 +10,7 @@ from json.decoder import JSONDecodeError
 from .models import User, Party, PartyType, Restaurant, Menu, Payment
 from .decorator import allow_authenticated, allow_method
 from .decorator import get_menu, get_party, get_payment, get_restaurant
+from .util import make_record
 
 
 @allow_method(['POST'])
@@ -100,6 +101,9 @@ def party_detail(request: HttpRequest, party: Party):
         if party.leader != request.user:
             return HttpResponseForbidden()
 
+        state = party.state
+        if state is not None:
+            make_record(state)
         party.delete()
 
         return HttpResponse()

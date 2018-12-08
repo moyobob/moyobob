@@ -2,6 +2,7 @@ from django.test import Client
 
 from . import TestCaseWithHttp
 from api.models import User, Party, PartyType, Restaurant, Menu, PartyRecord, Payment
+from api.util import make_record
 from websocket.models import PartyState, PartyPhase
 
 
@@ -52,11 +53,7 @@ class RecordTestCase(TestCaseWithHttp):
 
     def test_create_record(self):
         state = self.party.state
-        state.delete()
-
-        self.assertTrue(PartyRecord.objects.all().exists())
-
-        record = PartyRecord.objects.all()[0]
+        record = make_record(state)
 
         self.assertEqual(record.name, self.party.name)
         self.assertEqual(record.type, self.party.type)
@@ -99,8 +96,7 @@ class RecordTestCase(TestCaseWithHttp):
         self.assertEqual(self.get('/api/collections/').status_code, 403)
 
     def test_get_records(self):
-        self.party.state.delete()
-        record = PartyRecord.objects.all()[0]
+        record = make_record(self.party.state)
 
         self.login()
 
@@ -110,8 +106,7 @@ class RecordTestCase(TestCaseWithHttp):
         self.assertEqual(resp_json[0]['id'], record.id)
 
     def test_get_payments(self):
-        self.party.state.delete()
-        record = PartyRecord.objects.all()[0]
+        record = make_record(self.party.state)
 
         self.login()
 
@@ -125,8 +120,7 @@ class RecordTestCase(TestCaseWithHttp):
         )
 
     def test_get_collections(self):
-        self.party.state.delete()
-        record = PartyRecord.objects.all()[0]
+        record = make_record(self.party.state)
 
         self.login()
 
@@ -140,8 +134,7 @@ class RecordTestCase(TestCaseWithHttp):
         )
 
     def test_resolve_payment(self):
-        self.party.state.delete()
-        record = PartyRecord.objects.all()[0]
+        record = make_record(self.party.state)
 
         super().login(email="pbzweihander@rustaceans.org", password="iluvrust2")
 

@@ -1,5 +1,5 @@
 from .models import Menu, Payment, Party, PartyRecord, User
-from websocket.models import PartyState
+from websocket.models import PartyState, PartyPhase
 
 
 def make_payments(state: PartyState, record: PartyRecord):
@@ -18,14 +18,15 @@ def make_payments(state: PartyState, record: PartyRecord):
             )
             if state.paid_user_id:
                 payment.paid_user_id = state.paid_user_id
-            payment.save()
             payments.append(payment)
-    for payment in payments:
-        payment.save()
+    Payment.objects.bulk_create(payments)
     return payments
 
 
 def make_record(state: PartyState):
+    if state.phase < PartyPhase.Ordered:
+        return None
+    state.member_ids = state.member_ids_backup[:]
     party = Party.objects.get(id=state.id)
     record = PartyRecord(
         name=party.name,
@@ -39,5 +40,5 @@ def make_record(state: PartyState):
         record.paid_user_id = state.paid_user_id
     record.save()
     record.members.set(User.objects.filter(id__in=state.member_ids))
-    record.save()
     make_payments(state, record)
+    return record
