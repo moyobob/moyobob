@@ -1,21 +1,24 @@
-<mat-toolbar color="primary">
-  <span>
-    <button class="side-nav-button" (click)="sidebar.toggle()" mat-icon-button>
-      <mat-icon aria-label="open side navigation">menu</mat-icon>
-    </button>
-  </span>
-  <span>{{ title }}</span>
-</mat-toolbar>
+<div class="container" [class.is-mobile]="mobileQuery.matches">
+  <mat-toolbar color="primary" class="toolbar">
+    <span>
+      <button class="side-nav-button" (click)="toggleSidebar()" *ngIf="mobileQuery.matches" mat-icon-button>
+        <mat-icon aria-label="open side navigation">menu</mat-icon>
+      </button>
+    </span>
+    <span>{{ title }}</span>
+  </mat-toolbar>
 
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #sidebar mode="over">
-    <mat-nav-list class="navlist">
-      <a mat-list-item routerLink="/lobby">Lobby</a>
-      <a mat-list-item routerLink="/party">Party</a>
-      <a mat-list-item routerLink="/payment">Payment</a>
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content class="sidenav-container-content">
-    <router-outlet></router-outlet>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  <mat-sidenav-container class="sidenav-container" [style.marginTop.px]="mobileQuery.matches ? 56 : 0">
+    <mat-sidenav [opened]="!mobileQuery.matches || isSidebarOpened" [mode]="mobileQuery.matches ? 'over' : 'side'"
+      [fixedInViewport]="mobileQuery.matches" fixedTopGap="56">
+      <mat-nav-list class="navlist">
+        <a mat-list-item routerLink="/lobby">Lobby</a>
+        <a mat-list-item routerLink="/party">Party</a>
+        <a mat-list-item routerLink="/payment">Payment</a>
+      </mat-nav-list>
+    </mat-sidenav>
+    <mat-sidenav-content class="sidenav-container-content">
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
