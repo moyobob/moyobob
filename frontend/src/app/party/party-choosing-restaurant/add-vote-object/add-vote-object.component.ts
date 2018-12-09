@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Restaurant} from "../../../types/restaurant";
+import {Restaurant} from '../../../types/restaurant';
 
 @Component({
   selector: 'app-add-vote-object',
@@ -20,11 +20,11 @@ export class AddVoteObjectComponent implements OnInit {
   ngOnInit() {
   }
 
-  onClickRestaurant(restaurantId: number) :void {
+  onClickRestaurant(restaurantId: number): void {
     this.clickRestaurant.emit(restaurantId);
   }
 
-  onCancelButtonClick() :void {
+  onCancelButtonClick(): void {
     this.cancel.emit();
   }
 }

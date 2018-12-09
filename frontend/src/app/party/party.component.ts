@@ -14,7 +14,7 @@ import {
 } from '../types/party';
 import { Menu } from '../types/menu';
 import { User } from '../types/user';
-import {Restaurant} from "../types/restaurant";
+import {Restaurant} from '../types/restaurant';
 
 @Component({
   selector: 'app-party',
@@ -94,27 +94,27 @@ export class PartyComponent implements OnInit, OnDestroy {
     this.router.navigate(['/lobby']);
   }
 
-  voteRestaurant(restaurantId:number) :void{
+  voteRestaurant(restaurantId: number): void {
     this.partyService.voteToggleRestaurant(restaurantId);
   }
 
-  toChoosingMenu(restaurantId:number) :void {
+  toChoosingMenu(restaurantId: number): void {
     this.partyService.toChoosingMenu(restaurantId);
   }
 
-  addMenu(req: MenuEntryCreateRequest) :void {
+  addMenu(req: MenuEntryCreateRequest): void {
     this.partyService.createMenu(req);
   }
 
-  updateMenu(req: MenuEntryUpdateRequest) :void {
+  updateMenu(req: MenuEntryUpdateRequest): void {
     this.partyService.updateMenu(req);
   }
 
-  toOrdered():void {
+  toOrdered(): void {
     this.partyService.toOrdered();
   }
 
-  toPayment(user: User):void {
+  toPayment(user: User): void {
     this.partyService.toPayment(user.id);
   }
 }

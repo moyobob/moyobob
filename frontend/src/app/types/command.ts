@@ -35,7 +35,7 @@ export class ToChoosingMenuCommand implements  Command {
   @serializeAs('restaurant_id')
   restaurantId: number;
 
-  constructor(restaurantId: number){
+  constructor(restaurantId: number) {
     this.restaurantId = restaurantId;
   }
 }
@@ -151,11 +151,11 @@ export function serializeCommand(command: Command): any {
     }
      case 'to.choosing.menu': {
       return Serialize(command, ToChoosingMenuCommand);
-      break
+      break;
     }
     case 'to.ordering': {
       return Serialize(command, ToOrderingCommand);
-      break
+      break;
     }
     case 'to.ordered': {
       return Serialize(command, ToOrderedCommand);

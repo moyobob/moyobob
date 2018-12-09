@@ -92,7 +92,7 @@ export class PartyState {
   @deserializeAs('restaurant_id')
   restaurantId?: number;
 
-  //User's id, Restaurant's id
+  // User's id, Restaurant's id
   restaurantVotes: [number, number][];
 
   @deserializeAs('member_ids')

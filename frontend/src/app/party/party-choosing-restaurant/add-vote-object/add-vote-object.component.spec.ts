@@ -27,17 +27,17 @@ describe('AddVoteObjectComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('onClickRestaurant', () => {
+  it('onClickRestaurant emits event with same parameter', () => {
     component.clickRestaurant.subscribe(restaurantId => {
       expect(restaurantId).toEqual(1);
     });
     component.onClickRestaurant(1);
     });
 
-  it('onCancelButtonClick', () => {
-    component.cancel.subscribe(_=>{
+  it('onCancelButtonClick emits event with no parameter', () => {
+    component.cancel.subscribe(_ => {
       expect(_).toEqual(undefined);
-    })
+    });
     component.onCancelButtonClick();
-  })
+  });
 });

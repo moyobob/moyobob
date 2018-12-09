@@ -182,7 +182,7 @@ export class PartyService {
     this.websocketService.send(command);
   }
 
-  voteToggleRestaurant(restaurantId: number){
+  voteToggleRestaurant(restaurantId: number) {
     const command = new RestaurantVoteToggleCommand(restaurantId);
     this.websocketService.send(command);
   }

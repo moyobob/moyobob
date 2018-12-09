@@ -1,19 +1,19 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PartyChoosingRestaurantComponent } from './party-choosing-restaurant.component';
-import {FormsModule} from "@angular/forms";
-import {Component, EventEmitter, Input, Output, SimpleChange} from "@angular/core";
-import {Restaurant} from "../../types/restaurant";
-import {Party, PartyState} from "../../types/party";
+import {FormsModule} from '@angular/forms';
+import {Component, EventEmitter, Input, Output, SimpleChange} from '@angular/core';
+import {Restaurant} from '../../types/restaurant';
+import {PartyState} from '../../types/party';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
-const anotherMockUser = {id: 2, email: '@.', username: 'a'}
+const anotherMockUser = {id: 2, email: '@.', username: 'a'};
 const mockRestaurant1 = {id: 1, name: 'MockRestaurant1', menus: [1]};
-const mockParty = { id: 1, name: 'mockParty', type: 0, location: 'location1', leaderId: 1, since: '0000', memberCount:2 }
+const mockParty = { id: 1, name: 'mockParty', type: 0, location: 'location1', leaderId: 1, since: '0000', memberCount: 2 };
 const mockPartyState1: PartyState = {
   id: 1,
   phase: 0,
-  restaurantVotes: [], //User's id, Restaurant's id
+  restaurantVotes: [], // User's id, Restaurant's id
   restaurantId: null,
   memberIds: [],
   menuEntries: [],
@@ -21,7 +21,7 @@ const mockPartyState1: PartyState = {
 const mockPartyState2: PartyState = {
   id: 1,
   phase: 0,
-  restaurantVotes: [[1,1],[2,1]], //User's id, Restaurant's id
+  restaurantVotes: [[1, 1], [2, 1]], // User's id, Restaurant's id
   restaurantId: null,
   memberIds: [],
   menuEntries: [],
@@ -63,9 +63,9 @@ describe('PartyChoosingRestaurantComponent', () => {
     component.restaurants = [mockRestaurant1];
     component.ngOnChanges({
       party: new SimpleChange(undefined, mockParty, true),
-      partyState: new SimpleChange(undefined,mockPartyState1,true),
-      user: new SimpleChange(undefined,mockUser,true),
-      restaurants: new SimpleChange(undefined,[mockRestaurant1],true),
+      partyState: new SimpleChange(undefined, mockPartyState1, true),
+      user: new SimpleChange(undefined, mockUser, true),
+      restaurants: new SimpleChange(undefined, [mockRestaurant1], true),
     });
   });
 
@@ -73,28 +73,39 @@ describe('PartyChoosingRestaurantComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('making myVoiting',() => {
+  it('making myVoting list and votedRestaurants list', () => {
     component.myVoting = [];
     component.votedRestaurants = [];
     component.partyState = mockPartyState2;
     component.ngOnChanges({
-      partyState: new SimpleChange(mockPartyState1,mockPartyState2,false)
+      partyState: new SimpleChange(mockPartyState1, mockPartyState2, false)
     });
 
+    expect(component.myVoting[0]).toEqual(1);
+    expect(component.votedRestaurants[0][0]).toEqual(1);
   });
 
-  it('partyLeaderChecker',() => {
+   it('isVoted should return true when I voted for the restaurant else return false', () => {
+    component.myVoting = [1, 2, 3];
+    expect(component.isVoted(1)).toBeTruthy();
+
+    component.myVoting = [2, 3];
+    expect(component.isVoted(1)).toBeFalsy();
+  });
+
+  it('partyLeaderChecker should return false when the user is not leader', () => {
     component.user = anotherMockUser;
     component.ngOnChanges({
-      user: new SimpleChange(mockUser,anotherMockUser,false),
+      user: new SimpleChange(mockUser, anotherMockUser, false),
     });
     expect(component.amIPartyLeader).toBe(false);
   });
-  it('getRestaurantNameById shoul return if restaurants is undefined', () => {
+
+  it('getRestaurantNameById should return empty string if restaurants is undefined', () => {
     component.restaurants = undefined;
     component.ngOnChanges({
-      restaurants: new SimpleChange([mockRestaurant1],undefined,false),
-    })
+      restaurants: new SimpleChange([mockRestaurant1], undefined, false),
+    });
     expect(component.getRestaurantNameById(1)).toEqual('');
   });
 
@@ -105,16 +116,6 @@ describe('PartyChoosingRestaurantComponent', () => {
   it('getRestaurantNameById should return empty string if not exist', () => {
     expect(component.getRestaurantNameById(2)).toEqual('');
   });
-
-  it('isVoted should return true when I voted for the restaurant', () => {
-    component.myVoting = [1,2,3];
-    expect(component.isVoted(1)).toBeTruthy();
-  })
-
-  it('isVoted should return false when I did not voted for the restaurant', () => {
-    component.myVoting = [2,3];
-    expect(component.isVoted(1)).toBeFalsy();
-  })
 
   it('toggleConfirmMode should toggle confirmMode', () => {
     component.confirmMode = true;
@@ -130,9 +131,9 @@ describe('PartyChoosingRestaurantComponent', () => {
     component.showAddObjectDialog = false;
     component.toggleAddObject();
     expect(component.showAddObjectDialog).toBeTruthy();
-  })
+  });
 
-  it('if confirmMode, clickRestaurant confirms restaurant', async((done)=> {
+  it('if confirmMode, clickRestaurant should emit toNextState with same parameter', async((done) => {
     component.toNextState.subscribe(restaurantId => {
       expect(restaurantId).toEqual(1);
     });
@@ -140,7 +141,7 @@ describe('PartyChoosingRestaurantComponent', () => {
     component.clickRestaurant(1);
     }));
 
-  it('if not confirmMode, clickRestaurant emit votingEvent', async((done)=>{
+  it('if not confirmMode, clickRestaurant should emit votingEvent with same parameter', async((done) => {
     component.votingEvent.subscribe(restaurantId => {
       expect(restaurantId).toEqual(1);
     });
