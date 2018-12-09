@@ -75,9 +75,11 @@ export class PartyLeaveEvent {
 }
 
 export class RestaurantVoteEvent {
-  // TODO: add user
   @deserialize
   readonly type = 'restaurant.vote';
+
+  @deserializeAs('user_id')
+  userId: number;
 
   @deserializeAs('restaurant_id')
   restaurantId: number;
@@ -86,6 +88,9 @@ export class RestaurantVoteEvent {
 export class RestaurantUnvoteEvent {
   @deserialize
   readonly type = 'restaurant.unvote';
+
+  @deserializeAs('user_id')
+  userId: number;
 
   @deserializeAs('restaurant_id')
   restaurantId: number;
