@@ -94,27 +94,27 @@ export class PartyComponent implements OnInit, OnDestroy {
     this.router.navigate(['/lobby']);
   }
 
-  voteRestaurant(restaurantId:number) {
+  voteRestaurant(restaurantId:number) :void{
     this.partyService.voteToggleRestaurant(restaurantId);
   }
 
-  toChoosingMenu(restaurantId:number){
+  toChoosingMenu(restaurantId:number) :void {
     this.partyService.toChoosingMenu(restaurantId);
   }
 
-  addMenu(req: MenuEntryCreateRequest) {
+  addMenu(req: MenuEntryCreateRequest) :void {
     this.partyService.createMenu(req);
   }
 
-  updateMenu(req: MenuEntryUpdateRequest) {
+  updateMenu(req: MenuEntryUpdateRequest) :void {
     this.partyService.updateMenu(req);
   }
 
-  toOrdered() {
+  toOrdered():void {
     this.partyService.toOrdered();
   }
 
-  toPayment(user: User) {
+  toPayment(user: User):void {
     this.partyService.toPayment(user.id);
   }
 }

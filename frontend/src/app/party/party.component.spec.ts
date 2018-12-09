@@ -11,6 +11,7 @@ import { RestaurantService } from '../services/restaurant.service';
 import { Party, PartyType, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 import { User } from '../types/user';
 import { Menu } from '../types/menu';
+import {Restaurant} from "../types/restaurant";
 
 const mockParty: Party = {
   id: 3,
@@ -39,7 +40,12 @@ class MockActivatedRoute {
 
 @Component({ selector: 'app-party-choosing-restaurant', template: '' })
 export class MockPartyChoosingRestaurantComponent {
-
+  @Input() party: Party;
+  @Input() partyState: PartyState;
+  @Input() user: User;
+  @Input() restaurants: Restaurant[];
+  @Output() votingEvent: EventEmitter<number>;
+  @Output() toNextState: EventEmitter<number>;
 }
 
 @Component({ selector: 'app-party-choosing-menu', template: '' })

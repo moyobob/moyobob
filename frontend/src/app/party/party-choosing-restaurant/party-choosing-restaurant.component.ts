@@ -35,6 +35,7 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     this.updateState();
+    this.partyLeaderChecker();
   }
 
   updateState(): void {
@@ -60,27 +61,33 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
     return this.myVoting.includes(restaurantId);
   }
 
-  partyLeaderChecker() {
+  partyLeaderChecker(): void {
+    if (this.user === undefined || this.party === undefined) {
+      return;
+    }
     if (this.user.id === this.party.leaderId) {
       this.amIPartyLeader = true;
+    } else {
+      this.amIPartyLeader = false;
     }
   }
 
   getRestaurantNameById(id: number): string {
-    if (this.restaurants) {
-      const restaurant = this.restaurants.filter(restaurant => restaurant.id === id);
-      if (restaurant.length) {
-        return restaurant[0].name;
-      }
+    if (this.restaurants === undefined) {
+      return '';
+    }
+    const restaurant = this.restaurants.filter(restaurant => restaurant.id === id);
+    if (restaurant.length) {
+      return restaurant[0].name;
     }
     return '';
   }
 
-  toggleConfirmMode() {
+  toggleConfirmMode() :void {
     this.confirmMode = !this.confirmMode;
   }
 
-  toggleAddObject() {
+  toggleAddObject() :void {
     this.showAddObjectDialog = !this.showAddObjectDialog;
   }
 

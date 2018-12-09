@@ -20,11 +20,11 @@ export class AddVoteObjectComponent implements OnInit {
   ngOnInit() {
   }
 
-  onClickRestaurant(restaurantId: number) {
+  onClickRestaurant(restaurantId: number) :void {
     this.clickRestaurant.emit(restaurantId);
   }
 
-  onCancelButtonClick() {
+  onCancelButtonClick() :void {
     this.cancel.emit();
   }
 }
