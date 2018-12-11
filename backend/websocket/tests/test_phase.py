@@ -8,7 +8,7 @@ from websocket.models import PartyPhase
 class PhaseTestCase1(TestCaseWithSingleWebsocket):
     @async_test
     async def test_phase_transition(self):
-        state = self.party.state
+        state = self.state
 
         await self.join()
 
@@ -66,7 +66,7 @@ class PhaseTestCase1(TestCaseWithSingleWebsocket):
 
     @async_test
     async def test_invalid_user(self):
-        state = self.party.state
+        state = self.state
         state.phase = PartyPhase.Ordered
         state.save()
 

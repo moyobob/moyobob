@@ -41,7 +41,8 @@ class PartyState(CacheModel):
         self.restaurant_id = None
         self.restaurant_votes = []
         self.member_ids = []
-        self.paid_user_id = []
+        self.member_ids_backup = []
+        self.paid_user_id = None
         self.menu_entries = MenuEntries()
 
     @classmethod
@@ -55,12 +56,6 @@ class PartyState(CacheModel):
 
         return self
 
-    def delete(self):
-        if self.phase == PartyPhase.PaymentAndCollection:
-            from api.util import make_record
-            make_record(self)
-        super().delete()
-
     def refresh_from_db(self):
         super().refresh_from_db()
         o = super().get(self.id)
@@ -68,6 +63,7 @@ class PartyState(CacheModel):
         self.restaurant_id = o.get('restaurant_id', None)
         self.restaurant_votes = o.get('restaurant_votes', [])
         self.member_ids = o.get('member_ids', [])
+        self.member_ids_backup = o.get('member_ids_backup', [])
         self.paid_user_id = o.get('paid_user_id', None)
         self.menu_entries = MenuEntries.from_dict(o['menu_entries'])
 
@@ -78,6 +74,7 @@ class PartyState(CacheModel):
             'restaurant_id': self.restaurant_id,
             'restaurant_votes': self.restaurant_votes,
             'member_ids': self.member_ids,
+            'member_ids_backup': self.member_ids_backup,
             'paid_user_id': self.paid_user_id,
             'menu_entries': self.menu_entries.as_dict() if isinstance(
                 self.menu_entries, MenuEntries) else self.menu_entries,
@@ -114,6 +111,12 @@ class MenuEntries:
 
     def get(self, menu_entry_id: int, default=None):
         return self.inner.get(menu_entry_id, default)
+
+    def remove_user(self, user_id: int):
+        for k in self.inner:
+            (m, q, ul) = self.inner[k]
+            ul = [u for u in ul if u != user_id]
+            self.inner[k] = (m, q, ul)
 
     def update(self, menu_entry_id: int, quantity: int, add_user_ids=[], remove_user_ids=[]):
         (m, q, ul) = self.inner[menu_entry_id]

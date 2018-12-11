@@ -32,7 +32,7 @@ class ConsumerTestCase(TestCaseWithSingleWebsocket):
 
         await self.join()
 
-        state = self.party.state
+        state = self.state
         state.phase = PartyPhase.ChoosingMenu
         state.save()
 
@@ -43,7 +43,7 @@ class ConsumerTestCase(TestCaseWithSingleWebsocket):
         resp = await communicator.receive_json_from(1)
         self.assertDictEqual(resp, event.error.command_not_allowed())
 
-        state = self.party.state
+        state = self.state
         state.phase = PartyPhase.ChoosingRestaurant
         state.save()
 
@@ -66,7 +66,7 @@ class ConsumerTestCase(TestCaseWithSingleWebsocket):
         resp = await communicator.receive_json_from(1)
         self.assertDictEqual(resp, event.error.command_not_allowed())
 
-        state = self.party.state
+        state = self.state
         state.phase = PartyPhase.ChoosingMenu
         state.save()
 
@@ -77,7 +77,7 @@ class ConsumerTestCase(TestCaseWithSingleWebsocket):
         resp = await communicator.receive_json_from(1)
         self.assertDictEqual(resp, event.error.command_not_allowed())
 
-        state = self.party.state
+        state = self.state
         state.phase = PartyPhase.ChoosingRestaurant
         state.save()
 

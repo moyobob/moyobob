@@ -11,7 +11,7 @@ from api.models import Party, Menu
 class MenuTestCase1(TestCaseWithSingleWebsocket):
     def setUp(self):
         super().setUp()
-        state = self.party.state
+        state = self.state
         state.phase = PartyPhase.ChoosingMenu
         state.save()
 
@@ -75,7 +75,7 @@ class MenuTestCase1(TestCaseWithSingleWebsocket):
 class MenuTestCase2(TestCaseWithDoubleWebsocket):
     def setUp(self):
         super().setUp()
-        state = self.party.state
+        state = self.state
         state.phase = PartyPhase.ChoosingMenu
         state.save()
 
@@ -88,10 +88,9 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
     async def test_menu_create(self):
         user1 = self.user1
         user2 = self.user2
-        party = self.party
+        state = self.state
         communicator1 = self.communicator1
         communicator2 = self.communicator2
-        state = party.state
 
         await self.join_both()
 
@@ -133,10 +132,9 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
     async def test_menu_update(self):
         user1 = self.user1
         user2 = self.user2
-        party = self.party
+        state = self.state
         communicator1 = self.communicator1
         communicator2 = self.communicator2
-        state = party.state
         state.menu_entries.inner = {1: (self.menu1.id, 1, [user1.id])}
         state.save()
 
@@ -193,10 +191,9 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
     async def test_menu_delete(self):
         user1 = self.user1
         user2 = self.user2
-        party = self.party
+        state = self.state
         communicator1 = self.communicator1
         communicator2 = self.communicator2
-        state = party.state
         state.menu_entries.inner = {
             1: (self.menu1.id, 1, [user1.id]), 2: (self.menu2.id, 2, [user2.id])}
         state.save()
@@ -230,9 +227,35 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
             'command': 'menu.delete',
             'menu_entry_id': 3,
         })
-        await communicator1.receive_nothing()
+        await communicator1.receive_nothing(1)
         resp = await communicator2.receive_json_from(1)
         self.assertDictEqual(resp, event.error.invalid_menu_entry())
+
+    @async_test
+    async def test_leaving_party(self):
+        user1 = self.user1
+        user2 = self.user2
+        state = self.state
+        communicator2 = self.communicator2
+        state.menu_entries.inner = {
+            1: (self.menu1.id, 1, [user1.id]), 2: (self.menu2.id, 2, [user2.id])}
+        state.save()
+
+        await self.join_both()
+
+        await communicator2.send_json_to({
+            'command': 'party.leave',
+        })
+        await communicator2.receive_nothing(1)
+
+        state.refresh_from_db()
+        self.assertDictEqual(
+            state.menu_entries.inner,
+            {
+                1: (self.menu1.id, 1, [user1.id]),
+                2: (self.menu2.id, 2, [])
+            },
+        )
 
 
 class MenuEntriesTestCase(TestCase):
