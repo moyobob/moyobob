@@ -11,6 +11,7 @@ class PartyTestCase1(TestCaseWithSingleWebsocket):
     async def test_party_join(self):
         user = self.user
         party = self.party
+        state = self.state
         communicator = self.communicator
         party_id = party.id
 
@@ -21,8 +22,9 @@ class PartyTestCase1(TestCaseWithSingleWebsocket):
         resp = await communicator.receive_json_from(1)
 
         party.refresh_from_db()
-        self.assertDictEqual(resp, event.state_update(party.state))
-        self.assertEqual(party.state.member_ids[0], user.id)
+        state.refresh_from_db()
+        self.assertDictEqual(resp, event.state_update(state))
+        self.assertEqual(state.member_ids[0], user.id)
         self.assertEqual(party.member_count, 1)
         self.assertEqual(cache.get('user-party:{}'.format(user.id)), party_id)
 
@@ -40,10 +42,11 @@ class PartyTestCase1(TestCaseWithSingleWebsocket):
     @async_test
     async def test_party_join_state_does_not_exist(self):
         party = self.party
+        state = self.state
         communicator = self.communicator
         party_id = party.id
 
-        party.state.delete()
+        state.delete()
 
         await communicator.send_json_to({
             'command': 'party.join',
@@ -98,12 +101,12 @@ class PartyTestCase1(TestCaseWithSingleWebsocket):
 
     @async_test
     async def test_party_leave_deleted_state(self):
-        party = self.party
+        state = self.state
         communicator = self.communicator
 
         await self.join()
 
-        party.state.delete()
+        state.delete()
 
         await communicator.send_json_to({
             'command': 'party.leave',
@@ -131,7 +134,7 @@ class PartyTestCase1(TestCaseWithSingleWebsocket):
 
         await communicator.connect()
         resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.state_update(self.party.state))
+        self.assertDictEqual(resp, event.state_update(self.party.get_state()))
 
 
 class PartyTestCase2(TestCaseWithDoubleWebsocket):
@@ -163,6 +166,7 @@ class PartyTestCase2(TestCaseWithDoubleWebsocket):
         user1 = self.user1
         user2 = self.user2
         party = self.party
+        state = self.state
         communicator1 = self.communicator1
         communicator2 = self.communicator2
 
@@ -176,8 +180,9 @@ class PartyTestCase2(TestCaseWithDoubleWebsocket):
         self.assertDictEqual(resp, event.party_leave(user2.id))
 
         party.refresh_from_db()
-        self.assertEqual(len(party.state.member_ids), 1)
-        self.assertEqual(party.state.member_ids[0], user1.id)
+        state.refresh_from_db()
+        self.assertEqual(len(state.member_ids), 1)
+        self.assertEqual(state.member_ids[0], user1.id)
         self.assertEqual(party.member_count, 1)
         self.assertIsNone(cache.get('user-party:{}'.format(user2.id)))
 
@@ -203,7 +208,7 @@ class PartyTestCase2(TestCaseWithDoubleWebsocket):
 
         await communicator.connect()
         resp = await communicator.receive_json_from(1)
-        self.assertDictEqual(resp, event.state_update(self.party.state))
+        self.assertDictEqual(resp, event.state_update(self.party.get_state()))
 
         await self.communicator2.send_json_to({
             'command': 'party.leave',
