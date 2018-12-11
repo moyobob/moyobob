@@ -2,6 +2,7 @@ from django.test import Client
 
 from . import TestCaseWithHttp
 from api.models import User, Party, PartyType, Restaurant, Menu, PartyRecord, Payment
+from api.util import make_record
 from websocket.models import PartyState, PartyPhase
 
 
@@ -36,6 +37,8 @@ class RecordTestCase(TestCaseWithHttp):
         self.menu3.save()
 
         self.state.member_ids = [self.user1.id, self.user2.id, self.user3.id]
+        self.state.member_ids_backup = [
+            self.user1.id, self.user2.id, self.user3.id]
         self.state.menu_entries.add(
             self.menu1.id, 3, [self.user1.id, self.user2.id, self.user3.id])
         self.state.menu_entries.add(
@@ -51,11 +54,7 @@ class RecordTestCase(TestCaseWithHttp):
 
     def test_create_record(self):
         state = self.state
-        state.delete()
-
-        self.assertTrue(PartyRecord.objects.all().exists())
-
-        record = PartyRecord.objects.all()[0]
+        record = make_record(state)
 
         self.assertEqual(record.name, self.party.name)
         self.assertEqual(record.type, self.party.type)
@@ -70,11 +69,11 @@ class RecordTestCase(TestCaseWithHttp):
         payments = record.payments.all()
 
         for payment in payments:
-            self.assertTrue(payment.user.id in [self.user1.id, self.user3.id])
-            self.assertEqual(payment.paid_user.id, self.user2.id)
-            if payment.menu.id == self.menu1.id:
+            self.assertTrue(payment.user_id in [self.user1.id, self.user3.id])
+            self.assertEqual(payment.paid_user_id, self.user2.id)
+            if payment.menu_id == self.menu1.id:
                 self.assertEqual(payment.price, self.menu1.price)
-            elif payment.menu.id == self.menu2.id:
+            elif payment.menu_id == self.menu2.id:
                 self.assertEqual(payment.price, self.menu2.price / 3)
             else:
                 self.assertEqual(payment.price, self.menu3.price * 2)
@@ -98,8 +97,7 @@ class RecordTestCase(TestCaseWithHttp):
         self.assertEqual(self.get('/api/collections/').status_code, 403)
 
     def test_get_records(self):
-        self.state.delete()
-        record = PartyRecord.objects.all()[0]
+        record = make_record(self.state)
 
         self.login()
 
@@ -109,8 +107,7 @@ class RecordTestCase(TestCaseWithHttp):
         self.assertEqual(resp_json[0]['id'], record.id)
 
     def test_get_payments(self):
-        self.state.delete()
-        record = PartyRecord.objects.all()[0]
+        record = make_record(self.state)
 
         self.login()
 
@@ -124,8 +121,7 @@ class RecordTestCase(TestCaseWithHttp):
         )
 
     def test_get_collections(self):
-        self.state.delete()
-        record = PartyRecord.objects.all()[0]
+        record = make_record(self.state)
 
         self.login()
 
@@ -139,8 +135,7 @@ class RecordTestCase(TestCaseWithHttp):
         )
 
     def test_resolve_payment(self):
-        self.state.delete()
-        record = PartyRecord.objects.all()[0]
+        record = make_record(self.state)
 
         super().login(email="pbzweihander@rustaceans.org", password="iluvrust2")
 
@@ -151,7 +146,7 @@ class RecordTestCase(TestCaseWithHttp):
             resp = self.get('/api/resolve_payment/{}/'.format(payment.id))
             self.assertEqual(resp.status_code, 200)
 
-        self.assertFalse(Payment.objects.filter(resolved=False).exists())
+        self.assertFalse(record.payments.filter(resolved=False).exists())
 
         resp = self.get('/api/collections/')
         self.assertListEqual(resp.json(), [])
@@ -164,3 +159,24 @@ class RecordTestCase(TestCaseWithHttp):
         resp = client.get(
             '/api/resolve_payment/{}/'.format(record.payments.all()[0].id))
         self.assertEqual(resp.status_code, 403)
+
+    def test_create_record_without_paid_user(self):
+        state = self.state
+        state.paid_user_id = None
+        record = make_record(state)
+
+        self.assertEqual(record.paid_user, None)
+
+        payments = record.payments.all()
+
+        for payment in payments:
+            self.assertEqual(payment.paid_user, None)
+
+    def test_create_record_with_api(self):
+        super().login(email="ferris@rustaceans.org", password="iluvrust")
+
+        records_length = PartyRecord.objects.all().count()
+
+        self.delete('/api/party/{}/'.format(self.party.id))
+
+        self.assertEqual(PartyRecord.objects.all().count() - records_length, 1)

@@ -141,6 +141,22 @@ class PartyTestCase(TestCaseWithHttp):
         state.delete()
         party.delete()
 
+    def test_delete_party_with_invalid_state(self):
+        party = Party(
+            name="new party name",
+            type=int(PartyType.Private),
+            location="new party location",
+            leader=self.user,
+        )
+        party.save()
+        id = party.id
+
+        self.login()
+
+        party.get_state().delete()
+        resp = self.delete('/api/party/{}/'.format(id))
+        self.assertEqual(resp.status_code, 200)
+
     def test_get_party_detail(self):
         self.login()
 

@@ -90,7 +90,8 @@ class PartyRecord(models.Model):
     members = models.ManyToManyField(User, related_name='party_records')
     restaurant = models.ForeignKey(
         Restaurant, null=True, on_delete=models.SET_NULL)
-    paid_user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    paid_user = models.ForeignKey(
+        User, blank=True, null=True, on_delete=models.SET_NULL)
 
     def as_dict(self):
         return {

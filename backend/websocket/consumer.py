@@ -5,6 +5,7 @@ import json
 
 from .models import PartyState, PartyPhase
 from api.models import Party, User, Restaurant, Menu
+from api.util import make_record
 from websocket import event, exception
 
 WEBSOCKET_REJECT_UNAUTHORIZED = 4000
@@ -175,6 +176,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         party_id = party.id
 
         state.member_ids.remove(user_id)
+        state.menu_entries.remove_user(user_id)
         party.member_count -= 1
         state.save()
         party.save()
@@ -200,6 +202,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                     event.leader_change(next_user_id),
                 )
         else:
+            make_record(state)
             party.delete()
 
     async def command_to_choosing_menu(self, data):
@@ -234,6 +237,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             raise exception.NotAuthorizedError
 
         state.phase = PartyPhase.Ordering
+        state.member_ids_backup = state.member_ids[:]
         state.save()
 
         await self.channel_layer.group_send(
