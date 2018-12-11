@@ -225,7 +225,6 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
     async def test_leaving_party(self):
         user1 = self.user1
         user2 = self.user2
-        party = self.party
         state = self.state
         communicator2 = self.communicator2
         state.menu_entries.inner = {
