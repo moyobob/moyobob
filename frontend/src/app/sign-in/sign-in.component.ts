@@ -45,18 +45,20 @@ export class SignInComponent implements OnInit {
       } else {
         this.logInStatus = InputStatus.TriedSignIn;
         this.userService.requestSignIn(this.emailInput, this.passwordInput)
-        .then(success => {
-          if (success) {
-            this.router.navigateByUrl('lobby');
-          } else {
-            this.logInStatus = InputStatus.EmailOrPasswordWrong;
-            this.emailInput = null;
-            this.passwordInput = null;
-            this.snackBar.open('Wrong Email or Password', '', {duration: 500});
-          }
-        });
+          .then(success => {
+            if (success) {
+              this.router.navigateByUrl('lobby');
+            } else {
+              this.logInStatus = InputStatus.EmailOrPasswordWrong;
+              this.snackBar.open('Wrong Email or Password', '', { duration: 500 });
+            }
+          });
       }
     }
+  }
+
+  navigateToSignUp(): void {
+    this.router.navigate(['/sign-up']);
   }
 
 }

@@ -10,6 +10,8 @@ import { UserService } from '../services/user.service';
 
 import { Party, PartyType, PartyCreateRequest, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 import { User } from '../types/user';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatDialog, MatIconModule, MatListModule } from '@angular/material';
 
 const mockUser: User = {
   id: 1,
@@ -81,6 +83,9 @@ describe('LobbyComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
+        BrowserAnimationsModule,
+        MatListModule,
+        MatIconModule,
       ],
       declarations: [
         LobbyComponent,
@@ -91,6 +96,7 @@ describe('LobbyComponent', () => {
         { provide: PartyService, useClass: MockPartyService },
         { provide: UserService, useValue: userSpy },
         { provide: Router, useValue: routerSpy },
+        { provide: MatDialog, useValue: {} },
       ],
     }).compileComponents();
 
