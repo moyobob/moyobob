@@ -12,6 +12,9 @@ import {
   MatSidenavModule,
   MatIconModule,
   MatListModule,
+  MatBadgeModule,
+  MatDialogModule,
+  MatRadioModule,
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -30,6 +33,7 @@ import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/sel
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { UserItemComponent } from './party/party-ordered/user-item/user-item.component';
 import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
+
 
 @NgModule({
   declarations: [
@@ -66,6 +70,12 @@ import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-
     MatSidenavModule,
     MatIconModule,
     MatListModule,
+    MatBadgeModule,
+    MatDialogModule,
+    MatRadioModule,
+  ],
+  entryComponents: [
+    PartyCreateComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,6 +1,7 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import {Component, OnInit, Output, EventEmitter, Inject} from '@angular/core';
 
-import { PartyType, PartyCreateRequest } from '../../types/party';
+import { PartyCreateRequest, PartyType} from '../../types/party';
+import { MatDialogRef } from '@angular/material';
 
 @Component({
   selector: 'app-party-create',
@@ -8,31 +9,27 @@ import { PartyType, PartyCreateRequest } from '../../types/party';
   styleUrls: ['./party-create.component.css']
 })
 export class PartyCreateComponent implements OnInit {
-  @Output() createParty: EventEmitter<PartyCreateRequest> = new EventEmitter();
-  @Output() cancel: EventEmitter<void> = new EventEmitter();
 
-  party: PartyCreateRequest = {
-    name: '',
-    type: PartyType.InGroup,
-    location: '',
-  };
-  submitting = false;
+  name: string;
+  type: PartyType;
+  location: string;
 
-  constructor() { }
+  constructor(public dialogRef: MatDialogRef<PartyCreateComponent>) { }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
 
   ngOnInit() {
   }
 
-  cancelButton() {
-    this.cancel.emit();
-  }
-
-  createButton() {
-    if (this.submitting) {
-      return;
+  tryCreateParty(): void {
+    if (this.name && this.type && this.location) {
+      const req = new PartyCreateRequest();
+      req.name = this.name;
+      req.type = this.type;
+      req.location = this.location;
+      this.dialogRef.close(req);
     }
-    this.submitting = true;
-
-    this.createParty.emit(this.party);
   }
 }
