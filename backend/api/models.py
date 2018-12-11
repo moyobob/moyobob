@@ -36,7 +36,7 @@ class Restaurant(models.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'menus': list(self.menus.values_list('id', flat=True).all()),
+            'menu_ids': list(self.menus.values_list('id', flat=True).all()),
             'phone_number': self.phone_number,
         }
 
