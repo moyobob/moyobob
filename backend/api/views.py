@@ -101,7 +101,7 @@ def party_detail(request: HttpRequest, party: Party):
         if party.leader != request.user:
             return HttpResponseForbidden()
 
-        state = party.state
+        state = party.get_state()
         if state is not None:
             make_record(state)
         party.delete()

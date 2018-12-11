@@ -78,10 +78,9 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
     async def test_menu_create(self):
         user1 = self.user1
         user2 = self.user2
-        party = self.party
+        state = self.state
         communicator1 = self.communicator1
         communicator2 = self.communicator2
-        state = party.state
 
         await self.join_both()
 
@@ -123,10 +122,9 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
     async def test_menu_update(self):
         user1 = self.user1
         user2 = self.user2
-        party = self.party
+        state = self.state
         communicator1 = self.communicator1
         communicator2 = self.communicator2
-        state = party.state
         state.menu_entries.inner = {1: (self.menu1.id, 1, [user1.id])}
         state.save()
 
@@ -183,10 +181,9 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
     async def test_menu_delete(self):
         user1 = self.user1
         user2 = self.user2
-        party = self.party
+        state = self.state
         communicator1 = self.communicator1
         communicator2 = self.communicator2
-        state = party.state
         state.menu_entries.inner = {
             1: (self.menu1.id, 1, [user1.id]), 2: (self.menu2.id, 2, [user2.id])}
         state.save()
@@ -229,8 +226,8 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
         user1 = self.user1
         user2 = self.user2
         party = self.party
+        state = self.state
         communicator2 = self.communicator2
-        state = party.state
         state.menu_entries.inner = {
             1: (self.menu1.id, 1, [user1.id]), 2: (self.menu2.id, 2, [user2.id])}
         state.save()

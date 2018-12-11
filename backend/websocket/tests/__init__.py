@@ -57,6 +57,8 @@ class TestCaseWithSingleWebsocket(TestCaseWithCache):
             leader=self.user,
         )
         self.party.save()
+        self.state = self.party.get_state()
+
         self.client.login(email=self.user.email, password='iluvrust')
 
         self.communicator = new_communicator(self.user)
@@ -105,7 +107,10 @@ class TestCaseWithDoubleWebsocket(TestCaseWithCache):
             leader=self.user1,
         )
         self.party.save()
+        self.state = self.party.get_state()
+
         self.client.login(email=self.user1.email, password='iluvrust')
+
         client2 = Client()
         client2.login(email=self.user2.email, password='iluvrusttoo')
 

@@ -24,6 +24,7 @@ class RecordTestCase(TestCaseWithHttp):
         self.party = Party(
             name="rust party", location="rustland", type=int(PartyType.InGroup), leader=self.user1)
         self.party.save()
+        self.state = self.party.get_state()
 
         self.restaurant = Restaurant(name="Rustaurant")
         self.restaurant.save()
@@ -35,24 +36,24 @@ class RecordTestCase(TestCaseWithHttp):
         self.menu3 = Menu(name="Macro", price=13130)
         self.menu3.save()
 
-        state = self.party.state
-        state.member_ids = [self.user1.id, self.user2.id, self.user3.id]
-        state.member_ids_backup = [self.user1.id, self.user2.id, self.user3.id]
-        state.menu_entries.add(
+        self.state.member_ids = [self.user1.id, self.user2.id, self.user3.id]
+        self.state.member_ids_backup = [
+            self.user1.id, self.user2.id, self.user3.id]
+        self.state.menu_entries.add(
             self.menu1.id, 3, [self.user1.id, self.user2.id, self.user3.id])
-        state.menu_entries.add(
+        self.state.menu_entries.add(
             self.menu2.id, 1, [self.user1.id, self.user2.id, self.user3.id])
-        state.menu_entries.add(
+        self.state.menu_entries.add(
             self.menu3.id, 6, [self.user1.id, self.user2.id, self.user3.id])
-        state.phase = PartyPhase.PaymentAndCollection
-        state.paid_user_id = self.user2.id
-        state.restaurant_id = self.restaurant.id
-        state.save()
+        self.state.phase = PartyPhase.PaymentAndCollection
+        self.state.paid_user_id = self.user2.id
+        self.state.restaurant_id = self.restaurant.id
+        self.state.save()
         self.party.restaurant_id = self.restaurant.id
         self.party.save()
 
     def test_create_record(self):
-        state = self.party.state
+        state = self.state
         record = make_record(state)
 
         self.assertEqual(record.name, self.party.name)
@@ -96,7 +97,7 @@ class RecordTestCase(TestCaseWithHttp):
         self.assertEqual(self.get('/api/collections/').status_code, 403)
 
     def test_get_records(self):
-        record = make_record(self.party.state)
+        record = make_record(self.state)
 
         self.login()
 
@@ -106,7 +107,7 @@ class RecordTestCase(TestCaseWithHttp):
         self.assertEqual(resp_json[0]['id'], record.id)
 
     def test_get_payments(self):
-        record = make_record(self.party.state)
+        record = make_record(self.state)
 
         self.login()
 
@@ -120,7 +121,7 @@ class RecordTestCase(TestCaseWithHttp):
         )
 
     def test_get_collections(self):
-        record = make_record(self.party.state)
+        record = make_record(self.state)
 
         self.login()
 
@@ -134,7 +135,7 @@ class RecordTestCase(TestCaseWithHttp):
         )
 
     def test_resolve_payment(self):
-        record = make_record(self.party.state)
+        record = make_record(self.state)
 
         super().login(email="pbzweihander@rustaceans.org", password="iluvrust2")
 
@@ -160,7 +161,7 @@ class RecordTestCase(TestCaseWithHttp):
         self.assertEqual(resp.status_code, 403)
 
     def test_create_record_without_paid_user(self):
-        state = self.party.state
+        state = self.state
         state.paid_user_id = None
         record = make_record(state)
 
