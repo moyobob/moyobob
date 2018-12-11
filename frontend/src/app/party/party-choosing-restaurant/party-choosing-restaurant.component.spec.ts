@@ -1,14 +1,14 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PartyChoosingRestaurantComponent } from './party-choosing-restaurant.component';
-import {FormsModule} from '@angular/forms';
-import {Component, EventEmitter, Input, Output, SimpleChange} from '@angular/core';
-import {Restaurant} from '../../types/restaurant';
-import {PartyState} from '../../types/party';
+import { FormsModule } from '@angular/forms';
+import { Component, EventEmitter, Input, Output, SimpleChange } from '@angular/core';
+import { Restaurant } from '../../types/restaurant';
+import { PartyState } from '../../types/party';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
-const anotherMockUser = {id: 2, email: '@.', username: 'a'};
-const mockRestaurant1 = {id: 1, name: 'MockRestaurant1', menus: [1]};
+const anotherMockUser = { id: 2, email: '@.', username: 'a' };
+const mockRestaurant1 = new Restaurant(1, 'MockRestaurant1', [1]);
 const mockParty = { id: 1, name: 'mockParty', type: 0, location: 'location1', leaderId: 1, since: '0000', memberCount: 2 };
 const mockPartyState1: PartyState = {
   id: 1,
@@ -49,7 +49,7 @@ describe('PartyChoosingRestaurantComponent', () => {
         MockAddVoteObjectComponent,
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -85,7 +85,7 @@ describe('PartyChoosingRestaurantComponent', () => {
     expect(component.votedRestaurants[0][0]).toEqual(1);
   });
 
-   it('isVoted should return true when I voted for the restaurant else return false', () => {
+  it('isVoted should return true when I voted for the restaurant else return false', () => {
     component.myVoting = [1, 2, 3];
     expect(component.isVoted(1)).toBeTruthy();
 
@@ -139,7 +139,7 @@ describe('PartyChoosingRestaurantComponent', () => {
     });
     component.confirmMode = true;
     component.clickRestaurant(1);
-    }));
+  }));
 
   it('if not confirmMode, clickRestaurant should emit votingEvent with same parameter', async((done) => {
     component.votingEvent.subscribe(restaurantId => {
@@ -147,5 +147,5 @@ describe('PartyChoosingRestaurantComponent', () => {
     });
     component.confirmMode = false;
     component.clickRestaurant(1);
-    }));
+  }));
 });
