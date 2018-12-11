@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.is-mobile .toolbar {
+  position: fixed;
+  z-index: 2;
+}
+
+.side-nav-button {
+  margin: 0 10px 0 0;
+}
+
+.navlist {
+  min-width: 200px;
+}
+
+.sidenav-container-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav-container {
+  flex: 1;
+}
+
+.is-mobile .sidenav-container {
+  flex: 1 0 auto;
+}
+
+.fill {
+  flex: 1 1 auto;
+}

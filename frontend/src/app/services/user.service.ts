@@ -36,6 +36,18 @@ export class UserService {
     return this.signedInUsername;
   }
 
+  async signOut(): Promise<void> {
+    if (!this.signedInUsername) {
+      return;
+    }
+    try {
+      await this.http.get(`${environment.apiUrl}signout/`).toPromise();
+      this.signedInUsername = null;
+    } catch (e) {
+      return;
+    }
+  }
+
   async verifyUser(): Promise<boolean> {
     if (this.signedInUsername !== null) {
       return this.signedInUsername !== undefined;
