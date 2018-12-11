@@ -247,6 +247,34 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
             },
         )
 
+    @async_test
+    async def test_menu_confirm(self):
+        await self.join_both()
+
+        await self.communicator1.send_json_to({
+            'command': 'menu.confirm.toggle',
+        })
+        resp = await self.communicator1.receive_json_from(1)
+        self.assertDictEqual(resp, event.menu_confirm(self.user1.id))
+        resp = await self.communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.menu_confirm(self.user1.id))
+
+        self.state.refresh_from_db()
+        self.assertListEqual(
+            self.state.menu_confirmed_user_ids, [self.user1.id])
+
+        await self.communicator1.send_json_to({
+            'command': 'menu.confirm.toggle',
+        })
+        resp = await self.communicator1.receive_json_from(1)
+        self.assertDictEqual(resp, event.menu_unconfirm(self.user1.id))
+        resp = await self.communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.menu_unconfirm(self.user1.id))
+
+        self.state.refresh_from_db()
+        self.assertListEqual(
+            self.state.menu_confirmed_user_ids, [])
+
 
 class MenuEntriesTestCase(TestCase):
     def setUp(self):

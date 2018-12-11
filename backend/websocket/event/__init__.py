@@ -58,6 +58,20 @@ def menu_delete(menu_entry_id: int):
     }
 
 
+def menu_confirm(user_id: int):
+    return {
+        'type': 'menu.confirm',
+        'user_id': user_id,
+    }
+
+
+def menu_unconfirm(user_id: int):
+    return {
+        'type': 'menu.unconfirm',
+        'user_id': user_id,
+    }
+
+
 def state_update(state):
     return {
         'type': 'state.update',

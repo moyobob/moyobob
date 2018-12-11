@@ -44,6 +44,7 @@ class PartyState(CacheModel):
         self.member_ids_backup = []
         self.paid_user_id = None
         self.menu_entries = MenuEntries()
+        self.menu_confirmed_user_ids = []
 
     @classmethod
     def get(cls, id: int):
@@ -66,6 +67,7 @@ class PartyState(CacheModel):
         self.member_ids_backup = o.get('member_ids_backup', [])
         self.paid_user_id = o.get('paid_user_id', None)
         self.menu_entries = MenuEntries.from_dict(o['menu_entries'])
+        self.menu_confirmed_user_ids = o.get('menu_confirmed_user_ids', [])
 
     def as_dict(self):
         return {
@@ -78,6 +80,7 @@ class PartyState(CacheModel):
             'paid_user_id': self.paid_user_id,
             'menu_entries': self.menu_entries.as_dict() if isinstance(
                 self.menu_entries, MenuEntries) else self.menu_entries,
+            'menu_confirmed_user_ids': self.menu_confirmed_user_ids,
         }
 
 

@@ -74,6 +74,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             'menu.create': self.command_menu_create,
             'menu.update': self.command_menu_update,
             'menu.delete': self.command_menu_delete,
+            'menu.confirm.toggle': self.command_menu_confirm_toggle,
         }
 
     async def connect(self):
@@ -370,6 +371,27 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             event.menu_delete(menu_entry_id)
         )
 
+    async def command_menu_confirm_toggle(self, data):
+        user_id = self.scope['user'].id
+        state = get_party_state_of_user(user_id)
+
+        if user_id in state.menu_confirmed_user_ids:
+            state.menu_confirmed_user_ids.remove(user_id)
+            state.save()
+
+            await self.channel_layer.group_send(
+                'party-{}'.format(state.id),
+                event.menu_unconfirm(user_id),
+            )
+        else:
+            state.menu_confirmed_user_ids.append(user_id)
+            state.save()
+
+            await self.channel_layer.group_send(
+                'party-{}'.format(state.id),
+                event.menu_confirm(user_id),
+            )
+
     async def party_join(self, data):
         user_id = data['user_id']
 
@@ -426,6 +448,20 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         await self.send_json(
             event.menu_delete(menu_entry_id)
+        )
+
+    async def menu_confirm(self, data):
+        user_id = data['user_id']
+
+        await self.send_json(
+            event.menu_confirm(user_id)
+        )
+
+    async def menu_unconfirm(self, data):
+        user_id = data['user_id']
+
+        await self.send_json(
+            event.menu_unconfirm(user_id)
         )
 
     async def state_update(self, data):
