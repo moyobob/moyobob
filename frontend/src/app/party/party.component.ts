@@ -6,9 +6,15 @@ import { UserService } from '../services/user.service';
 import { PartyService } from '../services/party.service';
 import { RestaurantService } from '../services/restaurant.service';
 
-import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
+import {
+  Party,
+  PartyState,
+  MenuEntryCreateRequest,
+  MenuEntryUpdateRequest,
+} from '../types/party';
 import { Menu } from '../types/menu';
 import { User } from '../types/user';
+import { Restaurant } from '../types/restaurant';
 
 @Component({
   selector: 'app-party',
@@ -22,6 +28,7 @@ export class PartyComponent implements OnInit, OnDestroy {
   users: User[];
   partyId: number;
   menus: Menu[];
+  restaurants: Restaurant[];
 
   subscriptions: Subscription[] = [];
 
@@ -87,19 +94,27 @@ export class PartyComponent implements OnInit, OnDestroy {
     this.router.navigate(['/lobby']);
   }
 
-  addMenu(req: MenuEntryCreateRequest) {
+  voteRestaurant(restaurantId: number): void {
+    this.partyService.voteToggleRestaurant(restaurantId);
+  }
+
+  toChoosingMenu(restaurantId: number): void {
+    this.partyService.toChoosingMenu(restaurantId);
+  }
+
+  addMenu(req: MenuEntryCreateRequest): void {
     this.partyService.createMenu(req);
   }
 
-  updateMenu(req: MenuEntryUpdateRequest) {
+  updateMenu(req: MenuEntryUpdateRequest): void {
     this.partyService.updateMenu(req);
   }
 
-  toOrdered() {
+  toOrdered(): void {
     this.partyService.toOrdered();
   }
 
-  toPayment(user: User) {
+  toPayment(user: User): void {
     this.partyService.toPayment(user.id);
   }
 }
