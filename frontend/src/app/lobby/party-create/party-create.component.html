@@ -1,18 +1,20 @@
-<div>
-  <div>
-    <input type="text" [(ngModel)]="party.name" placeholder="Name" autofocus>
-  </div>
-  <div>
-    <select [(ngModel)]="party.type">
-      <option value="0">In Group</option>
-      <option value="1">Private</option>
-    </select>
-  </div>
-  <div>
-    <input type="text" [(ngModel)]="party.location" placeholder="Location" autofocus>
-  </div>
-  <div>
-    <button (click)="cancelButton();">Cancel</button>
-    <button (click)="createButton();">Create</button>
-  </div>
+<h3 mat-dialog-title>Create New Party</h3>
+  <section class="input">
+    <mat-form-field>
+      <input matInput type="text" [(ngModel)]="name" placeholder="Name">
+    </mat-form-field>
+    <div class="radio-group">
+      <label class="radio">Type:</label>
+        <mat-radio-group [(ngModel)]="type">
+          <mat-radio-button class="radio" value="0">In Group</mat-radio-button>
+          <mat-radio-button class="radio" value="1">Private</mat-radio-button>
+      </mat-radio-group>
+    </div>
+    <mat-form-field>
+      <input matInput type="text" [(ngModel)]="location" placeholder="Location">
+    </mat-form-field>
+  </section>
+<div class="buttons" mat-dialog-actions>
+  <button mat-raised-button color="primary" (click)="tryCreateParty()">Create</button>
+  <button mat-raised-button color="primary" (click)="onNoClick()">Cancel</button>
 </div>

@@ -1,0 +1,19 @@
+mat-list-item {
+  height: 100% !important;
+}
+
+app-lobby-list-item {
+  content: 'block';
+  width: 100%;
+}
+
+.fixed {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+button {
+  align-items: center;
+  align-content: center;
+}
