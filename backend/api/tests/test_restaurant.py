@@ -34,3 +34,12 @@ class RestaurantTestCase(TestCaseWithHttp):
 
         resp_json = resp.json()
         self.assertDictEqual(resp_json, self.restaurant.as_dict())
+
+    def test_get_restaurant(self):
+        self.login()
+
+        resp = self.get('/api/restaurant/')
+        self.assertEqual(resp.status_code, 200)
+
+        resp_json = resp.json()
+        self.assertListEqual(resp_json, [self.restaurant.as_dict()])

@@ -111,6 +111,16 @@ def party_detail(request: HttpRequest, party: Party):
 
 @allow_method(['GET'])
 @allow_authenticated
+def restaurant(request: HttpRequest):
+    restaurant_list = [
+        restaurant.as_dict()
+        for restaurant in Restaurant.objects.all()
+    ]
+    return JsonResponse(restaurant_list, safe=False)
+
+
+@allow_method(['GET'])
+@allow_authenticated
 @get_restaurant
 def restaurant_detail(request: HttpRequest, restaurant: Restaurant):
     return JsonResponse(restaurant.as_dict())
