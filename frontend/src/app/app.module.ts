@@ -21,7 +21,15 @@ import { UserItemComponent } from './party/party-ordered/user-item/user-item.com
 import { VoteRestaurantComponent } from './party/party-choosing-restaurant/vote-restaurant/vote-restaurant.component';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/material';
+import {
+  MatBadgeModule,
+  MatButtonModule,
+  MatDialogModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule, MatRadioModule,
+  MatSnackBarModule
+} from '@angular/material';
 
 @NgModule({
   declarations: [
@@ -54,6 +62,14 @@ import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/mat
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatListModule,
+    MatIconModule,
+    MatBadgeModule,
+    MatDialogModule,
+    MatRadioModule,
+  ],
+  entryComponents: [
+    PartyCreateComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

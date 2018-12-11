@@ -1,5 +1,6 @@
 .main {
-  width: 40%;
+  width: 70%;
+  max-width: 400px;
   margin: 20% auto;
   display: flex;
   flex-direction: column;
@@ -10,8 +11,9 @@
   font-size: xx-large;
 }
 
-.full-width {
+mat-form-field {
   width: 100%;
+  margin-top: 20px;
 }
 
 .sign-up {
