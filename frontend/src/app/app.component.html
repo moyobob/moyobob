@@ -7,7 +7,7 @@
     </span>
     <span>{{ title }}</span>
     <span class="fill"></span>
-    <span>
+    <span *ngIf="userService.signedInUsername">
       <button class="mat-button" (click)="signOut()">Sign out</button>
     </span>
   </mat-toolbar>

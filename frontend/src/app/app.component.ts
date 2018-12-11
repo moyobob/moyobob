@@ -18,7 +18,7 @@ export class AppComponent implements OnDestroy {
 
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    private userService: UserService,
+    public userService: UserService,
     private router: Router,
     media: MediaMatcher) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -39,9 +39,7 @@ export class AppComponent implements OnDestroy {
   }
 
   signOut(): void {
-    console.log('foo');
     this.userService.signOut().then(_ => {
-      console.log('bar');
       this.router.navigate(['/sign-in']);
     });
   }
