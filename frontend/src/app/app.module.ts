@@ -34,6 +34,7 @@ import { SignUpComponent } from './sign-up/sign-up.component';
 import { UserItemComponent } from './party/party-ordered/user-item/user-item.component';
 import { AddVoteObjectComponent } from './party/party-choosing-restaurant/add-vote-object/add-vote-object.component';
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -65,6 +66,16 @@ import { AddVoteObjectComponent } from './party/party-choosing-restaurant/add-vo
     MatInputModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatToolbarModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    MatBadgeModule,
+    MatDialogModule,
+    MatRadioModule,
+  ],
+  entryComponents: [
+    PartyCreateComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]
