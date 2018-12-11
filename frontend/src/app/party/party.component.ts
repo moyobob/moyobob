@@ -14,7 +14,7 @@ import {
 } from '../types/party';
 import { Menu } from '../types/menu';
 import { User } from '../types/user';
-import {Restaurant} from '../types/restaurant';
+import { Restaurant } from '../types/restaurant';
 
 @Component({
   selector: 'app-party',

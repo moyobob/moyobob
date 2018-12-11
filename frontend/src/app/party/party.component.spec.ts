@@ -11,7 +11,7 @@ import { RestaurantService } from '../services/restaurant.service';
 import { Party, PartyType, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
 import { User } from '../types/user';
 import { Menu } from '../types/menu';
-import {Restaurant} from '../types/restaurant';
+import { Restaurant } from '../types/restaurant';
 
 const mockParty: Party = {
   id: 3,
