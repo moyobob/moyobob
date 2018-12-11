@@ -19,7 +19,7 @@ import {
 import {
   PartyJoinCommand, PartyLeaveCommand,
   MenuCreateCommand, MenuUpdateCommand,
-  ToOrderedCommand, ToPaymentCommand, ToChoosingMenuCommand, RestaurantVoteToggleCommand,
+  ToOrderedCommand, ToPaymentCommand, ToChoosingMenuCommand, RestaurantVoteToggleCommand, ToOrderingCommand,
 } from '../types/command';
 
 const httpOptions = {
@@ -189,6 +189,11 @@ export class PartyService {
 
   toChoosingMenu(restaurantId: number) {
     const command = new ToChoosingMenuCommand(restaurantId);
+    this.websocketService.send(command);
+  }
+
+  toOrdering() {
+    const command = new ToOrderingCommand();
     this.websocketService.send(command);
   }
 

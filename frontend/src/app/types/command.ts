@@ -28,7 +28,7 @@ export class PartyLeaveCommand implements Command {
   }
 }
 
-export class ToChoosingMenuCommand implements  Command {
+export class ToChoosingMenuCommand implements Command {
   @serialize
   readonly command = 'to.choosing.menu';
 
@@ -42,7 +42,7 @@ export class ToChoosingMenuCommand implements  Command {
 
 export class ToOrderingCommand implements Command {
   @serialize
-  readonly command = 'to.choosing.menu';
+  readonly command = 'to.ordering';
 
   constructor() { }
 }
@@ -149,7 +149,7 @@ export function serializeCommand(command: Command): any {
       return Serialize(command, PartyLeaveCommand);
       break;
     }
-     case 'to.choosing.menu': {
+    case 'to.choosing.menu': {
       return Serialize(command, ToChoosingMenuCommand);
       break;
     }
