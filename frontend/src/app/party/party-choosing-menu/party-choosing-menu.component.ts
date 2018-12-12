@@ -16,6 +16,7 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   @Output() addMenu: EventEmitter<MenuEntryCreateRequest>;
   @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest>;
+  @Output() toNextState: EventEmitter<void>;
 
   menuEntries: MenuEntry[] = [];
   showAddMenuDialog = false;
@@ -94,5 +95,9 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
     }
 
     this.updateMenu.emit(req);
+  }
+
+  onNextStateButtonClick(): void {
+    this.toNextState.emit();
   }
 }

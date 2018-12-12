@@ -22,7 +22,7 @@ describe('PartyOrderingComponent', () => {
       1, 'Name 1', 0, 'Location 1', 1, 'Since 1', 1
     );
     component.partyState = {
-      id: 1, phase: 2, restaurantId: 1, memberIds: [], menuEntries: []
+      id: 1, phase: 2, restaurantVotes: [], restaurantId: 1, memberIds: [], menuEntries: []
     };
     fixture.detectChanges();
   });

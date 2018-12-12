@@ -1,0 +1,12 @@
+<div>
+  <ul>
+    <li *ngFor="let restaurant of restaurants">
+      <button type="button" name="restaurant" (click)="onClickRestaurant(restaurant.id);">
+        {{restaurant.name}}
+      </button>
+    </li>
+  </ul>
+  <div>
+    <button (click)="onCancelButtonClick();">Cancel</button>
+  </div>
+</div>

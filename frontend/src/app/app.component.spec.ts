@@ -1,8 +1,10 @@
 import { TestBed, async, ComponentFixture } from '@angular/core/testing';
-import { Component } from '@angular/core';
-import { AppComponent } from './app.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatToolbarModule, MatSidenavModule, MatIconModule, MatListModule } from '@angular/material';
+
+import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -13,8 +15,13 @@ describe('AppComponent', () => {
       imports: [
         HttpClientTestingModule,
         RouterTestingModule,
+        BrowserAnimationsModule,
+        MatToolbarModule,
+        MatSidenavModule,
+        MatIconModule,
+        MatListModule,
       ],
-      declarations: [ AppComponent ]
+      declarations: [AppComponent]
     }).compileComponents();
   }));
 

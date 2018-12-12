@@ -32,6 +32,7 @@
     </li>
   </ul>
 </div>
+<button (click)="onNextStateButtonClick();">Let's Order!</button>
 <button (click)="toggleAddMenu();">Add Menu</button>
 <app-select-menu *ngIf="showAddMenuDialog" [menus]="menus" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
   (cancel)="cancelAddMenu($event);">

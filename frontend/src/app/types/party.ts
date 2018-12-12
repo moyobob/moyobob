@@ -92,8 +92,15 @@ export class PartyState {
   @deserializeAs('restaurant_id')
   restaurantId?: number;
 
+  // User's id, Restaurant's id
+  @deserializeAs('restaurant_votes')
+  restaurantVotes: [number, number][];
+
   @deserializeAs('member_ids')
   memberIds: number[];
+
+  @deserializeAs('paid_user_id')
+  paidUserId?: number;
 
   menuEntries: MenuEntry[];
 

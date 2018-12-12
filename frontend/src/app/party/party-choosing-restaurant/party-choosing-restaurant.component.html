@@ -1,3 +1,27 @@
-<p>
-  party-choosing-restaurant works!
-</p>
+<div>
+  <ul>
+    <li *ngFor="let vote of votedRestaurants">
+      RestaurantName: {{vote[1]}}, Vote: {{vote[2]}}
+      <span *ngIf="confirmMode">
+        <button (click)="clickRestaurant(vote[0]);">
+          confirm
+        </button>
+      </span>
+      <span *ngIf="isVoted(vote[0]) && !confirmMode">
+        <button (click)="clickRestaurant(vote[0]);">
+          UNVOTE
+        </button>
+        </span>
+      <span *ngIf="!isVoted(vote[0]) && !confirmMode">
+        <button (click)="clickRestaurant(vote[0]);">
+          VOTE
+        </button>
+      </span>
+    </li>
+  </ul>
+</div>
+<button *ngIf="amIPartyLeader" (click)="toggleConfirmMode();">toConfirmMode</button>
+<button (click)="toggleAddObject();">Add Survey Component</button>
+<app-add-vote-object *ngIf="showAddObjectDialog" [restaurants]="restaurants" [loggedInUserId]="user.id"
+                     (clickRestaurant)="clickRestaurant($event)" (cancel)="toggleAddObject();">
+</app-add-vote-object>

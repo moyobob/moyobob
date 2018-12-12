@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Deserialize } from 'cerialize';
 
 import { environment } from '../../environments/environment';
 
@@ -15,10 +16,15 @@ export class RestaurantService {
     private http: HttpClient,
   ) { }
 
+  async getRestaurants(): Promise<Restaurant[]> {
+    return await this.http.get<any[]>(`${environment.apiUrl}restaurant/`).toPromise()
+      .then(jsons => jsons.map(json => Deserialize(json, Restaurant)));
+  }
+
   async getRestaurant(restaurant_id: number): Promise<Restaurant> {
-    return await this.http.get<Restaurant>(
+    return await this.http.get<any>(
       `${environment.apiUrl}restaurant/${restaurant_id}/`,
-    ).toPromise();
+    ).toPromise().then(json => Deserialize(json, Restaurant));
   }
 
   async getMenus(restaurant_id: number): Promise<Menu[]> {

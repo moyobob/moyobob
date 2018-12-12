@@ -6,14 +6,20 @@ import { environment } from '../../environments/environment';
 
 import { WebsocketService } from './websocket.service';
 
-import { Party, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest, PartyCreateRequest } from '../types/party';
+import {
+  Party,
+  PartyState,
+  MenuEntryCreateRequest,
+  MenuEntryUpdateRequest,
+  PartyCreateRequest,
+} from '../types/party';
 import {
   Event, PartyJoinEvent, PartyLeaveEvent, InitiallyNotJoinedEvent, StateUpdateEvent, MenuCreateEvent, MenuUpdateEvent
 } from '../types/event';
 import {
   PartyJoinCommand, PartyLeaveCommand,
   MenuCreateCommand, MenuUpdateCommand,
-  ToOrderedCommand, ToPaymentCommand,
+  ToOrderedCommand, ToPaymentCommand, ToChoosingMenuCommand, RestaurantVoteToggleCommand, ToOrderingCommand,
 } from '../types/command';
 
 const httpOptions = {
@@ -35,6 +41,8 @@ export class PartyService {
   ) {
     this.websocketService.onEvent.subscribe(event => {
       this.onWebsocketEvent(event);
+
+
     });
   }
 
@@ -171,6 +179,21 @@ export class PartyService {
       request.addUserIds,
       request.removeUserIds,
     );
+    this.websocketService.send(command);
+  }
+
+  voteToggleRestaurant(restaurantId: number) {
+    const command = new RestaurantVoteToggleCommand(restaurantId);
+    this.websocketService.send(command);
+  }
+
+  toChoosingMenu(restaurantId: number) {
+    const command = new ToChoosingMenuCommand(restaurantId);
+    this.websocketService.send(command);
+  }
+
+  toOrdering() {
+    const command = new ToOrderingCommand();
     this.websocketService.send(command);
   }
 
