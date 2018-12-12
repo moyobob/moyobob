@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddVoteObjectComponent } from './add-vote-object.component';
 
-const mockRestaurant1 = {id: 1, name: 'MockRestaurant1', menus: [1]};
+const mockRestaurant1 = { id: 1, name: 'MockRestaurant1', menuIds: [1] };
 
 describe('AddVoteObjectComponent', () => {
   let component: AddVoteObjectComponent;
@@ -9,9 +9,9 @@ describe('AddVoteObjectComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AddVoteObjectComponent ]
+      declarations: [AddVoteObjectComponent]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -32,7 +32,7 @@ describe('AddVoteObjectComponent', () => {
       expect(restaurantId).toEqual(1);
     });
     component.onClickRestaurant(1);
-    });
+  });
 
   it('onCancelButtonClick emits event with no parameter', () => {
     component.cancel.subscribe(_ => {

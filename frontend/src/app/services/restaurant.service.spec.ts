@@ -1,5 +1,6 @@
 import { TestBed, async } from '@angular/core/testing';
 import { HttpTestingController, HttpClientTestingModule } from '@angular/common/http/testing';
+import { Serialize } from 'cerialize';
 
 import { environment } from '../../environments/environment';
 
@@ -21,11 +22,7 @@ const mockMenus: Menu[] = [
   },
 ];
 
-const mockRestaurant: Restaurant = {
-  id: 1,
-  name: 'Rustaurant',
-  menus: mockMenus.map(m => m.id),
-};
+const mockRestaurant = new Restaurant(1, 'Rustaurant', mockMenus.map(m => m.id));
 
 describe('RestaurantService', () => {
   let httpTestingController: HttpTestingController;
@@ -51,7 +48,7 @@ describe('RestaurantService', () => {
 
     const req = httpTestingController.expectOne(`${environment.apiUrl}restaurant/${mockRestaurant.id}/`);
     expect(req.request.method).toEqual('GET');
-    req.flush(mockRestaurant);
+    req.flush(Serialize(mockRestaurant, Restaurant));
   }));
 
   it('should get menus of restaurant', async(() => {

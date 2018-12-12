@@ -104,7 +104,7 @@ describe('PartyComponent', () => {
 
   beforeEach(async(() => {
     const userServiceSpy = jasmine.createSpyObj('UserService', ['signedInUserId']);
-    const restaurantServiceSpy = jasmine.createSpyObj('RestaurantService', ['getMenus']);
+    const restaurantServiceSpy = jasmine.createSpyObj('RestaurantService', ['getRestaurants', 'getMenus']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -134,7 +134,8 @@ describe('PartyComponent', () => {
     userService.signedInUserId.and.returnValue(1);
 
     restaurantService = TestBed.get(RestaurantService);
-    restaurantService.getMenus.and.returnValue([]);
+    restaurantService.getMenus.and.returnValue(new Promise(r => r([])));
+    restaurantService.getRestaurants.and.returnValue(new Promise(r => r([])));
 
     router = TestBed.get(Router);
   }));

@@ -53,6 +53,9 @@ export class PartyComponent implements OnInit, OnDestroy {
     this.updateState(this.partyService.partyState);
     this.partyService.connectWebsocket();
     this.user = { id: this.userService.signedInUserId, email: '', username: '' };
+    this.restaurantService.getRestaurants().then(restaurants => {
+      this.restaurants = restaurants;
+    });
   }
 
   ngOnDestroy() {
