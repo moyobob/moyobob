@@ -1,3 +1,5 @@
+all: test report
+
 test:
 	. ./test.sh
 
