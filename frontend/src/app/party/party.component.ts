@@ -101,16 +101,20 @@ export class PartyComponent implements OnInit, OnDestroy {
     this.partyService.voteToggleRestaurant(restaurantId);
   }
 
-  toChoosingMenu(restaurantId: number): void {
-    this.partyService.toChoosingMenu(restaurantId);
-  }
-
   addMenu(req: MenuEntryCreateRequest): void {
     this.partyService.createMenu(req);
   }
 
   updateMenu(req: MenuEntryUpdateRequest): void {
     this.partyService.updateMenu(req);
+  }
+
+  toChoosingMenu(restaurantId: number): void {
+    this.partyService.toChoosingMenu(restaurantId);
+  }
+
+  toOrdering(): void {
+    this.partyService.toOrdering();
   }
 
   toOrdered(): void {
