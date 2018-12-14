@@ -124,4 +124,10 @@ export class PartyComponent implements OnInit, OnDestroy {
   toPayment(user: User): void {
     this.partyService.toPayment(user.id);
   }
+
+  toFinish(): void {
+    this.partyService.deleteParty(this.party.id).then(_ => {
+      this.router.navigate(['/lobby']);
+    });
+  }
 }
