@@ -15,7 +15,7 @@ import { PartyCreateComponent } from './party-create/party-create.component';
 })
 export class LobbyComponent implements OnInit, OnDestroy {
   parties: Party[];
-  joinedPartyId = undefined;
+  joinedPartyId: number;
   subscriptions: Subscription[] = [];
 
   constructor(

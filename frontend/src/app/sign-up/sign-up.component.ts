@@ -20,16 +20,16 @@ export class SignUpComponent implements OnInit {
   emailInput: string;
   passwordInput: string;
   userNameInput: string;
-  signUpStatus: InputStatus;
+  signUpStatus: InputStatus = InputStatus.HaveNotTriedSignUp;
+  inputStatus = InputStatus;
 
   constructor(
     private userService: UserService,
     private router: Router
   ) { }
 
-  ngOnInit() {
-    this.signUpStatus = InputStatus.HaveNotTriedSignUp;
-  }
+  ngOnInit() { }
+
   // TODO: 이메일 중복 체크, 비밀번호 '확인'
   trySignUp(event) {
     if (
