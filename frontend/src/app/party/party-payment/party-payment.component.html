@@ -1,8 +1,11 @@
 <div>
   <div>
+    You have to pay {{totalCost}} to {{partyState.paidUserId}}
+  </div>
+  <div>
     <ul>
-      <li *ngFor="let menuEntry of partyState.menuEntries">
-        <b>{{findMenuNameById(menuEntry.menuId)}}</b> quantity: {{menuEntry.quantity}}
+      <li *ngFor="let myMenu of myMenus">
+        <b>{{getMenuNameById(myMenu[0])}}</b> price: {{myMenu[1]}} quantity: {{myMenu[2]}}
       </li>
     </ul>
   </div>

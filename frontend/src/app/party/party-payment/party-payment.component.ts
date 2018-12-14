@@ -13,11 +13,55 @@ export class PartyPaymentComponent implements OnInit {
   @Input() party: Party;
   @Input() partyState: PartyState;
   @Input() user: User;
+  @Input() menus: Menu[];
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
 
-  constructor() { }
+  myMenus: [number, number, number][]; // menuId, menuPrice, menuQuantity
+  totalCost: number = 0;
 
-  ngOnInit() {
+  constructor() {
+    this.toNextState = new EventEmitter();
   }
 
+  ngOnInit() {
+    if (this.partyState === undefined) {
+      return;
+    }
+
+    for (const entry of this.partyState.menuEntries) {
+      if (entry.userIds.includes(this.user.id)) {
+        const menuPrice = this.getMenuPriceById(entry.menuId);
+        this.myMenus.push([entry.menuId, menuPrice, entry.quantity / entry.userIds.length]);
+        this.totalCost += menuPrice * entry.quantity / entry.userIds.length;
+      }
+    }
+  }
+
+  getMenuPriceById(id: number): number {
+    if(this.menus === undefined) {
+      return 0;
+    }
+
+    const menu = this.menus.filter(menuor => menuor.id === id);
+    if (menu.length) {
+      return menu[0].price;
+    }
+    return 0;
+  }
+
+  getMenuNameById(id: number): string {
+    if (this.menus === undefined) {
+      return '';
+    }
+
+    const menu = this.menus.filter(menuor => menuor.id === id);
+    if (menu.length) {
+      return menu[0].name;
+    }
+    return '';
+  }
+
+  toFinish(): void {
+    this.toNextState.emit();
+  }
 }
