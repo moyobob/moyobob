@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {Menu} from "../../types/menu";
-import {User} from "../../types/user";
-import {Party, PartyState} from "../../types/party";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Menu } from '../../types/menu';
+import { User } from '../../types/user';
+import { Party, PartyState } from '../../types/party';
 
 @Component({
   selector: 'app-party-payment',
@@ -17,7 +17,7 @@ export class PartyPaymentComponent implements OnInit {
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
 
   myMenus: [number, number, number][]; // menuId, menuPrice, menuQuantity
-  totalCost: number = 0;
+  totalCost: number;
 
   constructor() {
     this.toNextState = new EventEmitter();
@@ -38,7 +38,7 @@ export class PartyPaymentComponent implements OnInit {
   }
 
   getMenuPriceById(id: number): number {
-    if(this.menus === undefined) {
+    if (this.menus === undefined) {
       return 0;
     }
 
