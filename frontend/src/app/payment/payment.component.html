@@ -13,7 +13,7 @@
     <ul>
       <li *ngFor="let bePaidItem of bePaidList">
         totalCost:{{bePaidItem[1]}} user:{{getUserNameById(bePaidItem[0])}}
-        <button (click)="resolve(bePaidItem[1])">RESOLVE</button>
+        <button (click)="resolve(bePaidItem[0])">RESOLVE</button>
       </li>
     </ul>
   </div>
