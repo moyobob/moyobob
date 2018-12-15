@@ -24,6 +24,7 @@ export class PaymentService {
     return await this.http.get<any[]>(`${environment.apiUrl}party_records/`, httpOptions).toPromise()
       .then(json => Deserialize(json, Payment));
   }
+
   async getPayments(): Promise<Payment[]> {
     return await this.http.get<any[]>(`${environment.apiUrl}payments/`, httpOptions).toPromise()
       .then(json => Deserialize(json, Payment));
