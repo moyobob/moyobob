@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PartyPaymentComponent } from './party-payment.component';
 import { PartyState } from '../../types/party';
+import { SimpleChange } from '@angular/core';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 const mockParty = { id: 1, name: 'mockParty', type: 0, location: 'location1', leaderId: 1, since: '0000', memberCount: 2 };
@@ -36,13 +37,20 @@ describe('PartyPaymentComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PartyPaymentComponent);
     component = fixture.componentInstance;
+    fixture.detectChanges();
+
     component.party = mockParty;
     component.partyState = mockPartyState;
     component.user = mockUser;
     component.menus = mockMenus;
     component.myMenus = [];
     component.totalCost = 0;
-    fixture.detectChanges();
+    component.ngOnChanges({
+      party: new SimpleChange(undefined, mockParty, true),
+      partyState: new SimpleChange(undefined, mockPartyState, true),
+      user: new SimpleChange(undefined, mockUser, true),
+      menus: new SimpleChange(undefined, mockMenus, true),
+    });
   });
 
   it('ngOnInit should return immediately when partyState is undefined', () => {
@@ -67,9 +75,10 @@ describe('PartyPaymentComponent', () => {
     expect(component.getMenuNameById(1)).toBe('');
   });
 
-  it('checking totalCost & myMenus', () => {
+  it('checking totalCost & myMenus & getMenuNameById', () => {
     expect(component.totalCost).toEqual(25000);
     expect(component.myMenus[0]).toEqual([20, 20000, 0.5]);
+    expect(component.getMenuNameById(20)).toEqual('chicken');
   });
 
   it('toFinish emits event with no parameter', () => {
