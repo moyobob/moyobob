@@ -6,12 +6,14 @@ import { SignInComponent } from '../sign-in/sign-in.component';
 import { LobbyComponent } from '../lobby/lobby.component';
 import { PartyComponent } from '../party/party.component';
 import { SignUpComponent } from '../sign-up/sign-up.component';
+import { PaymentComponent } from '../payment/payment.component';
 
 const routes: Routes = [
   { path: 'sign-in', component: SignInComponent, canActivate: [AuthGuard] },
   { path: 'sign-up', component: SignUpComponent },
   { path: 'lobby', component: LobbyComponent, canActivate: [AuthGuard] },
   { path: 'party', component: PartyComponent, canActivate: [AuthGuard] },
+  { path: 'payment', component: PaymentComponent, canActivate: [AuthGuard]},
   { path: '', redirectTo: '/sign-in', pathMatch: 'full' },
   { path: '**', redirectTo: '/sign-in' },
 ];
