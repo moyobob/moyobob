@@ -2,7 +2,7 @@ from django.http import HttpRequest
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden, HttpResponseNotFound
 from functools import wraps
 
-from .models import Party, Restaurant, Menu, Payment
+from .models import User, Party, Restaurant, Menu, Payment
 
 
 def allow_method(methods: list):
@@ -24,6 +24,17 @@ def allow_authenticated(func):
             return HttpResponseForbidden()
         else:
             return func(request, *args, **kwargs)
+    return __wrapper
+
+
+def get_user(func):
+    @wraps(func)
+    def __wrapper(request: HttpRequest, user_id: int, *args, **kwargs):
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return HttpResponseNotFound()
+        return func(request, user, *args, **kwargs)
     return __wrapper
 
 
