@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, SimpleChanges} from '@angular/core';
 import { Menu } from '../../types/menu';
 import { User } from '../../types/user';
 import { Party, PartyState } from '../../types/party';
@@ -24,6 +24,14 @@ export class PartyPaymentComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.makeMyMenus();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.makeMyMenus();
+  }
+
+  makeMyMenus(): void {
     if (this.partyState === undefined) {
       return;
     }

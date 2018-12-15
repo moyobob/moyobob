@@ -67,7 +67,7 @@ describe('PartyPaymentComponent', () => {
     expect(component.getMenuNameById(1)).toBe('');
   });
 
-  it('checking totalCost', () => {
+  it('checking totalCost & myMenus', () => {
     expect(component.totalCost).toEqual(25000);
     expect(component.myMenus[0]).toEqual([20, 20000, 0.5]);
   });
