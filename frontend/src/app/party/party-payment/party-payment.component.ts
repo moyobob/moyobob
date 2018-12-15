@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, SimpleChanges} from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Menu } from '../../types/menu';
 import { User } from '../../types/user';
 import { Party, PartyState } from '../../types/party';
@@ -8,7 +8,7 @@ import { Party, PartyState } from '../../types/party';
   templateUrl: './party-payment.component.html',
   styleUrls: ['./party-payment.component.css']
 })
-export class PartyPaymentComponent implements OnInit {
+export class PartyPaymentComponent implements OnInit, OnChanges {
 
   @Input() party: Party;
   @Input() partyState: PartyState;
