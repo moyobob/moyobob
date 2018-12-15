@@ -117,6 +117,6 @@ class UserTestCase(TestCaseWithHttp):
     def test_not_found(self):
         user = User.objects.create_user(
             username='ferris', email='ferris@rustacean.org', password='iluvrust')
-        self.login("ferris@rustacean.org", "iluvrust")
+        self.login(user.email, "iluvrust")
 
         self.assertEqual(self.get('/api/user/0/').status_code, 404)
