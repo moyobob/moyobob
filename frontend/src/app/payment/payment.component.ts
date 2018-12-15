@@ -14,11 +14,11 @@ export class PaymentComponent implements OnInit {
   }
 
   getUserNameById(Id: number): string {
-    return ''
+    return '';
   }
 
   getMeansById(Id: number): string {
-    return ''
+    return '';
   }
 
   resolve(senderId: number): void {
