@@ -78,7 +78,11 @@ export class MockPartyOrderedComponent {
 
 @Component({ selector: 'app-party-payment', template: '' })
 export class MockPartyPaymentComponent {
-
+  @Input() party: Party;
+  @Input() partyState: PartyState;
+  @Input() user: User;
+  @Input() menus: Menu[];
+  @Output() toNextState: EventEmitter<void> = new EventEmitter();
 }
 
 class MockPartyService {

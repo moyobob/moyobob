@@ -1,3 +1,13 @@
-<p>
-  party-payment works!
-</p>
+<div *ngIf="partyState !== undefined">
+  <div>
+    You have to pay {{totalCost}} to {{partyState.paidUserId}}
+  </div>
+  <div>
+    <ul>
+      <li *ngFor="let myMenu of myMenus">
+        <b>{{getMenuNameById(myMenu[0])}}</b> price: {{myMenu[1]}} quantity: {{myMenu[2]}}
+      </li>
+    </ul>
+  </div>
+  <button *ngIf="party.leaderId === user.id" (click)="toFinish();">Ordered</button>
+</div>

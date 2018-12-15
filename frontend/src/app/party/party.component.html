@@ -13,7 +13,8 @@
       (toNextState)="toOrdered($event);"></app-party-ordering>
     <app-party-ordered *ngSwitchCase="3" [party]="party" [user]="user" [users]="users" (toNextState)="toPayment($event);">
     </app-party-ordered>
-    <app-party-payment *ngSwitchCase="4"></app-party-payment>
+    <app-party-payment *ngSwitchCase="4" [party]="party" [partyState]= "partyState" [user]="user" [menus]="menus" (toNextState)="toFinish();">
+    ></app-party-payment>
     <div *ngSwitchDefault></div>
   </div>
   <div>
