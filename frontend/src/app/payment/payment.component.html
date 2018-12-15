@@ -1,3 +1,20 @@
-<p>
-  payment works!
-</p>
+<div>
+  <div>
+    You Have To Pay
+    <ul>
+      <li *ngFor="let shouldPayItem of shouldPayList">
+        totalCost:{{shouldPayItem[1]}} user:{{getUserNameById(shouldPayItem[0])}}
+         by:{{getMeansById(shouldPayItem[0])}}
+      </li>
+    </ul>
+  </div>
+  <div>
+    You Have To Get
+    <ul>
+      <li *ngFor="let bePaidItem of bePaidList">
+        totalCost:{{bePaidItem[1]}} user:{{getUserNameById(bePaidItem[0])}}
+        <button (click)="resolve(bePaidItem[1])">RESOLVE</button>
+      </li>
+    </ul>
+  </div>
+</div>
