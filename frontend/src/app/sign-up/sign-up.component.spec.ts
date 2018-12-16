@@ -4,6 +4,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of } from 'rxjs';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/material';
+import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 import { SignUpComponent } from './sign-up.component';
 import { UserService } from '../services/user.service';
@@ -28,9 +30,13 @@ describe('SignUpComponent', () => {
     const routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
     TestBed.configureTestingModule({
       imports: [
+        NoopAnimationsModule,
         FormsModule,
         HttpClientTestingModule,
         RouterTestingModule,
+        MatInputModule,
+        MatButtonModule,
+        MatSnackBarModule,
       ],
       declarations: [SignUpComponent],
       providers: [

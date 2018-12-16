@@ -40,7 +40,11 @@ export class SignInComponent implements OnInit {
       this.logInStatus !== InputStatus.TriedSignIn
       && (!event || event.key === 'Enter')
     ) {
-      if (!this.emailInput || !this.passwordInput) {
+      if (!this.emailInput) {
+        this.snackBar.open('Please Enter Your Email', '', { duration: 1000 });
+        this.logInStatus = InputStatus.NoInput;
+      } else if (!this.passwordInput) {
+        this.snackBar.open('Please Enter Your Password', '', { duration: 1000 });
         this.logInStatus = InputStatus.NoInput;
       } else {
         this.logInStatus = InputStatus.TriedSignIn;
@@ -50,7 +54,7 @@ export class SignInComponent implements OnInit {
               this.router.navigateByUrl('lobby');
             } else {
               this.logInStatus = InputStatus.EmailOrPasswordWrong;
-              this.snackBar.open('Wrong Email or Password', '', { duration: 500 });
+              this.snackBar.open('Wrong Email or Password', '', { duration: 1000 });
             }
           });
       }

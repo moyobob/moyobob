@@ -1,11 +1,12 @@
 .main {
   width: 70%;
   max-width: 400px;
-  margin: 20% auto;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex-grow: 1;
+  justify-content: center;
+  height: 100%;
 }
 
 .title {

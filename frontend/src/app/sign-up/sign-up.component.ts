@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatSnackBar } from '@angular/material';
+
 import { UserService } from '../services/user.service';
 
 enum InputStatus {
@@ -25,7 +27,8 @@ export class SignUpComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private router: Router
+    private router: Router,
+    public snackBar: MatSnackBar
   ) { }
 
   ngOnInit() { }
@@ -37,21 +40,25 @@ export class SignUpComponent implements OnInit {
       && (!event || event.key === 'Enter')
     ) {
       if (!this.emailInput) {
+        this.snackBar.open('Please Enter Your Email', '', { duration: 1000 });
         this.signUpStatus = InputStatus.EmailNoInput;
       } else if (!this.passwordInput) {
+        this.snackBar.open('Please Enter Your Password', '', { duration: 1000 });
         this.signUpStatus = InputStatus.PasswordNoInput;
       } else if (!this.userNameInput) {
+        this.snackBar.open('Please Enter Your Username', '', { duration: 1000 });
         this.signUpStatus = InputStatus.UserNameNoInput;
       } else {
         this.signUpStatus = InputStatus.TriedSignUp;
         this.userService.signUp(this.emailInput, this.passwordInput, this.userNameInput)
-          .then(success => {
-            if (success) {
-              this.router.navigateByUrl('/sign-in/');
-            } else {
-              this.signUpStatus = InputStatus.SomethingWrong;
-            }
-          });
+        .then(success => {
+          if (success) {
+            this.router.navigateByUrl('/sign-in/');
+          } else {
+            this.signUpStatus = InputStatus.SomethingWrong;
+            this.snackBar.open('Something went wrong. This incident will be reported.', '', { duration: 1000 });
+          }
+        });
       }
     }
   }
