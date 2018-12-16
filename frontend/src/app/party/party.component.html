@@ -1,8 +1,15 @@
 <div *ngIf="party" class="main">
-  <div>
+  <div style="width: 100%; text-align: center;">
     <h2>{{party.name}}</h2>
-    <span>{{party.location}}</span>
-    <span>{{party.memberCount}}</span>
+    <div class="party-info">
+      <span style="text-align: left;" class="party-info-item">{{party.location}}</span>
+      <div class="party-info-item right-align">
+        <div class="member-count right-align">
+          <mat-icon color="primary" class="right-align">account_circle</mat-icon>
+          <span class="right-align">{{party.memberCount}}</span>
+        </div>
+      </div>
+    </div>
   </div>
   <div [ngSwitch]="partyState.phase">
     <app-party-choosing-restaurant *ngSwitchCase="0" [party]="party" [partyState]="partyState" [user]="user"
