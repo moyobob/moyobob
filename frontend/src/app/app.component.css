@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  flex: 1;
 }
 
 .is-mobile .toolbar {
@@ -20,10 +20,13 @@
 .sidenav-container-content {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  height: 100% !important;
 }
 
 .sidenav-container {
   flex: 1;
+  height: 100%;
 }
 
 .is-mobile .sidenav-container {
