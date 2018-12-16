@@ -2,7 +2,7 @@ from django.core.cache import cache
 
 from . import TestCaseWithCache
 from api.models import Party, PartyType, User
-from websocket.consumer import get_party, get_party_of_user
+from websocket.util import get_party, get_party_of_user
 from websocket.exception import NotJoinedError, InvalidPartyError
 
 

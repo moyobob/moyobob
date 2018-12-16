@@ -1,14 +1,20 @@
 from django.core.cache import cache
 from django.test import TestCase
 
-from websocket import event
 from . import async_test, new_communicator
 from . import TestCaseWithSingleWebsocket, TestCaseWithDoubleWebsocket
-from websocket.models import MenuEntries
+from websocket import event
+from websocket.models import MenuEntries, PartyPhase
 from api.models import Party, Menu
 
 
 class MenuTestCase1(TestCaseWithSingleWebsocket):
+    def setUp(self):
+        super().setUp()
+        state = self.state
+        state.phase = PartyPhase.ChoosingMenu
+        state.save()
+
     @async_test
     async def test_invalid_menu(self):
         await self.join()
@@ -69,6 +75,10 @@ class MenuTestCase1(TestCaseWithSingleWebsocket):
 class MenuTestCase2(TestCaseWithDoubleWebsocket):
     def setUp(self):
         super().setUp()
+        state = self.state
+        state.phase = PartyPhase.ChoosingMenu
+        state.save()
+
         self.menu1 = Menu(name="Rust")
         self.menu2 = Menu(name="Cargo")
         self.menu1.save()
@@ -246,6 +256,34 @@ class MenuTestCase2(TestCaseWithDoubleWebsocket):
                 2: (self.menu2.id, 2, [])
             },
         )
+
+    @async_test
+    async def test_menu_confirm(self):
+        await self.join_both()
+
+        await self.communicator1.send_json_to({
+            'command': 'menu.confirm.toggle',
+        })
+        resp = await self.communicator1.receive_json_from(1)
+        self.assertDictEqual(resp, event.menu_confirm(self.user1.id))
+        resp = await self.communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.menu_confirm(self.user1.id))
+
+        self.state.refresh_from_db()
+        self.assertListEqual(
+            self.state.menu_confirmed_user_ids, [self.user1.id])
+
+        await self.communicator1.send_json_to({
+            'command': 'menu.confirm.toggle',
+        })
+        resp = await self.communicator1.receive_json_from(1)
+        self.assertDictEqual(resp, event.menu_unconfirm(self.user1.id))
+        resp = await self.communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.menu_unconfirm(self.user1.id))
+
+        self.state.refresh_from_db()
+        self.assertListEqual(
+            self.state.menu_confirmed_user_ids, [])
 
 
 class MenuEntriesTestCase(TestCase):
