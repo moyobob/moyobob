@@ -11,6 +11,7 @@ import { User } from '../../types/user';
 })
 export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   @Input() partyState: PartyState;
+  @Input() party: Party;
   @Input() user: User;
   @Input() menus: Menu[];
   @Input() members: User[];
