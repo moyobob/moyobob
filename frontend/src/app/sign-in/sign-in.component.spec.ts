@@ -11,7 +11,7 @@ import { MatButtonModule, MatInputModule, MatSnackBarModule } from '@angular/mat
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 class MockUserService {
-  requestSignIn(email: string, password: string) { }
+  signIn(email: string, password: string) { }
 }
 
 describe('SignInComponent', () => {
@@ -38,7 +38,7 @@ describe('SignInComponent', () => {
         BrowserAnimationsModule,
         MatSnackBarModule,
       ],
-      declarations: [ SignInComponent ],
+      declarations: [SignInComponent],
       providers: [
         {
           provide: UserService,
@@ -49,7 +49,7 @@ describe('SignInComponent', () => {
         },
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe('SignInComponent', () => {
     component = fixture.componentInstance;
     mockUserService = TestBed.get(UserService);
     router = TestBed.get(Router);
-    spy = spyOn(mockUserService, 'requestSignIn');
+    spy = spyOn(mockUserService, 'signIn');
     component.logInStatus = component.inputStatus.HaveNotTriedSignIn;
     fixture.detectChanges();
   });
@@ -114,14 +114,14 @@ describe('SignInComponent', () => {
         expect(router.navigateByUrl).toHaveBeenCalledTimes(0);
       });
     }
-  ));
+    ));
 
   it('should call requestSignIn if both filled and enter', async(() => {
     spy.and.returnValue(of(true).toPromise());
 
     component.emailInput = mockEmail;
     component.passwordInput = mockPassword;
-    component.trySignIn({'key': 'Enter'});
+    component.trySignIn({ 'key': 'Enter' });
 
     fixture.whenStable().then(() => {
       expect(spy).toHaveBeenCalledWith(
@@ -137,7 +137,7 @@ describe('SignInComponent', () => {
 
     component.emailInput = mockEmail;
     component.passwordInput = mockPassword;
-    component.trySignIn({'key': 'a'});
+    component.trySignIn({ 'key': 'a' });
 
     fixture.whenStable().then(() => {
       expect(spy).toHaveBeenCalledTimes(0);

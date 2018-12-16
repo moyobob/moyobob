@@ -1,6 +1,7 @@
 import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { MediaMatcher } from '@angular/cdk/layout';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { UserService } from './services/user.service';
 
@@ -16,9 +17,12 @@ export class AppComponent implements OnDestroy {
   mobileQuery: MediaQueryList;
   private mobileQueryListener: () => void;
 
+  subscription: Subscription;
+  signedIn = false;
+
   constructor(
     private changeDetectorRef: ChangeDetectorRef,
-    public userService: UserService,
+    private userService: UserService,
     private router: Router,
     media: MediaMatcher) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
@@ -27,10 +31,16 @@ export class AppComponent implements OnDestroy {
       this.changeDetectorRef.detectChanges();
     };
     this.mobileQuery.addListener(this.mobileQueryListener);
+
+    this.signedIn = this.userService.user !== undefined;
+    this.subscription = this.userService.userUpdate.subscribe(user => {
+      this.signedIn = user !== undefined;
+    });
   }
 
   ngOnDestroy(): void {
     this.mobileQuery.removeListener(this.mobileQueryListener);
+    this.subscription.unsubscribe();
   }
 
   toggleSidebar(): void {

@@ -11,8 +11,9 @@ import { SignUpComponent } from './sign-up.component';
 import { UserService } from '../services/user.service';
 
 class MockUserService {
-  requestSignUp(email: string, password: string, username: string) { }
+  signUp(email: string, password: string, username: string) { }
 }
+
 describe('SignUpComponent', () => {
   let component: SignUpComponent;
   let fixture: ComponentFixture<SignUpComponent>;
@@ -37,7 +38,7 @@ describe('SignUpComponent', () => {
         MatButtonModule,
         MatSnackBarModule,
       ],
-      declarations: [ SignUpComponent ],
+      declarations: [SignUpComponent],
       providers: [
         {
           provide: UserService,
@@ -48,7 +49,7 @@ describe('SignUpComponent', () => {
         }
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -56,8 +57,7 @@ describe('SignUpComponent', () => {
     component = fixture.componentInstance;
     mockUserService = TestBed.get(UserService);
     router = TestBed.get(Router);
-    spy = spyOn(mockUserService, 'requestSignUp');
-    component.signUpStatus = component.inputStatus.HaveNotTriedSignUp;
+    spy = spyOn(mockUserService, 'signUp');
     fixture.detectChanges();
   });
 

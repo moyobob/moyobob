@@ -24,6 +24,12 @@ const mockParty: Party = {
   memberCount: 3,
 };
 
+const mockUser: User = {
+  id: 1,
+  email: 'k2pa00@gmail.com',
+  username: 'kipa00',
+};
+
 class MockParamMap {
   get(id): number {
     expect(id).toEqual('id');
@@ -99,6 +105,10 @@ class MockPartyService {
   updateMenu(_: MenuEntryUpdateRequest): void { }
 }
 
+class MockUserService {
+  public userUpdate: EventEmitter<User> = new EventEmitter();
+}
+
 describe('PartyComponent', () => {
   let component: PartyComponent;
   let fixture: ComponentFixture<PartyComponent>;
@@ -108,7 +118,6 @@ describe('PartyComponent', () => {
   let router: jasmine.SpyObj<Router>;
 
   beforeEach(async(() => {
-    const userServiceSpy = jasmine.createSpyObj('UserService', ['signedInUserId']);
     const restaurantServiceSpy = jasmine.createSpyObj('RestaurantService', ['getRestaurants', 'getMenus']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -123,7 +132,7 @@ describe('PartyComponent', () => {
       ],
       providers: [
         { provide: PartyService, useClass: MockPartyService },
-        { provide: UserService, useValue: userServiceSpy },
+        { provide: UserService, useClass: MockUserService },
         { provide: RestaurantService, useValue: restaurantServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useClass: MockActivatedRoute },
@@ -141,7 +150,6 @@ describe('PartyComponent', () => {
     partyServiceGetParty.and.returnValue(new Promise(r => r(mockParty)));
 
     userService = TestBed.get(UserService);
-    userService.signedInUserId.and.returnValue(1);
 
     restaurantService = TestBed.get(RestaurantService);
     restaurantService.getMenus.and.returnValue(new Promise(r => r([])));

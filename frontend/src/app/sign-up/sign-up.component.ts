@@ -22,8 +22,7 @@ export class SignUpComponent implements OnInit {
   emailInput: string;
   passwordInput: string;
   userNameInput: string;
-  signUpStatus: InputStatus;
-  // TODO(??) inputStatus 꼭 있어야 하나
+  signUpStatus: InputStatus = InputStatus.HaveNotTriedSignUp;
   inputStatus = InputStatus;
 
   constructor(
@@ -32,9 +31,8 @@ export class SignUpComponent implements OnInit {
     public snackBar: MatSnackBar
   ) { }
 
-  ngOnInit() {
-    this.signUpStatus = InputStatus.HaveNotTriedSignUp;
-  }
+  ngOnInit() { }
+
   // TODO: 이메일 중복 체크, 비밀번호 '확인'
   trySignUp(event) {
     if (
@@ -52,7 +50,7 @@ export class SignUpComponent implements OnInit {
         this.signUpStatus = InputStatus.UserNameNoInput;
       } else {
         this.signUpStatus = InputStatus.TriedSignUp;
-        this.userService.requestSignUp(this.emailInput, this.passwordInput, this.userNameInput)
+        this.userService.signUp(this.emailInput, this.passwordInput, this.userNameInput)
         .then(success => {
           if (success) {
             this.router.navigateByUrl('/sign-in/');
