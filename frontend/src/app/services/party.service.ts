@@ -14,12 +14,26 @@ import {
   PartyCreateRequest,
 } from '../types/party';
 import {
-  Event, PartyJoinEvent, PartyLeaveEvent, InitiallyNotJoinedEvent, StateUpdateEvent, MenuCreateEvent, MenuUpdateEvent
+  Event,
+  PartyJoinEvent,
+  PartyLeaveEvent,
+  InitiallyNotJoinedEvent,
+  StateUpdateEvent,
+  MenuCreateEvent,
+  MenuUpdateEvent,
+  RestaurantVoteEvent,
+  RestaurantUnvoteEvent
 } from '../types/event';
 import {
-  PartyJoinCommand, PartyLeaveCommand,
-  MenuCreateCommand, MenuUpdateCommand,
-  ToOrderedCommand, ToPaymentCommand, ToChoosingMenuCommand, RestaurantVoteToggleCommand, ToOrderingCommand,
+  PartyJoinCommand,
+  PartyLeaveCommand,
+  MenuCreateCommand,
+  MenuUpdateCommand,
+  ToOrderedCommand,
+  ToPaymentCommand,
+  ToChoosingMenuCommand,
+  RestaurantVoteToggleCommand,
+  ToOrderingCommand,
 } from '../types/command';
 
 const httpOptions = {
@@ -105,6 +119,23 @@ export class PartyService {
         const event = <PartyLeaveEvent>rawEvent;
 
         this.partyState.memberIds = this.partyState.memberIds.filter(id => id !== event.userId);
+        this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
+      case rawEvent instanceof RestaurantVoteEvent: {
+        const event = <RestaurantVoteEvent>rawEvent;
+
+        this.partyState.restaurantVotes.push([event.userId, event.restaurantId]);
+        this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
+      case rawEvent instanceof RestaurantUnvoteEvent: {
+        const event = <RestaurantVoteEvent>rawEvent;
+
+        this.partyState.restaurantVotes = this.partyState.restaurantVotes
+          .filter(v => v[0] !== event.userId && v[1] !== event.restaurantId);
         this.partyStateUpdate.emit(this.partyState);
 
         break;
