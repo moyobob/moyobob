@@ -17,4 +17,4 @@ COPY backend backend
 
 EXPOSE 8000
 
-CMD daphne -b 0.0.0.0 -p 8000 backend.asgi:application
+CMD uvicorn --host 0.0.0.0 --port 8000 backend.asgi:application
