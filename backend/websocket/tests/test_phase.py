@@ -66,6 +66,10 @@ class PhaseTestCase1(TestCaseWithSingleWebsocket):
 
     @async_test
     async def test_invalid_user(self):
+        state = self.state
+        state.phase = PartyPhase.Ordered
+        state.save()
+
         await self.join()
 
         await self.communicator.send_json_to({

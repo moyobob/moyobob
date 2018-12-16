@@ -67,3 +67,9 @@ class AlreadyJoinedError(ConsumerException):
     @classmethod
     def as_dict(cls):
         return error.already_joined()
+
+
+class CommandNotAllowedError(ConsumerException):
+    @classmethod
+    def as_dict(cls):
+        return error.command_not_allowed()

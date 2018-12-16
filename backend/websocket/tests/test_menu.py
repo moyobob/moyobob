@@ -1,14 +1,20 @@
 from django.core.cache import cache
 from django.test import TestCase
 
-from websocket import event
 from . import async_test, new_communicator
 from . import TestCaseWithSingleWebsocket, TestCaseWithDoubleWebsocket
-from websocket.models import MenuEntries
+from websocket import event
+from websocket.models import MenuEntries, PartyPhase
 from api.models import Party, Menu
 
 
 class MenuTestCase1(TestCaseWithSingleWebsocket):
+    def setUp(self):
+        super().setUp()
+        state = self.state
+        state.phase = PartyPhase.ChoosingMenu
+        state.save()
+
     @async_test
     async def test_invalid_menu(self):
         await self.join()
@@ -69,6 +75,10 @@ class MenuTestCase1(TestCaseWithSingleWebsocket):
 class MenuTestCase2(TestCaseWithDoubleWebsocket):
     def setUp(self):
         super().setUp()
+        state = self.state
+        state.phase = PartyPhase.ChoosingMenu
+        state.save()
+
         self.menu1 = Menu(name="Rust")
         self.menu2 = Menu(name="Cargo")
         self.menu1.save()
