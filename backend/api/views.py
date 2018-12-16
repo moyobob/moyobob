@@ -9,7 +9,7 @@ from json.decoder import JSONDecodeError
 
 from .models import User, Party, PartyType, Restaurant, Menu, Payment
 from .decorator import allow_authenticated, allow_method
-from .decorator import get_menu, get_party, get_payment, get_restaurant
+from .decorator import get_user, get_menu, get_party, get_payment, get_restaurant
 from .util import make_record
 
 
@@ -67,6 +67,13 @@ def verify_session(request: HttpRequest):
         return HttpResponseForbidden()
 
     return JsonResponse(request.user.as_dict())
+
+
+@allow_method(['GET'])
+@allow_authenticated
+@get_user
+def user_detail(request: HttpRequest, user: User):
+    return JsonResponse(user.as_dict())
 
 
 @allow_method(['GET', 'POST'])
