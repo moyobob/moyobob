@@ -58,6 +58,7 @@ export class MockPartyChoosingRestaurantComponent {
 @Component({ selector: 'app-party-choosing-menu', template: '' })
 export class MockPartyChoosingMenuComponent {
   @Input() partyState: PartyState;
+  @Input() party: Party;
   @Input() user: User;
   @Input() menus: Menu[];
   @Input() members: User[];

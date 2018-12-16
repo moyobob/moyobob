@@ -102,6 +102,9 @@ export class PartyState {
   @deserializeAs('paid_user_id')
   paidUserId?: number;
 
+  @deserializeAs('menu_confirmed_user_ids')
+  menuConfirmedUserIds: number[];
+
   menuEntries: MenuEntry[];
 
   public static OnDeserialized(instance: PartyState, json: any): void {

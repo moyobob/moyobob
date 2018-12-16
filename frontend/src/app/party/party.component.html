@@ -14,8 +14,9 @@
   <div [ngSwitch]="partyState.phase">
     <app-party-choosing-restaurant *ngSwitchCase="0" [party]="party" [partyState]="partyState" [user]="user"
       [restaurants]="restaurants" (votingEvent)="voteRestaurant($event)" (toNextState)="toChoosingMenu($event);"></app-party-choosing-restaurant>
-    <app-party-choosing-menu *ngSwitchCase="1" [partyState]="partyState" [user]="user" [menus]="menus" [members]="members"
-      (addMenu)="addMenu($event);" (updateMenu)="updateMenu($event);" (toNextState)="toOrdering();"></app-party-choosing-menu>
+    <app-party-choosing-menu *ngSwitchCase="1" [partyState]="partyState" [party]="party" [user]="user" [menus]="menus" [members]="members"
+      (addMenu)="addMenu($event);" (updateMenu)="updateMenu($event);" (toNextState)="toOrdering();" (confirm)="toggleConfirm();">
+    </app-party-choosing-menu>
     <app-party-ordering *ngSwitchCase="2" [party]="party" [menus]="menus" [user]="user" [partyState]="partyState"
       (toNextState)="toOrdered($event);"></app-party-ordering>
     <app-party-ordered *ngSwitchCase="3" [party]="party" [user]="user" [members]="members" (toNextState)="toPayment($event);">

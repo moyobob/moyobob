@@ -1,7 +1,9 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 
 import { Menu } from '../../types/menu';
-import { PartyState, MenuEntry, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../../types/party';
+import {
+  Party, PartyState, MenuEntry, MenuEntryCreateRequest, MenuEntryUpdateRequest
+} from '../../types/party';
 import { User } from '../../types/user';
 
 @Component({
@@ -11,16 +13,20 @@ import { User } from '../../types/user';
 })
 export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   @Input() partyState: PartyState;
+  @Input() party: Party;
   @Input() user: User;
   @Input() menus: Menu[];
   @Input() members: User[];
 
   @Output() addMenu: EventEmitter<MenuEntryCreateRequest> = new EventEmitter();
   @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest> = new EventEmitter();
+  @Output() confirm: EventEmitter<void> = new EventEmitter();
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
 
   menuEntries: MenuEntry[] = [];
   showAddMenuDialog = false;
+  totalMoney: number;
+  confirmed: boolean;
 
   constructor() { }
 
@@ -35,6 +41,8 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   updateState() {
     if (this.partyState) {
       this.menuEntries = this.partyState.menuEntries;
+      this.totalMoney = this.calculateTotalCost(this.menuEntries);
+      this.confirmed = this.partyState.menuConfirmedUserIds.includes(this.user.id);
     }
   }
 
@@ -107,5 +115,38 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   onNextStateButtonClick(): void {
     this.toNextState.emit();
+  }
+
+  filterMenuEntries(menuEntries: MenuEntry[]) {
+    return menuEntries.filter(x => x.userIds.includes(this.user.id));
+  }
+
+  calculateTotalCost(menuEntries: MenuEntry[]): number {
+    if (!this.menus) {
+      return 0;
+    }
+    return this.filterMenuEntries(menuEntries)
+      .map(x => {
+        const menu = this.menus.find(u => u.id === x.menuId);
+        if (menu) {
+          return menu.price * x.quantity / x.userIds.length;
+        }
+        return 0;
+      })
+      .reduce((x, y) => x + y, 0);
+  }
+
+  toggleConfirm() {
+    this.confirm.emit();
+  }
+
+  menuConfirmed(assignee: number) {
+    if (!this.partyState) {
+      return false;
+    }
+    if (!this.partyState.menuConfirmedUserIds) {
+      return false;
+    }
+    return this.partyState.menuConfirmedUserIds.includes(assignee);
   }
 }

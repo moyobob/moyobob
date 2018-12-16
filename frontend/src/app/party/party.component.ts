@@ -144,4 +144,9 @@ export class PartyComponent implements OnInit, OnDestroy {
       this.router.navigate(['/lobby']);
     });
   }
+
+  toggleConfirm(): void {
+    this.partyService.toggleConfirm();
+  }
+
 }

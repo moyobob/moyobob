@@ -21,6 +21,7 @@ const mockPartyState: PartyState = {
   memberIds: [1, 10],
   paidUserId: 10,
   menuEntries: [mockMenuEntry1, mockMenuEntry2, mockMenuEntry3],
+  menuConfirmedUserIds: [],
 };
 
 describe('PartyPaymentComponent', () => {
