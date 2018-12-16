@@ -27,12 +27,17 @@
       <ul>
         <li *ngFor="let assignee of menuEntry.userIds">
           {{getUserNameById(assignee)}}
+          <span *ngIf="menuConfirmed(assignee)">
+            Confirmed
+          </span>
         </li>
       </ul>
     </li>
   </ul>
 </div>
 <button (click)="toggleAddMenu();">Add Menu</button>
+<button *ngIf="confirmed" (click)="toggleConfirm();">Unconfirm</button>
+<button *ngIf="!confirmed"(click)="toggleConfirm();">Confirm</button>
 <app-select-menu *ngIf="showAddMenuDialog" [menus]="menus" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
   (cancel)="cancelAddMenu($event);">
 </app-select-menu>

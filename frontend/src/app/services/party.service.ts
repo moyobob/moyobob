@@ -22,7 +22,9 @@ import {
   MenuCreateEvent,
   MenuUpdateEvent,
   RestaurantVoteEvent,
-  RestaurantUnvoteEvent
+  RestaurantUnvoteEvent,
+  MenuConfirmEvent,
+  MenuUnconfirmEvent,
 } from '../types/event';
 import {
   PartyJoinCommand,
@@ -34,6 +36,7 @@ import {
   ToChoosingMenuCommand,
   RestaurantVoteToggleCommand,
   ToOrderingCommand,
+  ToggleConfirmCommand,
 } from '../types/command';
 
 const httpOptions = {
@@ -170,6 +173,24 @@ export class PartyService {
 
         break;
       }
+      case rawEvent instanceof MenuConfirmEvent: {
+        const event = <MenuConfirmEvent>rawEvent;
+
+        this.partyState.menuConfirmedUserIds.push(event.userId);
+        this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
+      case rawEvent instanceof MenuUnconfirmEvent: {
+        const event = <MenuUnconfirmEvent>rawEvent;
+
+        this.partyState.menuConfirmedUserIds = this.partyState.menuConfirmedUserIds
+          .filter(x => x !== event.userId);
+        this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
+
     }
   }
 
@@ -241,4 +262,10 @@ export class PartyService {
     const command = new ToPaymentCommand(id);
     this.websocketService.send(command);
   }
+
+  toggleConfirm(): void {
+    const command = new ToggleConfirmCommand();
+    this.websocketService.send(command);
+  }
+
 }

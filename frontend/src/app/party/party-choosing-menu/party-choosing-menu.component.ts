@@ -20,11 +20,13 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   @Output() addMenu: EventEmitter<MenuEntryCreateRequest> = new EventEmitter();
   @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest> = new EventEmitter();
+  @Output() confirm: EventEmitter<void> = new EventEmitter();
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
 
   menuEntries: MenuEntry[] = [];
   showAddMenuDialog = false;
   totalMoney: number;
+  confirmed: boolean;
 
   constructor() { }
 
@@ -34,12 +36,13 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     this.updateState();
-    this.totalMoney = this.calculateTotalCost(this.menuEntries);
   }
 
   updateState() {
     if (this.partyState) {
       this.menuEntries = this.partyState.menuEntries;
+      this.totalMoney = this.calculateTotalCost(this.menuEntries);
+      this.confirmed = this.partyState.menuConfirmedUserIds.includes(this.user.id);
     }
   }
 
@@ -131,5 +134,19 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
         return 0;
       })
       .reduce((x, y) => x + y, 0);
+  }
+
+  toggleConfirm() {
+    this.confirm.emit();
+  }
+
+  menuConfirmed(assignee: number) {
+    if (!this.partyState) {
+      return false;
+    }
+    if (!this.partyState.menuConfirmedUserIds) {
+      return false;
+    }
+    return this.partyState.menuConfirmedUserIds.includes(assignee);
   }
 }

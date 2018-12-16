@@ -154,6 +154,22 @@ export class LeaderChangeEvent {
   userId: number;
 }
 
+export class MenuConfirmEvent {
+  @deserialize
+  readonly type = 'menu.confirm';
+
+  @deserializeAs('user_id')
+  userId: number;
+}
+
+export class MenuUnconfirmEvent {
+  @deserialize
+  readonly type = 'menu.unconfirm';
+
+  @deserializeAs('user_id')
+  userId: number;
+}
+
 export type Event
   = Nothing
   | InvalidCommandError
@@ -175,7 +191,9 @@ export type Event
   | MenuUpdateEvent
   | MenuDeleteEvent
   | StateUpdateEvent
-  | LeaderChangeEvent;
+  | LeaderChangeEvent
+  | MenuConfirmEvent
+  | MenuUnconfirmEvent;
 
 export function deserializeEvent(json: any): Event {
   switch (json['type']) {
@@ -257,6 +275,14 @@ export function deserializeEvent(json: any): Event {
     }
     case 'leader.change': {
       return Deserialize(json, LeaderChangeEvent);
+      break;
+    }
+    case 'menu.confirm': {
+      return Deserialize(json, MenuConfirmEvent);
+      break;
+    }
+    case 'menu.unconfirm': {
+      return Deserialize(json, MenuUnconfirmEvent);
       break;
     }
     default: {
