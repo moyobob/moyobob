@@ -17,19 +17,21 @@ export class RestaurantService {
   ) { }
 
   async getRestaurants(): Promise<Restaurant[]> {
-    return await this.http.get<any[]>(`${environment.apiUrl}restaurant/`).toPromise()
-      .then(jsons => jsons.map(json => Deserialize(json, Restaurant)));
+    const jsons = await this.http.get<any[]>(`${environment.apiUrl}restaurant/`).toPromise();
+    return jsons.map(json => Deserialize(json, Restaurant));
   }
 
-  async getRestaurant(restaurant_id: number): Promise<Restaurant> {
-    return await this.http.get<any>(
-      `${environment.apiUrl}restaurant/${restaurant_id}/`,
-    ).toPromise().then(json => Deserialize(json, Restaurant));
-  }
-
-  async getMenus(restaurant_id: number): Promise<Menu[]> {
-    return await this.http.get<Menu[]>(
-      `${environment.apiUrl}restaurant/${restaurant_id}/menu/`,
+  async getRestaurant(restaurantId: number): Promise<Restaurant> {
+    const json = await this.http.get<any>(
+      `${environment.apiUrl}restaurant/${restaurantId}/`,
     ).toPromise();
+    return Deserialize(json, Restaurant);
+  }
+
+  async getMenus(restaurantId: number): Promise<Menu[]> {
+    const jsons = await this.http.get<any[]>(
+      `${environment.apiUrl}restaurant/${restaurantId}/menu/`,
+    ).toPromise();
+    return jsons.map(json => Deserialize(json, Menu));
   }
 }

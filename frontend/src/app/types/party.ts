@@ -109,13 +109,14 @@ export class PartyState {
 
     for (const menuEntryId of Object.keys(json['menu_entries'])) {
       const [menuId, quantity, userIds] = json['menu_entries'][menuEntryId];
-
-      menuEntries.push({
+      const entry: MenuEntry = {
         id: +menuEntryId,
         menuId: +menuId,
         quantity: +quantity,
         userIds: userIds.map(id => +id),
-      });
+      };
+
+      menuEntries.push(entry);
     }
     instance.menuEntries = menuEntries;
   }

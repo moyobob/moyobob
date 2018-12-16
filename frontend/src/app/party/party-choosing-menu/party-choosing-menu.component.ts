@@ -40,7 +40,7 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   getMenuNameById(id: number) {
     if (this.menus) {
-      const menu = this.menus.find(menuor => menuor.id === id);
+      const menu = this.menus.find(menuor => +menuor.id === +id);
       if (menu) {
         return menu.name;
       }
