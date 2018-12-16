@@ -10,16 +10,8 @@ import { Restaurant } from '../types/restaurant';
 import { Menu } from '../types/menu';
 
 const mockMenus: Menu[] = [
-  {
-    id: 1,
-    name: 'Rustonomicon',
-    price: 101010,
-  },
-  {
-    id: 2,
-    name: 'The Rust Programming Language',
-    price: 232312,
-  },
+  new Menu(1, 'Rustonomicon', 101010),
+  new Menu(2, 'The Rust Programming Language', 232312),
 ];
 
 const mockRestaurant = new Restaurant(1, 'Rustaurant', mockMenus.map(m => m.id));
@@ -58,6 +50,6 @@ describe('RestaurantService', () => {
 
     const req = httpTestingController.expectOne(`${environment.apiUrl}restaurant/${mockRestaurant.id}/menu/`);
     expect(req.request.method).toEqual('GET');
-    req.flush(mockMenus);
+    req.flush(mockMenus.map(menu => Serialize(menu, Menu)));
   }));
 });

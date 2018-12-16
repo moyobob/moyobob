@@ -26,7 +26,7 @@ describe('PartyOrderedComponent', () => {
         UserItemComponent,
       ],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -34,7 +34,7 @@ describe('PartyOrderedComponent', () => {
     component = fixture.componentInstance;
     component.party = mockParty;
     component.user = { id: 1, email: '@.', username: '' };
-    component.users = [];
+    component.members = [];
     fixture.detectChanges();
   });
 
