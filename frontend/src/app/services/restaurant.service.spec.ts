@@ -43,6 +43,16 @@ describe('RestaurantService', () => {
     req.flush(Serialize(mockRestaurant, Restaurant));
   }));
 
+  it('should not request if restaurant cached', async(() => {
+    service.cachedRestaurants = [mockRestaurant];
+
+    service.getRestaurant(mockRestaurant.id).then(restaurant => {
+      expect(restaurant).toEqual(mockRestaurant);
+    });
+
+    httpTestingController.expectNone(`${environment.apiUrl}restaurant/${mockRestaurant.id}/`);
+  }));
+
   it('should get menus of restaurant', async(() => {
     service.getMenus(mockRestaurant.id).then(menus => {
       expect(menus).toEqual(mockMenus);
@@ -51,5 +61,35 @@ describe('RestaurantService', () => {
     const req = httpTestingController.expectOne(`${environment.apiUrl}restaurant/${mockRestaurant.id}/menu/`);
     expect(req.request.method).toEqual('GET');
     req.flush(mockMenus.map(menu => Serialize(menu, Menu)));
+  }));
+
+  it('should not request if menus are cached', async(() => {
+    service.cachedMenus = [[mockRestaurant.id, mockMenus]];
+
+    service.getMenus(mockRestaurant.id).then(menus => {
+      expect(menus).toEqual(mockMenus);
+    });
+
+    httpTestingController.expectNone(`${environment.apiUrl}restaurant/${mockRestaurant.id}/menu/`);
+  }));
+
+  it('should get menu detail', async(() => {
+    service.getMenu(mockMenus[0].id).then(menu => {
+      expect(menu).toEqual(mockMenus[0]);
+    });
+
+    const req = httpTestingController.expectOne(`${environment.apiUrl}menu/${mockMenus[0].id}/`);
+    expect(req.request.method).toEqual('GET');
+    req.flush(Serialize(mockMenus[0], Menu));
+  }));
+
+  it('should not request if menu is cached', async(() => {
+    service.cachedMenus = [[mockRestaurant.id, mockMenus]];
+
+    service.getMenu(mockMenus[0].id).then(menu => {
+      expect(menu).toEqual(mockMenus[0]);
+    });
+
+    httpTestingController.expectNone(`${environment.apiUrl}menu/${mockMenus[0].id}/`);
   }));
 });
