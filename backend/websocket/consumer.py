@@ -14,22 +14,19 @@ WEBSOCKET_DISCONNECT_UNAUTHORIZED = 4010
 WEBSOCKET_DISCONNECT_DUPLICATE = 4011
 
 
-def get_party_state(party_id: int):
-    state = PartyState.get(party_id)
-    if state is None:
-        raise exception.InvalidPartyError
-    return state
-
-
 def get_party(party_id: int):
     try:
         party = Party.objects.get(id=party_id)
     except Party.DoesNotExist:
-        raise exception.InvalidPartyError
+        party = None
 
     state = PartyState.get(party_id)
-    if state is None:
-        party.delete()
+
+    if party is None or state is None:
+        if state is not None:
+            state.delete()
+        elif party is not None:
+            party.delete()
         raise exception.InvalidPartyError
 
     return (party, state)
@@ -48,15 +45,6 @@ def get_party_of_user(user_id: int):
         raise
 
     return (party, state)
-
-
-def get_party_state_of_user(user_id: int):
-    party_id = cache.get('user-party:{}'.format(user_id))
-
-    if party_id is None:
-        raise exception.NotJoinedError
-
-    return get_party_state(party_id)
 
 
 class WebsocketConsumer(AsyncJsonWebsocketConsumer):
@@ -203,6 +191,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
                 )
         else:
             make_record(state)
+            state.delete()
             party.delete()
 
     async def command_to_choosing_menu(self, data):
@@ -287,7 +276,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         user_id = user.id
         restaurant_id = data['restaurant_id']
 
-        state = get_party_state_of_user(user_id)
+        (_, state) = get_party_of_user(user_id)
         party_id = state.id
 
         if not Restaurant.objects.filter(id=restaurant_id).exists():
@@ -309,11 +298,14 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             state.save()
 
     async def command_menu_create(self, data):
+        user = self.scope['user']
+        user_id = user.id
         menu_id = data['menu_id']
         quantity = data['quantity']
         user_ids = data['user_ids']
 
-        state = get_party_state_of_user(self.scope['user'].id)
+        (_, state) = get_party_of_user(user_id)
+        party_id = state.id
 
         if not Menu.objects.filter(id=menu_id).exists():
             raise exception.InvalidMenuError
@@ -324,17 +316,20 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         state.save()
 
         await self.channel_layer.group_send(
-            'party-{}'.format(state.id),
+            'party-{}'.format(party_id),
             event.menu_create(menu_entry_id, menu_id, quantity, user_ids),
         )
 
     async def command_menu_update(self, data):
+        user = self.scope['user']
+        user_id = user.id
         menu_entry_id = data['menu_entry_id']
         quantity = data['quantity']
         add_user_ids = data.get('add_user_ids') or []
         remove_user_ids = data.get('remove_user_ids') or []
 
-        state = get_party_state_of_user(self.scope['user'].id)
+        (_, state) = get_party_of_user(user_id)
+        party_id = state.id
 
         if User.objects.filter(id__in=add_user_ids).count() != len(add_user_ids):
             raise exception.InvalidUserError
@@ -349,15 +344,18 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         state.save()
 
         await self.channel_layer.group_send(
-            'party-{}'.format(state.id),
+            'party-{}'.format(party_id),
             event.menu_update(menu_entry_id, quantity,
                               add_user_ids, remove_user_ids),
         )
 
     async def command_menu_delete(self, data):
+        user = self.scope['user']
+        user_id = user.id
         menu_entry_id = data['menu_entry_id']
 
-        state = get_party_state_of_user(self.scope['user'].id)
+        (_, state) = get_party_of_user(user_id)
+        party_id = state.id
 
         try:
             state.menu_entries.delete(menu_entry_id)
@@ -366,7 +364,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         state.save()
 
         await self.channel_layer.group_send(
-            'party-{}'.format(state.id),
+            'party-{}'.format(party_id),
             event.menu_delete(menu_entry_id)
         )
 
