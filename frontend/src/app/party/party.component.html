@@ -1,4 +1,4 @@
-<div *ngIf="party">
+<div *ngIf="party" class="main">
   <div>
     <h2>{{party.name}}</h2>
     <span>{{party.location}}</span>
@@ -14,11 +14,11 @@
     <app-party-ordered *ngSwitchCase="3" [party]="party" [user]="user" [users]="users" (toNextState)="toPayment($event);">
     </app-party-ordered>
     <app-party-payment *ngSwitchCase="4" [party]="party" [partyState]= "partyState" [user]="user" [menus]="menus" (toNextState)="toFinish();">
-    ></app-party-payment>
+    </app-party-payment>
     <div *ngSwitchDefault></div>
   </div>
   <div>
-    <button routerLink="/lobby/">Lobby</button>
-    <button *ngIf="partyState.id === partyId" (click)="leaveParty();">Leave</button>
+    <button mat-raised-button color="primary" routerLink="/lobby/">Lobby</button>
+    <button mat-raised-button color="primary" *ngIf="partyState.id === partyId" (click)="leaveParty();">Leave</button>
   </div>
 </div>
