@@ -66,7 +66,7 @@ describe('UserService', () => {
     });
   }));
 
-  it('should send request when verifyUser first time', async(() => {
+  it('should send request when verifySession first time', async(() => {
     const service: UserService = TestBed.get(UserService);
     service.verifySession()
       .then(success => {
