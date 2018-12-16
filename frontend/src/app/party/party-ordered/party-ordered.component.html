@@ -3,7 +3,7 @@
   <button *ngIf="isPartyLeader" (click)="showFoodArrived();">Food Arrived</button>
   <div *ngIf="foodArrived">
     <ul>
-      <li *ngFor="let user of users">
+      <li *ngFor="let user of members">
         <app-user-item [user]="user" (userSelected)="goNextState($event);">
         </app-user-item>
       </li>

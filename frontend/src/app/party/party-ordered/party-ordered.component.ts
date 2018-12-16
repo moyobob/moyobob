@@ -12,7 +12,7 @@ export class PartyOrderedComponent implements OnInit {
 
   @Input() party: Party;
   @Input() user: User;
-  @Input() users: User[];
+  @Input() members: User[];
   @Output() toNextState: EventEmitter<User> = new EventEmitter();
   isPartyLeader: boolean;
   foodArrived: boolean;

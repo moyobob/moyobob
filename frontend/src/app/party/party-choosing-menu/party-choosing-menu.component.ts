@@ -13,6 +13,7 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   @Input() partyState: PartyState;
   @Input() user: User;
   @Input() menus: Menu[];
+  @Input() members: User[];
 
   @Output() addMenu: EventEmitter<MenuEntryCreateRequest> = new EventEmitter();
   @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest> = new EventEmitter();
@@ -39,9 +40,19 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   getMenuNameById(id: number) {
     if (this.menus) {
-      const menu = this.menus.filter(menuor => menuor.id === id);
-      if (menu.length) {
-        return menu[0].name;
+      const menu = this.menus.find(menuor => menuor.id === id);
+      if (menu) {
+        return menu.name;
+      }
+    }
+    return '';
+  }
+
+  getUserNameById(id: number) {
+    if (this.members) {
+      const user = this.members.find(u => u.id === id);
+      if (user) {
+        return user.username;
       }
     }
     return '';

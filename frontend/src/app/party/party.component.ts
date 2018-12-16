@@ -25,7 +25,7 @@ export class PartyComponent implements OnInit, OnDestroy {
   party: Party;
   partyState: PartyState;
   user: User;
-  users: User[];
+  members: User[];
   partyId: number;
   menus: Menu[];
   restaurants: Restaurant[];
@@ -75,6 +75,7 @@ export class PartyComponent implements OnInit, OnDestroy {
     if (this.partyState) {
       this.getParty();
       this.getMenus();
+      this.getMembers();
     }
   }
 
@@ -93,6 +94,15 @@ export class PartyComponent implements OnInit, OnDestroy {
       });
     } else {
       this.menus = [];
+    }
+  }
+
+  getMembers(): void {
+    this.members = [];
+    for (const userId of this.partyState.memberIds) {
+      this.userService.getUser(userId).then(user => {
+        this.members.push(user);
+      });
     }
   }
 
