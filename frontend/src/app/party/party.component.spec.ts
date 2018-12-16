@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { MatBadgeModule, MatButtonModule, MatIconModule } from '@angular/material';
 
 import { PartyComponent } from './party.component';
 import { PartyService } from '../services/party.service';
@@ -136,6 +137,11 @@ describe('PartyComponent', () => {
         { provide: RestaurantService, useValue: restaurantServiceSpy },
         { provide: Router, useValue: routerSpy },
         { provide: ActivatedRoute, useClass: MockActivatedRoute },
+      ],
+      imports: [
+        MatButtonModule,
+        MatBadgeModule,
+        MatIconModule,
       ]
     })
       .compileComponents();
