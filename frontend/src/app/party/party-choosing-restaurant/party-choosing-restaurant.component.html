@@ -4,24 +4,25 @@
       RestaurantName: {{vote[1]}}, Vote: {{vote[2]}}
       <span *ngIf="confirmMode">
         <button (click)="clickRestaurant(vote[0]);">
-          confirm
+          Confirm
         </button>
       </span>
       <span *ngIf="isVoted(vote[0]) && !confirmMode">
         <button (click)="clickRestaurant(vote[0]);">
-          UNVOTE
+          Unvote
         </button>
-        </span>
+      </span>
       <span *ngIf="!isVoted(vote[0]) && !confirmMode">
         <button (click)="clickRestaurant(vote[0]);">
-          VOTE
+          Vote
         </button>
       </span>
     </li>
   </ul>
 </div>
-<button *ngIf="amIPartyLeader" (click)="toggleConfirmMode();">toConfirmMode</button>
-<button (click)="toggleAddObject();">Add Survey Component</button>
+<button *ngIf="amIPartyLeader && !confirmMode" (click)="toggleConfirmMode();">To Confirm Mode</button>
+<button *ngIf="amIPartyLeader && confirmMode" (click)="toggleConfirmMode();">To Vote Mode</button>
+<button (click)="toggleAddObject();">More ...</button>
 <app-add-vote-object *ngIf="showAddObjectDialog" [restaurants]="restaurants" [loggedInUserId]="user.id"
-                     (clickRestaurant)="clickRestaurant($event)" (cancel)="toggleAddObject();">
+  (clickRestaurant)="clickRestaurant($event)" (cancel)="toggleAddObject();">
 </app-add-vote-object>
