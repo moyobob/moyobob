@@ -56,7 +56,7 @@ export class UserService {
     }
   }
 
-  async verifyUser(): Promise<User> {
+  async verifySession(): Promise<User> {
     if (this.user) {
       return this.user;
     }
@@ -70,5 +70,9 @@ export class UserService {
 
       return undefined;
     }
+  }
+
+  async getUser(id: number): Promise<User> {
+    return await this.http.get<User>(`${environment.apiUrl}user/${id}/`).toPromise();
   }
 }

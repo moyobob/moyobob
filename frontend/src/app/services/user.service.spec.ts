@@ -68,7 +68,7 @@ describe('UserService', () => {
 
   it('should send request when verifyUser first time', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.verifyUser()
+    service.verifySession()
       .then(success => {
         expect(success).toEqual(mockUser);
       });
@@ -80,7 +80,7 @@ describe('UserService', () => {
 
   it('should not react when no one signed in', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.verifyUser()
+    service.verifySession()
       .then(success => {
         expect(success).toBeFalsy();
       });
@@ -96,7 +96,7 @@ describe('UserService', () => {
   it('should quickly return if already signed in', async(() => {
     const service: UserService = TestBed.get(UserService);
     service.user = mockUser;
-    service.verifyUser().then(u => {
+    service.verifySession().then(u => {
       expect(u).toEqual(mockUser);
     });
 
