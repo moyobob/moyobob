@@ -49,10 +49,14 @@ export class PartyComponent implements OnInit, OnDestroy {
       this.router.navigate(['/lobby']);
     });
     this.subscriptions.push(subscription);
+    subscription = this.userService.userUpdate.subscribe(user => {
+      this.user = user;
+    });
+    this.subscriptions.push(subscription);
 
     this.updateState(this.partyService.partyState);
     this.partyService.connectWebsocket();
-    this.user = { id: this.userService.signedInUserId, email: '', username: '' };
+    this.user = this.userService.user;
     this.restaurantService.getRestaurants().then(restaurants => {
       this.restaurants = restaurants;
     });

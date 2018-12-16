@@ -70,14 +70,12 @@ class MockPartyService {
 describe('LobbyComponent', () => {
   let component: LobbyComponent;
   let fixture: ComponentFixture<LobbyComponent>;
-  let userService: jasmine.SpyObj<UserService>;
   let router: jasmine.SpyObj<Router>;
 
   let getPartiesSpy: jasmine.Spy;
   let addPartySpy: jasmine.Spy;
 
   beforeEach(async(() => {
-    const userSpy = jasmine.createSpyObj('UserService', ['getSignedInUsername']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     TestBed.configureTestingModule({
@@ -94,7 +92,6 @@ describe('LobbyComponent', () => {
       ],
       providers: [
         { provide: PartyService, useClass: MockPartyService },
-        { provide: UserService, useValue: userSpy },
         { provide: Router, useValue: routerSpy },
         { provide: MatDialog, useValue: {} },
       ],
@@ -107,9 +104,6 @@ describe('LobbyComponent', () => {
 
     addPartySpy = spyOn(partyService, 'addParty');
     addPartySpy.and.returnValue(new Promise(r => r(mockParties[0])));
-
-    userService = TestBed.get(UserService);
-    userService.getSignedInUsername.and.returnValue(mockUser.username);
 
     router = TestBed.get(Router);
   }));

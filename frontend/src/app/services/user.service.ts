@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { environment } from '../../environments/environment';
@@ -9,65 +9,40 @@ import { User } from '../types/user';
   providedIn: 'root'
 })
 export class UserService {
-  signedInUsername: string;
-  signedInUserId: number;
+  user: User;
 
-  constructor(private http: HttpClient) {
-    this.signedInUsername = null;
-  }
+  userUpdate: EventEmitter<User> = new EventEmitter();
 
-  async requestSignIn(email: string, password: string): Promise<boolean> {
+  constructor(private http: HttpClient) { }
+
+  async signIn(email: string, password: string): Promise<User> {
     try {
-      const user = await this.http.post<User>(`${environment.apiUrl}signin/`, {
+      this.user = await this.http.post<User>(`${environment.apiUrl}signin/`, {
         'email': email,
         'password': password,
       }).toPromise();
 
-      this.signedInUsername = user.username;
-      this.signedInUserId = user.id;
-
-      return true;
+      this.userUpdate.emit(this.user);
+      return this.user;
     } catch (error) {
-      return false;
+      return undefined;
     }
   }
 
-  getSignedInUsername(): string {
-    return this.signedInUsername;
-  }
-
   async signOut(): Promise<void> {
-    if (!this.signedInUsername) {
+    if (!this.user) {
       return;
     }
     try {
       await this.http.get(`${environment.apiUrl}signout/`).toPromise();
-      this.signedInUsername = null;
+      this.user = undefined;
+      this.userUpdate.emit(undefined);
     } catch (e) {
       return;
     }
   }
 
-  async verifyUser(): Promise<boolean> {
-    if (this.signedInUsername !== null) {
-      return this.signedInUsername !== undefined;
-    }
-
-    try {
-      const user = await this.http.get<User>(`${environment.apiUrl}verify_session/`).toPromise();
-
-      this.signedInUsername = user.username;
-      this.signedInUserId = user.id;
-
-      return true;
-    } catch (error) {
-      this.signedInUsername = undefined;
-
-      return false;
-    }
-  }
-
-  async requestSignUp(email: string, password: string, username: string): Promise<boolean> {
+  async signUp(email: string, password: string, username: string): Promise<boolean> {
     try {
       await this.http.post<User>(`${environment.apiUrl}signup/`, {
         'email': email,
@@ -78,6 +53,22 @@ export class UserService {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  async verifyUser(): Promise<User> {
+    if (this.user) {
+      return this.user;
+    }
+    try {
+      this.user = await this.http.get<User>(`${environment.apiUrl}verify_session/`).toPromise();
+
+      this.userUpdate.emit(this.user);
+      return this.user;
+    } catch (error) {
+      this.user = undefined;
+
+      return undefined;
     }
   }
 }

@@ -44,7 +44,7 @@ export class SignInComponent implements OnInit {
         this.logInStatus = InputStatus.NoInput;
       } else {
         this.logInStatus = InputStatus.TriedSignIn;
-        this.userService.requestSignIn(this.emailInput, this.passwordInput)
+        this.userService.signIn(this.emailInput, this.passwordInput)
           .then(success => {
             if (success) {
               this.router.navigateByUrl('lobby');
