@@ -1,7 +1,9 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 
 import { Menu } from '../../types/menu';
-import { PartyState, MenuEntry, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../../types/party';
+import {
+  Party, PartyState, MenuEntry, MenuEntryCreateRequest, MenuEntryUpdateRequest
+} from '../../types/party';
 import { User } from '../../types/user';
 
 @Component({
@@ -22,6 +24,7 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   menuEntries: MenuEntry[] = [];
   showAddMenuDialog = false;
+  totalMoney: number;
 
   constructor() { }
 
@@ -31,6 +34,7 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     this.updateState();
+    this.totalMoney = this.calculateTotalCost(this.menuEntries);
   }
 
   updateState() {
@@ -108,5 +112,24 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
 
   onNextStateButtonClick(): void {
     this.toNextState.emit();
+  }
+
+  filterMenuEntries(menuEntries: MenuEntry[]) {
+    return menuEntries.filter(x => x.userIds.includes(this.user.id));
+  }
+
+  calculateTotalCost(menuEntries: MenuEntry[]): number {
+    if (!this.menus) {
+      return 0;
+    }
+    return this.filterMenuEntries(menuEntries)
+      .map(x => {
+        const menu = this.menus.find(u => u.id === x.menuId);
+        if (menu) {
+          return menu.price * x.quantity / x.userIds.length;
+        }
+        return 0;
+      })
+      .reduce((x, y) => x + y, 0);
   }
 }

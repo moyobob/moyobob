@@ -32,8 +32,18 @@
     </li>
   </ul>
 </div>
-<button *ngIf="party.leaderId === user.id" (click)="onNextStateButtonClick();">Let's Order!</button>
 <button (click)="toggleAddMenu();">Add Menu</button>
 <app-select-menu *ngIf="showAddMenuDialog" [menus]="menus" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
   (cancel)="cancelAddMenu($event);">
 </app-select-menu>
+<div>
+  <h3>Menus I eat</h3>
+  <ul>
+    <li *ngFor="let menuEntry of filterMenuEntries(menuEntries)">
+      {{getMenuNameById(menuEntry.menuId)}}, <!--
+      -->Amount: {{menuEntry.quantity / menuEntry.userIds.length | number:'1.0-3' }}
+    </li>
+  </ul>
+  <span>Total Cost: {{totalMoney | currency:'KRW' }}</span>
+</div>
+<button *ngIf="party.leaderId === user.id" (click)="onNextStateButtonClick();">Let's Order!</button>
