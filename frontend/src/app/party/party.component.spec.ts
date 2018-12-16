@@ -60,6 +60,7 @@ export class MockPartyChoosingMenuComponent {
   @Input() partyState: PartyState;
   @Input() user: User;
   @Input() menus: Menu[];
+  @Input() members: User[];
 
   @Output() addMenu: EventEmitter<MenuEntryCreateRequest> = new EventEmitter();
   @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest> = new EventEmitter();
@@ -80,7 +81,7 @@ export class MockPartyOrderingComponent {
 export class MockPartyOrderedComponent {
   @Input() party: Party;
   @Input() user: User;
-  @Input() users: User[];
+  @Input() members: User[];
 }
 
 @Component({ selector: 'app-party-payment', template: '' })

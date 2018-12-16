@@ -1,7 +1,7 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
-import {Party, PartyState} from '../../types/party';
-import {User} from '../../types/user';
-import {Restaurant} from '../../types/restaurant';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Party, PartyState } from '../../types/party';
+import { User } from '../../types/user';
+import { Restaurant } from '../../types/restaurant';
 
 @Component({
   selector: 'app-party-choosing-restaurant',
@@ -43,14 +43,16 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
       return;
     }
 
+    this.myVoting = [];
+    this.votedRestaurants = [];
     for (const vote of this.partyState.restaurantVotes) {
       if (this.user.id === vote[0]) {
         this.myVoting.push(vote[1]);
       }
 
-      const updateTarget = this.votedRestaurants.filter(x => x[0] === vote[1]);
-      if (updateTarget.length) {
-        updateTarget[0][2]++;
+      const updateTarget = this.votedRestaurants.find(x => x[0] === vote[1]);
+      if (updateTarget) {
+        updateTarget[2]++;
       } else {
         this.votedRestaurants.push([vote[1], this.getRestaurantNameById(vote[1]), 1]);
       }

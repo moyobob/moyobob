@@ -26,7 +26,7 @@
       </span>
       <ul>
         <li *ngFor="let assignee of menuEntry.userIds">
-          user id {{assignee}}
+          {{getUserNameById(assignee)}}
         </li>
       </ul>
     </li>
