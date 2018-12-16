@@ -111,6 +111,7 @@ def party_detail(request: HttpRequest, party: Party):
         state = party.get_state()
         if state is not None:
             make_record(state)
+            state.delete()
         party.delete()
 
         return HttpResponse()
