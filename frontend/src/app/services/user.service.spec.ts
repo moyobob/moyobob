@@ -66,9 +66,9 @@ describe('UserService', () => {
     });
   }));
 
-  it('should send request when verifyUser first time', async(() => {
+  it('should send request when verifySession first time', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.verifyUser()
+    service.verifySession()
       .then(success => {
         expect(success).toEqual(mockUser);
       });
@@ -80,7 +80,7 @@ describe('UserService', () => {
 
   it('should not react when no one signed in', async(() => {
     const service: UserService = TestBed.get(UserService);
-    service.verifyUser()
+    service.verifySession()
       .then(success => {
         expect(success).toBeFalsy();
       });
@@ -96,7 +96,7 @@ describe('UserService', () => {
   it('should quickly return if already signed in', async(() => {
     const service: UserService = TestBed.get(UserService);
     service.user = mockUser;
-    service.verifyUser().then(u => {
+    service.verifySession().then(u => {
       expect(u).toEqual(mockUser);
     });
 
@@ -137,5 +137,16 @@ describe('UserService', () => {
       status: 403,
       statusText: 'Forbidden'
     });
+  }));
+
+  it('should get user detail', async(() => {
+    const service: UserService = TestBed.get(UserService);
+    service.getUser(mockUser.id).then(user => {
+      expect(user).toEqual(mockUser);
+    });
+
+    const request = httpTestingController.expectOne(`${environment.apiUrl}user/${mockUser.id}/`);
+    expect(request.request.method).toEqual('GET');
+    request.flush(mockUser);
   }));
 });
