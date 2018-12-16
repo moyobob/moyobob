@@ -112,9 +112,9 @@ export class PartyState {
 
       menuEntries.push({
         id: +menuEntryId,
-        menuId: menuId,
-        quantity: quantity,
-        userIds: userIds,
+        menuId: +menuId,
+        quantity: +quantity,
+        userIds: userIds.map(id => +id),
       });
     }
     instance.menuEntries = menuEntries;

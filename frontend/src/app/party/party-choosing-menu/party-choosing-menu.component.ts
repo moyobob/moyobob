@@ -14,17 +14,14 @@ export class PartyChoosingMenuComponent implements OnInit, OnChanges {
   @Input() user: User;
   @Input() menus: Menu[];
 
-  @Output() addMenu: EventEmitter<MenuEntryCreateRequest>;
-  @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest>;
-  @Output() toNextState: EventEmitter<void>;
+  @Output() addMenu: EventEmitter<MenuEntryCreateRequest> = new EventEmitter();
+  @Output() updateMenu: EventEmitter<MenuEntryUpdateRequest> = new EventEmitter();
+  @Output() toNextState: EventEmitter<void> = new EventEmitter();
 
   menuEntries: MenuEntry[] = [];
   showAddMenuDialog = false;
 
-  constructor() {
-    this.addMenu = new EventEmitter();
-    this.updateMenu = new EventEmitter();
-  }
+  constructor() { }
 
   ngOnInit() {
     this.updateState();
