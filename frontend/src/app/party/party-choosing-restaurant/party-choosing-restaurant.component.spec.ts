@@ -17,6 +17,7 @@ const mockPartyState1: PartyState = {
   restaurantId: null,
   memberIds: [],
   menuEntries: [],
+  menuConfirmedUserIds: [],
 };
 const mockPartyState2: PartyState = {
   id: 1,
@@ -25,6 +26,7 @@ const mockPartyState2: PartyState = {
   restaurantId: null,
   memberIds: [],
   menuEntries: [],
+  menuConfirmedUserIds: [],
 };
 
 @Component({ selector: 'app-add-vote-object', template: '' })

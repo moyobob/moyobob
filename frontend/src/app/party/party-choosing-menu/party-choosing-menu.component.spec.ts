@@ -6,7 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { PartyChoosingMenuComponent } from './party-choosing-menu.component';
 
 import { Menu } from '../../types/menu';
-import { PartyState, MenuEntryCreateRequest } from '../../types/party';
+import { Party, PartyState, MenuEntryCreateRequest } from '../../types/party';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 
@@ -22,7 +22,8 @@ const mockPartyState: PartyState = {
   restaurantVotes: [],
   restaurantId: null,
   memberIds: [],
-  menuEntries: [mockMenuEntry1, mockMenuEntry2]
+  menuEntries: [mockMenuEntry1, mockMenuEntry2],
+  menuConfirmedUserIds: []
 };
 
 @Component({ selector: 'app-select-menu', template: '' })
@@ -50,20 +51,14 @@ describe('PartyChoosingMenuComponent', () => {
       .compileComponents();
   }));
 
-  it('should not update menu when not preloaded', () => {
-    fixture = TestBed.createComponent(PartyChoosingMenuComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-
-    expect(component).toBeTruthy();
-  });
-
   beforeEach(() => {
     fixture = TestBed.createComponent(PartyChoosingMenuComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
 
     component.partyState = mockPartyState;
+    component.party = new Party(
+      1, '', 0, '', 1, '', 1
+    );
     component.menus = [mockMenu1];
     component.user = mockUser;
     component.ngOnChanges({
@@ -71,6 +66,8 @@ describe('PartyChoosingMenuComponent', () => {
       menus: new SimpleChange(undefined, [mockMenu1], true),
       user: new SimpleChange(undefined, mockUser, true),
     });
+
+    fixture.detectChanges();
   });
 
   it('should create', () => {
