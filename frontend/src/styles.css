@@ -18,7 +18,7 @@ app-root {
   height: 100%;
 }
 
-router-outlet + *[_nghost-c7] {
+router-outlet + .ng-star-inserted {
   display: flex;
   flex-direction: column;
   height: 100%;
