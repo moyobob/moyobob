@@ -138,4 +138,15 @@ describe('UserService', () => {
       statusText: 'Forbidden'
     });
   }));
+
+  it('should get user detail', async(() => {
+    const service: UserService = TestBed.get(UserService);
+    service.getUser(mockUser.id).then(user => {
+      expect(user).toEqual(mockUser);
+    });
+
+    const request = httpTestingController.expectOne(`${environment.apiUrl}user/${mockUser.id}/`);
+    expect(request.request.method).toEqual('GET');
+    request.flush(mockUser);
+  }));
 });
