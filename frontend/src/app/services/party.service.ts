@@ -60,33 +60,31 @@ export class PartyService {
   ) {
     this.websocketService.onEvent.subscribe(event => {
       this.onWebsocketEvent(event);
-
-
     });
   }
 
   async getParties(): Promise<Party[]> {
-    return await this.http.get<any[]>(`${environment.apiUrl}party/`, httpOptions).toPromise()
-      .then(jsons => jsons.map(json => Deserialize(json, Party)));
+    const jsons = await this.http.get<any[]>(`${environment.apiUrl}party/`, httpOptions).toPromise();
+    return jsons.map(json => Deserialize(json, Party));
   }
 
   async getParty(id: number): Promise<Party> {
     if (id) {
-      return await this.http.get<any>(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise()
-        .then(json => Deserialize(json, Party));
+      const json = await this.http.get<any>(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise()
+      return Deserialize(json, Party);
     } else {
-      return await undefined;
+      return undefined;
     }
   }
 
   async addParty(party: PartyCreateRequest): Promise<Party> {
-    return await this.http.post<any>(`${environment.apiUrl}party/`, party, httpOptions).toPromise()
-      .then(json => Deserialize(json, Party));
+    const json = await this.http.post<any>(`${environment.apiUrl}party/`, party, httpOptions).toPromise();
+    return Deserialize(json, Party);
   }
 
   async updateParty(party: Party): Promise<Party> {
-    return await this.http.put<any>(`${environment.apiUrl}party/${party.id}/`, party, httpOptions)
-      .toPromise().then(() => party);
+    await this.http.put<any>(`${environment.apiUrl}party/${party.id}/`, party, httpOptions).toPromise();
+    return party;
   }
 
   async deleteParty(id: number): Promise<void> {
