@@ -1,6 +1,6 @@
 <div>
   <mat-radio-group class="menus" [(ngModel)]="chosenMenu">
-    <mat-radio-button class="radio-button" *ngFor="let menu of menus" [value]="menu">
+    <mat-radio-button class="radio-button menu" *ngFor="let menu of menus" [value]="menu">
       {{menu.name}}, Price: {{menu.price}}
     </mat-radio-button>
   </mat-radio-group>

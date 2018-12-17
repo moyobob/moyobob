@@ -9,4 +9,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  overflow-y: scroll;
+  max-height: 40vh;
+  width: 100%;
+}
+
+.menu {
+  margin-bottom: 5px;
 }

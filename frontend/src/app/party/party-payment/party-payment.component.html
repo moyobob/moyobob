@@ -5,7 +5,7 @@
   <div>
     <mat-list>
       <mat-list-item *ngFor="let myMenu of myMenus; last as last">
-        <b>{{getMenuNameById(myMenu[0])}}</b> price: {{myMenu[1]}} quantity: {{myMenu[2]}}
+        <b>{{getMenuNameById(myMenu[0])}}</b>&nbsp;price: {{myMenu[1]}} quantity: {{myMenu[2]}}
         <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
       </mat-list-item>
     </mat-list>
