@@ -11,6 +11,8 @@ import { Restaurant } from '../types/restaurant';
   providedIn: 'root'
 })
 export class RestaurantService {
+  cachedRestaurants: Restaurant[] = [];
+  cachedMenus: [number, Menu[]][] = [];
 
   constructor(
     private http: HttpClient,
@@ -18,20 +20,48 @@ export class RestaurantService {
 
   async getRestaurants(): Promise<Restaurant[]> {
     const jsons = await this.http.get<any[]>(`${environment.apiUrl}restaurant/`).toPromise();
-    return jsons.map(json => Deserialize(json, Restaurant));
+    const restaurants = jsons.map(json => Deserialize(json, Restaurant));
+    this.cachedRestaurants = restaurants;
+    return restaurants;
   }
 
-  async getRestaurant(restaurantId: number): Promise<Restaurant> {
-    const json = await this.http.get<any>(
-      `${environment.apiUrl}restaurant/${restaurantId}/`,
-    ).toPromise();
-    return Deserialize(json, Restaurant);
+  async getRestaurant(restaurant_id: number): Promise<Restaurant> {
+    const cachedRestaurant = this.cachedRestaurants.find(r => r.id === restaurant_id);
+    if (cachedRestaurant) {
+      return cachedRestaurant;
+    } else {
+      const json = await this.http.get<any>(
+        `${environment.apiUrl}restaurant/${restaurant_id}/`,
+      ).toPromise();
+      const restaurant = Deserialize(json, Restaurant);
+      this.cachedRestaurants.push(restaurant);
+      return restaurant;
+    }
   }
 
-  async getMenus(restaurantId: number): Promise<Menu[]> {
-    const jsons = await this.http.get<any[]>(
-      `${environment.apiUrl}restaurant/${restaurantId}/menu/`,
-    ).toPromise();
-    return jsons.map(json => Deserialize(json, Menu));
+  async getMenus(restaurant_id: number): Promise<Menu[]> {
+    const cachedMenu = this.cachedMenus.find(rm => rm[0] === restaurant_id);
+    if (cachedMenu) {
+      return cachedMenu[1];
+    } else {
+      const jsons = await this.http.get<any[]>(
+        `${environment.apiUrl}restaurant/${restaurant_id}/menu/`,
+      ).toPromise();
+      const menus = jsons.map(json => Deserialize(json, Menu));
+      this.cachedMenus.push([restaurant_id, menus]);
+      return menus;
+    }
+  }
+
+  async getMenu(menu_id: number): Promise<Menu> {
+    for (const cachedMenus of this.cachedMenus) {
+      const cachedMenu = cachedMenus[1].find(m => m.id === menu_id);
+      if (cachedMenu) {
+        return cachedMenu;
+      }
+    }
+    const json = await this.http.get<any>(`${environment.apiUrl}menu/${menu_id}/`).toPromise();
+    const menu = Deserialize(json, Menu);
+    return menu;
   }
 }

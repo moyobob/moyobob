@@ -1,5 +1,6 @@
 <div class="flex">
   <h3>Ordered!</h3>
+  <span>Total Cost: {{totalMoney | currency:'KRW' }}</span>
   <button mat-raised-button color="primary" *ngIf="isPartyLeader" (click)="showFoodArrived();">Food Arrived</button>
   <mat-list *ngIf="foodArrived" class="center">
     <mat-list-item *ngFor="let user of members; last as last">

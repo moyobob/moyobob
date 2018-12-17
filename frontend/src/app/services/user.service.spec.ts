@@ -149,4 +149,16 @@ describe('UserService', () => {
     expect(request.request.method).toEqual('GET');
     request.flush(mockUser);
   }));
+
+  it('should not request if user is cached', async(() => {
+    const service: UserService = TestBed.get(UserService);
+
+    service.cachedUsers = [mockUser];
+
+    service.getUser(mockUser.id).then(user => {
+      expect(user).toEqual(mockUser);
+    });
+
+    httpTestingController.expectNone(`${environment.apiUrl}user/${mockUser.id}/`);
+  }));
 });
