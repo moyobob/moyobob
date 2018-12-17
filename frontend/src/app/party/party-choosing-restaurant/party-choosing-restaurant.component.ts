@@ -58,7 +58,9 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
         this.votedRestaurants.push([vote[1], this.getRestaurantNameById(vote[1]), 1]);
       }
     }
-    this.unvotedRestaurants = this.restaurants.filter(r => this.votedRestaurants.find(vr => vr[0] === r.id) === undefined);
+    if (this.restaurants) {
+      this.unvotedRestaurants = this.restaurants.filter(r => this.votedRestaurants.find(vr => vr[0] === r.id) === undefined);
+    }
   }
 
   isVoted(restaurantId: number): boolean {
