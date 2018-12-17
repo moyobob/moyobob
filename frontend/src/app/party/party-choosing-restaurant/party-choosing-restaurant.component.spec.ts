@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Component, EventEmitter, Input, Output, SimpleChange } from '@angular/core';
 import { Restaurant } from '../../types/restaurant';
 import { PartyState } from '../../types/party';
-import {MatButtonModule, MatDividerModule, MatExpansionModule, MatListModule, MatSlideToggleModule} from '@angular/material';
+import { MatButtonModule, MatDividerModule, MatExpansionModule, MatListModule, MatSlideToggleModule } from '@angular/material';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 const anotherMockUser = { id: 2, email: '@.', username: 'a' };
@@ -34,8 +34,8 @@ const mockPartyState2: PartyState = {
 class MockAddVoteObjectComponent {
   @Input() restaurants: Restaurant[];
   @Input() loggedInUserId: number;
+  @Input() isConfirmMode: boolean;
   @Output() clickRestaurant: EventEmitter<number>;
-  @Output() cancel: EventEmitter<void>;
 }
 
 describe('PartyChoosingRestaurantComponent', () => {
