@@ -14,10 +14,12 @@ export class PartyPaymentComponent implements OnInit, OnChanges {
   @Input() partyState: PartyState;
   @Input() user: User;
   @Input() menus: Menu[];
+  @Input() members: User[];
+
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
 
-  myMenus: [number, number, number][]; // menuId, menuPrice, menuQuantity
-  totalCost: number;
+  myMenus: [number, number, number][] = []; // menuId, menuPrice, menuQuantity
+  totalCost = 0;
 
   constructor() {
     this.toNextState = new EventEmitter();
@@ -36,6 +38,8 @@ export class PartyPaymentComponent implements OnInit, OnChanges {
       return;
     }
 
+    this.myMenus = [];
+    this.totalCost = 0;
     for (const entry of this.partyState.menuEntries) {
       if (entry.userIds.includes(this.user.id)) {
         const menuPrice = this.getMenuPriceById(entry.menuId);
@@ -50,9 +54,9 @@ export class PartyPaymentComponent implements OnInit, OnChanges {
       return 0;
     }
 
-    const menu = this.menus.filter(menuor => menuor.id === id);
-    if (menu.length) {
-      return menu[0].price;
+    const menu = this.menus.find(menuor => menuor.id === id);
+    if (menu) {
+      return menu.price;
     }
     return 0;
   }
@@ -65,6 +69,16 @@ export class PartyPaymentComponent implements OnInit, OnChanges {
     const menu = this.menus.filter(menuor => menuor.id === id);
     if (menu.length) {
       return menu[0].name;
+    }
+    return '';
+  }
+
+  getUserNameById(id: number) {
+    if (this.members) {
+      const user = this.members.find(u => u.id === id);
+      if (user) {
+        return user.username;
+      }
     }
     return '';
   }

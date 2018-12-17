@@ -34,6 +34,9 @@ export class WebsocketService {
   }
 
   receive(json: any): void {
+    if (!environment.production) {
+      console.log('ws-recv: ', json);
+    }
     const event = deserializeEvent(json);
     this.onEvent.emit(event);
   }
@@ -44,6 +47,9 @@ export class WebsocketService {
     }
 
     const json = serializeCommand(command);
+    if (!environment.production) {
+      console.log('ws-send: ', json);
+    }
     this.websocket$.next(json);
   }
 }

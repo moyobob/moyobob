@@ -17,6 +17,7 @@ import {
   Event,
   PartyJoinEvent,
   PartyLeaveEvent,
+  PartyDeleteEvent,
   InitiallyNotJoinedEvent,
   StateUpdateEvent,
   MenuCreateEvent,
@@ -29,6 +30,7 @@ import {
 import {
   PartyJoinCommand,
   PartyLeaveCommand,
+  PartyDeleteCommand,
   MenuCreateCommand,
   MenuUpdateCommand,
   ToOrderedCommand,
@@ -58,37 +60,37 @@ export class PartyService {
   ) {
     this.websocketService.onEvent.subscribe(event => {
       this.onWebsocketEvent(event);
-
-
     });
   }
 
   async getParties(): Promise<Party[]> {
-    return await this.http.get<any[]>(`${environment.apiUrl}party/`, httpOptions).toPromise()
-      .then(jsons => jsons.map(json => Deserialize(json, Party)));
+    const jsons = await this.http.get<any[]>(`${environment.apiUrl}party/`, httpOptions).toPromise();
+    return jsons.map(json => Deserialize(json, Party));
   }
 
   async getParty(id: number): Promise<Party> {
     if (id) {
-      return await this.http.get<any>(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise()
-        .then(json => Deserialize(json, Party));
+      const json = await this.http.get<any>(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise();
+      return Deserialize(json, Party);
     } else {
-      return await undefined;
+      return undefined;
     }
   }
 
   async addParty(party: PartyCreateRequest): Promise<Party> {
-    return await this.http.post<any>(`${environment.apiUrl}party/`, party, httpOptions).toPromise()
-      .then(json => Deserialize(json, Party));
+    const json = await this.http.post<any>(`${environment.apiUrl}party/`, party, httpOptions).toPromise();
+    return Deserialize(json, Party);
   }
 
   async updateParty(party: Party): Promise<Party> {
-    return await this.http.put<any>(`${environment.apiUrl}party/${party.id}/`, party, httpOptions)
-      .toPromise().then(() => party);
+    await this.http.put<any>(`${environment.apiUrl}party/${party.id}/`, party, httpOptions).toPromise();
+    return party;
   }
 
   async deleteParty(id: number): Promise<void> {
     await this.http.delete(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise();
+    this.partyState = undefined;
+    this.partyStateUpdate.emit(undefined);
   }
 
   connectWebsocket(): void {
@@ -123,6 +125,14 @@ export class PartyService {
 
         this.partyState.memberIds = this.partyState.memberIds.filter(id => id !== event.userId);
         this.partyStateUpdate.emit(this.partyState);
+
+        break;
+      }
+      case rawEvent instanceof PartyDeleteEvent: {
+        const event = <PartyDeleteEvent>rawEvent;
+
+        this.partyState = undefined;
+        this.partyStateUpdate.emit(undefined);
 
         break;
       }
@@ -213,6 +223,18 @@ export class PartyService {
 
     this.partyState = undefined;
     this.partyStateUpdate.emit(this.partyState);
+  }
+
+  deletePartyWithWebsocket(): void {
+    if (this.partyState === undefined) {
+      return;
+    }
+
+    const command = new PartyDeleteCommand();
+    this.websocketService.send(command);
+
+    this.partyState = undefined;
+    this.partyStateUpdate.emit(undefined);
   }
 
   createMenu(request: MenuEntryCreateRequest) {

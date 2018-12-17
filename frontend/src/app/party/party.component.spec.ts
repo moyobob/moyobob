@@ -91,6 +91,7 @@ export class MockPartyPaymentComponent {
   @Input() partyState: PartyState;
   @Input() user: User;
   @Input() menus: Menu[];
+  @Input() members: User[];
   @Output() toNextState: EventEmitter<void> = new EventEmitter();
 }
 

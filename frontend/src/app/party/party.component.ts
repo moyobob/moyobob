@@ -71,11 +71,15 @@ export class PartyComponent implements OnInit, OnDestroy {
   }
 
   updateState(state: PartyState): void {
-    this.partyState = state;
-    if (this.partyState) {
-      this.getParty();
-      this.getMenus();
-      this.getMembers();
+    if (this.partyState !== undefined && state === undefined) {
+      this.router.navigate(['/lobby']);
+    } else {
+      this.partyState = state;
+      if (this.partyState) {
+        this.getParty();
+        this.getMenus();
+        this.getMembers();
+      }
     }
   }
 
@@ -140,13 +144,10 @@ export class PartyComponent implements OnInit, OnDestroy {
   }
 
   toFinish(): void {
-    this.partyService.deleteParty(this.party.id).then(_ => {
-      this.router.navigate(['/lobby']);
-    });
+    this.partyService.deletePartyWithWebsocket();
   }
 
   toggleConfirm(): void {
     this.partyService.toggleConfirm();
   }
-
 }
