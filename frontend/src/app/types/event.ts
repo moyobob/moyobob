@@ -74,6 +74,11 @@ export class PartyLeaveEvent {
   userId: number;
 }
 
+export class PartyDeleteEvent {
+  @deserialize
+  readonly type = 'party.delete';
+}
+
 export class RestaurantVoteEvent {
   @deserialize
   readonly type = 'restaurant.vote';

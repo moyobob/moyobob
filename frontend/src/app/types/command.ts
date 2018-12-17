@@ -28,6 +28,13 @@ export class PartyLeaveCommand implements Command {
   }
 }
 
+export class PartyDeleteCommand implements Command {
+  @serialize
+  readonly command = 'party.delete';
+
+  constructor() { }
+}
+
 export class ToChoosingMenuCommand implements Command {
   @serialize
   readonly command = 'to.choosing.menu';
@@ -148,53 +155,18 @@ export class ToggleConfirmCommand implements Command {
 
 export function serializeCommand(command: Command): any {
   switch (command.command) {
-    case 'party.join': {
-      return Serialize(command, PartyJoinCommand);
-      break;
-    }
-    case 'party.leave': {
-      return Serialize(command, PartyLeaveCommand);
-      break;
-    }
-    case 'to.choosing.menu': {
-      return Serialize(command, ToChoosingMenuCommand);
-      break;
-    }
-    case 'to.ordering': {
-      return Serialize(command, ToOrderingCommand);
-      break;
-    }
-    case 'to.ordered': {
-      return Serialize(command, ToOrderedCommand);
-      break;
-    }
-    case 'to.payment': {
-      return Serialize(command, ToPaymentCommand);
-      break;
-    }
-    case 'restaurant.vote.toggle': {
-      return Serialize(command, RestaurantVoteToggleCommand);
-      break;
-    }
-    case 'menu.create': {
-      return Serialize(command, MenuCreateCommand);
-      break;
-    }
-    case 'menu.update': {
-      return Serialize(command, MenuUpdateCommand);
-      break;
-    }
-    case 'menu.delete': {
-      return Serialize(command, MenuDeleteCommand);
-      break;
-    }
-    case 'menu.confirm.toggle': {
-      return Serialize(command, ToggleConfirmCommand);
-      break;
-    }
-
-    default: {
-      return {};
-    }
+    case 'party.join': return Serialize(command, PartyJoinCommand);
+    case 'party.leave': return Serialize(command, PartyLeaveCommand);
+    case 'party.delete': return Serialize(command, PartyDeleteCommand);
+    case 'to.choosing.menu': return Serialize(command, ToChoosingMenuCommand);
+    case 'to.ordering': return Serialize(command, ToOrderingCommand);
+    case 'to.ordered': return Serialize(command, ToOrderedCommand);
+    case 'to.payment': return Serialize(command, ToPaymentCommand);
+    case 'restaurant.vote.toggle': return Serialize(command, RestaurantVoteToggleCommand);
+    case 'menu.create': return Serialize(command, MenuCreateCommand);
+    case 'menu.update': return Serialize(command, MenuUpdateCommand);
+    case 'menu.delete': return Serialize(command, MenuDeleteCommand);
+    case 'menu.confirm.toggle': return Serialize(command, ToggleConfirmCommand);
+    default: return {};
   }
 }

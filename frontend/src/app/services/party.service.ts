@@ -17,6 +17,7 @@ import {
   Event,
   PartyJoinEvent,
   PartyLeaveEvent,
+  PartyDeleteEvent,
   InitiallyNotJoinedEvent,
   StateUpdateEvent,
   MenuCreateEvent,
@@ -29,6 +30,7 @@ import {
 import {
   PartyJoinCommand,
   PartyLeaveCommand,
+  PartyDeleteCommand,
   MenuCreateCommand,
   MenuUpdateCommand,
   ToOrderedCommand,
@@ -128,6 +130,14 @@ export class PartyService {
 
         break;
       }
+      case rawEvent instanceof PartyDeleteEvent: {
+        const event = <PartyDeleteEvent>rawEvent;
+
+        this.partyState = undefined;
+        this.partyStateUpdate.emit(undefined);
+
+        break;
+      }
       case rawEvent instanceof RestaurantVoteEvent: {
         const event = <RestaurantVoteEvent>rawEvent;
 
@@ -215,6 +225,18 @@ export class PartyService {
 
     this.partyState = undefined;
     this.partyStateUpdate.emit(this.partyState);
+  }
+
+  deletePartyWithWebsocket(): void {
+    if (this.partyState === undefined) {
+      return;
+    }
+
+    const command = new PartyDeleteCommand();
+    this.websocketService.send(command);
+
+    this.partyState = undefined;
+    this.partyStateUpdate.emit(undefined);
   }
 
   createMenu(request: MenuEntryCreateRequest) {
