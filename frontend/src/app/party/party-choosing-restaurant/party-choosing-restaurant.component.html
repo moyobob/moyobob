@@ -1,15 +1,13 @@
 <div class="margin">
   <mat-accordion>
-    <mat-expansion-panel (opened)="showAddObjectDialog = true"
-                         (closed)="showAddObjectDialog = false"
-                         [expanded]="showAddObjectDialog">
+    <mat-expansion-panel (opened)="showAddObjectDialog = true" (closed)="showAddObjectDialog = false" [expanded]="showAddObjectDialog">
       <mat-expansion-panel-header>
         <mat-panel-title class="max-width">
           Select Restaurants
         </mat-panel-title>
       </mat-expansion-panel-header>
-      <app-add-vote-object [restaurants]="restaurants" [loggedInUserId]="user.id"
-                           (clickRestaurant)="selectRestaurant($event)" [isConfirmMode]="confirmMode">
+      <app-add-vote-object [restaurants]="unvotedRestaurants" [loggedInUserId]="user.id" (clickRestaurant)="selectRestaurant($event)"
+        [isConfirmMode]="confirmMode">
       </app-add-vote-object>
     </mat-expansion-panel>
   </mat-accordion>
@@ -49,4 +47,3 @@
     <div *ngIf="confirmMode">To Vote Mode</div>
   </mat-slide-toggle>
 </div>
-
