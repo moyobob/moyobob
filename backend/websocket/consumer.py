@@ -22,6 +22,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
         self.commands = {
             'party.join': self.command_party_join,
             'party.leave': self.command_party_leave,
+            'party.delete': self.command_party_delete,
             'to.choosing.menu': self.command_to_choosing_menu,
             'to.ordering': self.command_to_ordering,
             'to.ordered': self.command_to_ordered,
@@ -162,6 +163,24 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
             make_record(state)
             state.delete()
             party.delete()
+
+    async def command_party_delete(self, data):
+        user = self.scope['user']
+        user_id = user.id
+
+        (party, state) = get_party_of_user(user_id)
+        if party.leader_id != user_id:
+            raise exception.NotAuthorizedError
+        party_id = party.id
+
+        await self.channel_layer.group_send(
+            'party-{}'.format(party_id),
+            event.party_delete(state),
+        )
+
+        make_record(state)
+        state.delete()
+        party.delete()
 
     async def command_to_choosing_menu(self, data):
         user = self.scope['user']

@@ -15,6 +15,12 @@ def party_leave(user_id: int):
     }
 
 
+def party_delete():
+    return {
+        'type': 'party.delete',
+    }
+
+
 def restaurant_vote(user_id: int, restaurant_id: int):
     return {
         'type': 'restaurant.vote',
