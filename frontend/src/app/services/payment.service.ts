@@ -43,7 +43,7 @@ export class PaymentService {
   }
 
   async getCollections(): Promise<Payment[]> {
-    return await this.http.get<any[]>(`${environment.apiUrl}allocations/`, httpOptions).toPromise()
+    return await this.http.get<any[]>(`${environment.apiUrl}collections/`, httpOptions).toPromise()
       .then(json => Deserialize(json, Payment));
   }
 

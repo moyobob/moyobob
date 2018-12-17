@@ -2,20 +2,26 @@
   <div>
     You Have To Pay
     <ul>
-      <li *ngFor="let payment of payments">
-        price: {{payment.price}} toUser: {{getUserNameById(payment.paidUserId | async)}}
-        partyName: when: {{getWhenByPartyRecordId(payment.partyRecordId | async)}}
-        menuName:{{getMenuNameById(payment.menuId | async)}}
+      <li *ngFor="let payment of paymentsPromise">
+        price: {{payment.price}} toUser: {{payment.toUser | async}}
+        <!--partyName: {{payment.partyName | async}} when: {{payment.when | async}}-->
+        menuName:{{payment.menuName | async}}
       </li>
     </ul>
   </div>
   <div>
     You Have To Get
-    <ul>
-      <li *ngFor="let collection of collections">
-        totalCost:{{bePaidItem[1]}} user:{{getUserNameById(bePaidItem[0])}}
-        <button (click)="resolve(bePaidItem[0])">RESOLVE</button>
+    <ul><li *ngFor="let collection of collectionsPromise">
+        price: {{collection.price}} toUser: {{collection.byUser| async}}
+        <!--partyName: {{collection.partyName | async}} when: {{collection.when | async}}-->
+        menuName:{{collection.menuName | async}}
+        <button (click)="resolve(collection.collectionId)">RESOLVE</button>
       </li>
+    <!--<ul><li *ngFor="let collection of collections">-->
+      <!--price: {{collection.price}} toUser: {{getUserNameById(collection.userId) | async}}-->
+      <!--&lt;!&ndash;menu: {{getMenuNameById(collection.menuId) | async}}&ndash;&gt;-->
+      <!--<button (click)="resolve(collection.id)">RESOLVE</button>-->
+    <!--</li>-->
     </ul>
   </div>
 </div>
