@@ -1,7 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { AddVoteObjectComponent } from './add-vote-object.component';
 import { MatButtonModule, MatRadioModule } from '@angular/material';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
+
+import { AddVoteObjectComponent } from './add-vote-object.component';
 
 const mockRestaurant1 = { id: 1, name: 'MockRestaurant1', menuIds: [1] };
 
@@ -13,6 +15,7 @@ describe('AddVoteObjectComponent', () => {
     TestBed.configureTestingModule({
       declarations: [AddVoteObjectComponent],
       imports: [
+        FormsModule,
         MatRadioModule,
         MatButtonModule,
         BrowserAnimationsModule,
