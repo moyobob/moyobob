@@ -70,7 +70,7 @@ export class PartyService {
 
   async getParty(id: number): Promise<Party> {
     if (id) {
-      const json = await this.http.get<any>(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise()
+      const json = await this.http.get<any>(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise();
       return Deserialize(json, Party);
     } else {
       return undefined;
