@@ -19,7 +19,8 @@
     </app-party-choosing-menu>
     <app-party-ordering *ngSwitchCase="2" [party]="party" [menus]="menus" [user]="user" [partyState]="partyState"
       (toNextState)="toOrdered($event);"></app-party-ordering>
-    <app-party-ordered *ngSwitchCase="3" [party]="party" [user]="user" [members]="members" (toNextState)="toPayment($event);">
+    <app-party-ordered *ngSwitchCase="3" [party]="party" [user]="user" [members]="members" [menuEntries]="partyState.menuEntries"
+      [menus]="menus" (toNextState)="toPayment($event);">
     </app-party-ordered>
     <app-party-payment *ngSwitchCase="4" [party]="party" [partyState]="partyState" [user]="user" [menus]="menus"
       (toNextState)="toFinish();">
