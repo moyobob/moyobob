@@ -13,6 +13,8 @@ export class UserService {
 
   userUpdate: EventEmitter<User> = new EventEmitter();
 
+  cachedUsers: User[] = [];
+
   constructor(private http: HttpClient) { }
 
   async signIn(email: string, password: string): Promise<User> {
@@ -73,6 +75,13 @@ export class UserService {
   }
 
   async getUser(id: number): Promise<User> {
-    return await this.http.get<User>(`${environment.apiUrl}user/${id}/`).toPromise();
+    const cachedUser = this.cachedUsers.find(u => u.id === id);
+    if (cachedUser) {
+      return cachedUser;
+    } else {
+      const user = await this.http.get<User>(`${environment.apiUrl}user/${id}/`).toPromise();
+      this.cachedUsers.push(user);
+      return user;
+    }
   }
 }
