@@ -1,8 +1,8 @@
 <div>
   <div>
     <ul>
-      <li *ngFor="let menuEntry of partyState.menuEntries">
-        <b>{{findMenuNameById(menuEntry.menuId)}}</b> quantity: {{menuEntry.quantity}}
+      <li *ngFor="let entry of mergeMenus(partyState.menuEntries)">
+        <b>{{findMenuNameById(entry[0])}}</b> quantity: {{entry[1]}}
       </li>
     </ul>
   </div>

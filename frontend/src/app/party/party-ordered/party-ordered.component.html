@@ -2,6 +2,7 @@
   <h3>Ordered!</h3>
   <button *ngIf="isPartyLeader" (click)="showFoodArrived();">Food Arrived</button>
   <div *ngIf="foodArrived">
+    <span>Total Cost: {{totalMoney | currency:'KRW' }}</span>
     <ul>
       <li *ngFor="let user of members">
         <app-user-item [user]="user" (userSelected)="goNextState($event);">
