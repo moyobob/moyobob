@@ -15,6 +15,9 @@ import {
   MatBadgeModule,
   MatDialogModule,
   MatRadioModule,
+  MatExpansionModule,
+  MatTabsModule,
+  MatSlideToggleModule,
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -75,6 +78,9 @@ import { PaymentComponent } from './payment/payment.component';
     MatBadgeModule,
     MatDialogModule,
     MatRadioModule,
+    MatExpansionModule,
+    MatTabsModule,
+    MatSlideToggleModule,
   ],
   entryComponents: [
     PartyCreateComponent,

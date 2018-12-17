@@ -1,13 +1,14 @@
-<div *ngIf="partyState !== undefined">
-  <div>
+<div *ngIf="partyState !== undefined" class="center">
+  <div class="margin">
     You have to pay {{totalCost}} to {{getUserNameById(partyState.paidUserId)}}
   </div>
   <div>
-    <ul>
-      <li *ngFor="let myMenu of myMenus">
-        <b>{{getMenuNameById(myMenu[0])}}</b> price: {{myMenu[1]}} quantity: {{myMenu[2]}}
-      </li>
-    </ul>
+    <mat-list>
+      <mat-list-item *ngFor="let myMenu of myMenus; last as last">
+        <b>{{getMenuNameById(myMenu[0])}}</b>&nbsp;price: {{myMenu[1]}} quantity: {{myMenu[2]}}
+        <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+      </mat-list-item>
+    </mat-list>
   </div>
-  <button *ngIf="party.leaderId === user.id" (click)="toFinish();">Finish</button>
+  <button mat-raised-button color="warn" *ngIf="party.leaderId === user.id" (click)="toFinish();" class="margin">Finish</button>
 </div>

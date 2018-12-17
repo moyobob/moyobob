@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Party } from '../../types/party';
 import { PartyOrderingComponent } from './party-ordering.component';
+import {MatButtonModule, MatDividerModule, MatListModule} from '@angular/material';
 
 describe('PartyOrderingComponent', () => {
   let component: PartyOrderingComponent;
@@ -9,7 +10,12 @@ describe('PartyOrderingComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PartyOrderingComponent ]
+      declarations: [ PartyOrderingComponent ],
+      imports: [
+        MatListModule,
+        MatDividerModule,
+        MatButtonModule,
+      ]
     })
     .compileComponents();
   }));

@@ -1,0 +1,24 @@
+.flex {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.width {
+  width: 70vw;
+  max-width: 400px;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.total-cost {
+  margin-bottom: 10px;
+}
+
+.select-paid-user {
+  margin-top: 10px;
+}

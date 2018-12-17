@@ -1,28 +1,49 @@
-<div>
-  <ul>
-    <li *ngFor="let vote of votedRestaurants">
-      RestaurantName: {{vote[1]}}, Vote: {{vote[2]}}
-      <span *ngIf="confirmMode">
-        <button (click)="clickRestaurant(vote[0]);">
-          Confirm
-        </button>
-      </span>
-      <span *ngIf="isVoted(vote[0]) && !confirmMode">
-        <button (click)="clickRestaurant(vote[0]);">
-          Unvote
-        </button>
-      </span>
-      <span *ngIf="!isVoted(vote[0]) && !confirmMode">
-        <button (click)="clickRestaurant(vote[0]);">
-          Vote
-        </button>
-      </span>
-    </li>
-  </ul>
+<div class="margin">
+  <mat-accordion>
+    <mat-expansion-panel (opened)="showAddObjectDialog = true" (closed)="showAddObjectDialog = false" [expanded]="showAddObjectDialog">
+      <mat-expansion-panel-header>
+        <mat-panel-title class="max-width">
+          Select Restaurants
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <app-add-vote-object [restaurants]="unvotedRestaurants" [loggedInUserId]="user.id" (clickRestaurant)="selectRestaurant($event)"
+        [isConfirmMode]="confirmMode">
+      </app-add-vote-object>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-list class="width">
+    <h2 mat-subheader class="width">Votes</h2>
+    <mat-list-item *ngFor="let vote of votedRestaurants; last as last" class="width">
+      <div class="align">
+        <div>
+          {{vote[2]}} | {{vote[1]}}
+        </div>
+        <div>
+          <div *ngIf="confirmMode">
+            <button mat-raised-button color="accent" (click)="clickRestaurant(vote[0]);">
+              Confirm
+            </button>
+          </div>
+          <div *ngIf="isVoted(vote[0]) && !confirmMode">
+            <button mat-raised-button color="primary" (click)="clickRestaurant(vote[0]);">
+              Unvote
+            </button>
+          </div>
+          <div *ngIf="!isVoted(vote[0]) && !confirmMode">
+            <button mat-raised-button color="primary" (click)="clickRestaurant(vote[0]);">
+              Vote
+            </button>
+          </div>
+        </div>
+      </div>
+      <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+    </mat-list-item>
+  </mat-list>
 </div>
-<button *ngIf="amIPartyLeader && !confirmMode" (click)="toggleConfirmMode();">To Confirm Mode</button>
-<button *ngIf="amIPartyLeader && confirmMode" (click)="toggleConfirmMode();">To Vote Mode</button>
-<button (click)="toggleAddObject();">More ...</button>
-<app-add-vote-object *ngIf="showAddObjectDialog" [restaurants]="restaurants" [loggedInUserId]="user.id"
-  (clickRestaurant)="clickRestaurant($event)" (cancel)="toggleAddObject();">
-</app-add-vote-object>
+<div class="margin" *ngIf="amIPartyLeader">
+  <mat-slide-toggle (toggleChange)="toggleConfirmMode()">
+    <div *ngIf="!confirmMode">To Confirm Mode</div>
+    <div *ngIf="confirmMode">To Vote Mode</div>
+  </mat-slide-toggle>
+</div>

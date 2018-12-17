@@ -1,10 +1,16 @@
-<div>
-  <div>
-    <ul>
-      <li *ngFor="let entry of mergeMenus(partyState.menuEntries)">
-        <b>{{findMenuNameById(entry[0])}}</b> quantity: {{entry[1]}}
-      </li>
-    </ul>
-  </div>
-  <button *ngIf="party.leaderId === user.id" (click)="toOrdered();">Ordered</button>
+<div class="margin">
+  <mat-list>
+    <mat-list-item *ngFor="let menuEntry of partyState.menuEntries; last as last" class="max-width">
+      <div class="big">
+        <div>
+          {{findMenuNameById(menuEntry.menuId)}}
+        </div>
+        <div>
+          Quantity: {{menuEntry.quantity}}
+        </div>
+      </div>
+      <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+    </mat-list-item>
+  </mat-list>
+  <button mat-raised-button color="accent" *ngIf="party.leaderId === user.id" (click)="toOrdered();">Ordered</button>
 </div>

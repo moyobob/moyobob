@@ -15,7 +15,7 @@ export class SelectMenuComponent implements OnInit {
   @Output() request: EventEmitter<MenuEntryCreateRequest>;
   @Output() cancel: EventEmitter<void>;
 
-  menuId: number;
+  chosenMenu: Menu;
   quantity: number;
 
   constructor() {
@@ -27,11 +27,11 @@ export class SelectMenuComponent implements OnInit {
   }
 
   addRequest() {
-    if (this.menuId === undefined || !this.quantity) {
+    if (this.chosenMenu === undefined || !this.quantity) {
       // TODO: showing error
     } else {
       this.request.next({
-        menuId: +this.menuId,
+        menuId: +this.chosenMenu.id,
         quantity: this.quantity,
         users: [this.loggedInUserId]
       });

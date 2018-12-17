@@ -1,0 +1,26 @@
+.max-width {
+  width: 70vw;
+  max-width: 400px;
+}
+
+.margin {
+  margin-top: 10px;
+}
+
+.width {
+  width: 100%;
+}
+
+.align {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h2 {
+  padding-top: 16px !important;
+  padding-bottom: 0px !important;
+  height: 32px !important;
+}

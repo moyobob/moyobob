@@ -1,14 +1,16 @@
-<div>
+<div class="flex">
   <h3>Ordered!</h3>
-  <button *ngIf="isPartyLeader" (click)="showFoodArrived();">Food Arrived</button>
-  <div *ngIf="foodArrived">
-    <span>Total Cost: {{totalMoney | currency:'KRW' }}</span>
-    <ul>
-      <li *ngFor="let user of members">
-        <app-user-item [user]="user" (userSelected)="goNextState($event);">
+  <span class="total-cost">Total Cost: {{totalMoney | currency:'KRW' }}</span>
+  <button mat-raised-button color="primary" *ngIf="isPartyLeader" (click)="showFoodArrived();">Food Arrived</button>
+  <div *ngIf="foodArrived" class="center">
+    <h4>Select the paid user</h4>
+    <mat-list>
+      <mat-list-item *ngFor="let user of members; last as last">
+        <app-user-item [user]="user" (userSelected)="goNextState($event);" class="width">
         </app-user-item>
-      </li>
-    </ul>
-    <button (click)="cancelFoodArrived();">Cancel</button>
+        <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+      </mat-list-item>
+      <button mat-raised-button color="primary" (click)="cancelFoodArrived();">Cancel</button>
+    </mat-list>
   </div>
 </div>

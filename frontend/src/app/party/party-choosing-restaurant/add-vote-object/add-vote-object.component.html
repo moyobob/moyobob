@@ -1,12 +1,11 @@
 <div>
-  <ul>
-    <li *ngFor="let restaurant of restaurants">
-      <button type="button" name="restaurant" (click)="onClickRestaurant(restaurant.id);">
-        {{restaurant.name}}
-      </button>
-    </li>
-  </ul>
-  <div>
-    <button (click)="onCancelButtonClick();">Cancel</button>
+  <mat-radio-group class="restaurants" [(ngModel)]="chosenRestaurant">
+    <mat-radio-button class="radio-button" *ngFor="let restaurant of restaurants" [value]="restaurant">
+      {{restaurant.name}}
+    </mat-radio-button>
+  </mat-radio-group>
+  <div class="align">
+    <button *ngIf="!isConfirmMode" mat-button color="primary" (click)="onClickRestaurant()">Vote</button>
+    <button *ngIf="isConfirmMode" mat-button color="accent" (click)="onClickRestaurant()">Confirm</button>
   </div>
 </div>

@@ -18,6 +18,7 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
   @Output() toNextState: EventEmitter<number>;
 
   votedRestaurants: [number, string, number][] = []; // restaurantId, restaurantName, voteNumber. Restaurants whose voteNumber >= 1
+  unvotedRestaurants: Restaurant[] = [];
   myVoting: number[]; // list of restaurants' Id I voted for
   showAddObjectDialog = false;
   amIPartyLeader = false;
@@ -57,6 +58,9 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
         this.votedRestaurants.push([vote[1], this.getRestaurantNameById(vote[1]), 1]);
       }
     }
+    if (this.restaurants) {
+      this.unvotedRestaurants = this.restaurants.filter(r => this.votedRestaurants.find(vr => vr[0] === r.id) === undefined);
+    }
   }
 
   isVoted(restaurantId: number): boolean {
@@ -89,15 +93,16 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
     this.confirmMode = !this.confirmMode;
   }
 
-  toggleAddObject(): void {
-    this.showAddObjectDialog = !this.showAddObjectDialog;
-  }
-
   clickRestaurant(restaurantId: number): void {
     if (this.confirmMode) {
       this.toNextState.emit(restaurantId);
     } else {
       this.votingEvent.emit(restaurantId);
     }
+  }
+
+  selectRestaurant(restaurantId: number): void {
+    this.clickRestaurant(restaurantId);
+    this.showAddObjectDialog = !this.showAddObjectDialog;
   }
 }

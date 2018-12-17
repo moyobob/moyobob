@@ -1,0 +1,21 @@
+.max-width {
+  width: 70vw;
+  max-width: 400px;
+}
+
+.margin {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.big {
+  width: 100%;
+  font-size: x-large;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+button {
+  margin-top: 10px;
+}

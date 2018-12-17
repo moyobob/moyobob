@@ -1,54 +1,85 @@
-<div>
-  <ul>
-    <li *ngFor="let menuEntry of menuEntries">
-      {{getMenuNameById(menuEntry.menuId)}}, Count: {{menuEntry.quantity}}
-      <span *ngIf="isAssigned(menuEntry.userIds)">
-        <button *ngIf="menuEntry.userIds.length <= menuEntry.quantity" (click)="updatePartyMenu(menuEntry, -1, true);">
-          Remove
-        </button>
-        <button *ngIf="menuEntry.userIds.length > menuEntry.quantity" (click)="updatePartyMenu(menuEntry, 0, true);">
-          Unassign
-        </button>
-      </span>
-      <span *ngIf="!isAssigned(menuEntry.userIds)">
-        <button *ngIf="(menuEntry.userIds.length == 1 &&
-            menuEntry.quantity == 1) ||
-          menuEntry.userIds.length <= menuEntry.quantity"
-          (click)="updatePartyMenu(menuEntry, 1, false);">
-          Add
-        </button>
-        <button *ngIf="(menuEntry.userIds.length == 1 &&
-            menuEntry.quantity == 1) ||
-          menuEntry.userIds.length > menuEntry.quantity"
-          (click)="updatePartyMenu(menuEntry, 0, false);">
-          Assign
-        </button>
-      </span>
-      <ul>
-        <li *ngFor="let assignee of menuEntry.userIds">
-          {{getUserNameById(assignee)}}
-          <span *ngIf="menuConfirmed(assignee)">
-            Confirmed
-          </span>
-        </li>
-      </ul>
-    </li>
-  </ul>
+<div class="margin">
+  <mat-accordion>
+    <mat-expansion-panel (opened)="showAddMenuDialog = true"
+                         (closed)="showAddMenuDialog = false"
+                         [expanded]="showAddMenuDialog">
+      <mat-expansion-panel-header>
+        <mat-panel-title class="max-width">
+          Add Menus
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <app-select-menu [menus]="menus" [loggedInUserId]="user.id"
+                       (request)="requestAddMenu($event);" (cancel)="cancelAddMenu($event);">
+      </app-select-menu>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-tab-group>
+    <mat-tab label="Whole Order">
+      <mat-list class="width">
+        <mat-list-item *ngFor="let menuEntry of menuEntries; last as last" class="width">
+          <div class="align">
+            <div>
+              <div class="big">
+                {{menuEntry.quantity}} | {{getMenuNameById(menuEntry.menuId)}}
+              </div>
+              <div class="row">
+                <div *ngFor="let assignee of menuEntry.userIds; last as last" class="small">
+                  {{getUserNameById(assignee)}}
+                  <span *ngIf="menuConfirmed(assignee)">
+                    (Confirmed)
+                  </span>
+                  <span *ngIf="!last">,</span>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="isAssigned(menuEntry.userIds)">
+              <button mat-raised-button color="primary" *ngIf="menuEntry.userIds.length <= menuEntry.quantity" (click)="updatePartyMenu(menuEntry, -1, true);">
+                Remove
+              </button>
+              <button mat-raised-button color="primary" *ngIf="menuEntry.userIds.length > menuEntry.quantity" (click)="updatePartyMenu(menuEntry, 0, true);">
+                Unassign
+              </button>
+            </div>
+            <div *ngIf="!isAssigned(menuEntry.userIds)">
+              <button *ngIf="(menuEntry.userIds.length == 1 &&  menuEntry.quantity == 1) ||
+                              menuEntry.userIds.length <= menuEntry.quantity"
+                      (click)="updatePartyMenu(menuEntry, 1, false);"
+                      mat-raised-button color="primary" class="add-assign">
+                Add
+              </button>
+              <button *ngIf="(menuEntry.userIds.length == 1 && menuEntry.quantity == 1) ||
+                              menuEntry.userIds.length > menuEntry.quantity"
+                      (click)="updatePartyMenu(menuEntry, 0, false);"
+                      mat-raised-button color="primary" class="add-assign">
+                Assign
+              </button>
+            </div>
+          </div>
+          <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+        </mat-list-item>
+      </mat-list>
+
+    </mat-tab>
+    <mat-tab label="My Menu">
+      <mat-list class="width">
+        <mat-list-item *ngFor="let menuEntry of filterMenuEntries(menuEntries); last as last">
+          <div>
+            {{getMenuNameById(menuEntry.menuId)}}, Amount : {{menuEntry.quantity / menuEntry.userIds.length | number:'1.0-3' }}
+          </div>
+        <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+        </mat-list-item>
+        <div>
+          Total Cost: {{totalMoney | currency:'KRW' }}
+        </div>
+      </mat-list>
+    </mat-tab>
+  </mat-tab-group>
+
+  <div class="confirm">
+    <button mat-raised-button color="accent" *ngIf="confirmed" (click)="toggleConfirm();">Unconfirm</button>
+    <button mat-raised-button color="accent" *ngIf="!confirmed"(click)="toggleConfirm();">Confirm</button>
+    <button mat-raised-button color="accent" *ngIf="party.leaderId === user.id" (click)="onNextStateButtonClick();">Let's Order!</button>
+  </div>
+
 </div>
-<button (click)="toggleAddMenu();">Add Menu</button>
-<button *ngIf="confirmed" (click)="toggleConfirm();">Unconfirm</button>
-<button *ngIf="!confirmed"(click)="toggleConfirm();">Confirm</button>
-<app-select-menu *ngIf="showAddMenuDialog" [menus]="menus" [loggedInUserId]="user.id" (request)="requestAddMenu($event);"
-  (cancel)="cancelAddMenu($event);">
-</app-select-menu>
-<div>
-  <h3>Menus I eat</h3>
-  <ul>
-    <li *ngFor="let menuEntry of filterMenuEntries(menuEntries)">
-      {{getMenuNameById(menuEntry.menuId)}}, <!--
-      -->Amount: {{menuEntry.quantity / menuEntry.userIds.length | number:'1.0-3' }}
-    </li>
-  </ul>
-  <span>Total Cost: {{totalMoney | currency:'KRW' }}</span>
-</div>
-<button *ngIf="party.leaderId === user.id" (click)="onNextStateButtonClick();">Let's Order!</button>

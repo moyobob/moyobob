@@ -1,15 +1,14 @@
 <div>
-  <ul>
-    <li *ngFor="let menu of menus">
-      <input type="radio" name="menu" [(ngModel)]="menuId" value="{{menu.id}}" />
+  <mat-radio-group class="menus" [(ngModel)]="chosenMenu">
+    <mat-radio-button class="radio-button menu" *ngFor="let menu of menus" [value]="menu">
       {{menu.name}}, Price: {{menu.price}}
-    </li>
-  </ul>
-  <div>
-    Amount: <input type="number" [(ngModel)]="quantity" min="1" max="100" />
-  </div>
-  <div>
-    <button (click)="addRequest();">Add</button>
-    <button (click)="cancelRequest();">Cancel</button>
+    </mat-radio-button>
+  </mat-radio-group>
+  <div class="align">
+    <div>
+      Amount: <input type="number" [(ngModel)]="quantity" min="1" max="100" />
+    </div>
+    <button mat-button color="primary" (click)="addRequest()">Add</button>
+    <button mat-button color="primary" (click)="cancelRequest()">Cancel</button>
   </div>
 </div>
