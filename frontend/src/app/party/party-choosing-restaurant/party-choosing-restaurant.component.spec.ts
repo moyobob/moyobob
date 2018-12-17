@@ -1,11 +1,12 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, EventEmitter, Input, Output, SimpleChange } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonModule, MatDividerModule, MatExpansionModule, MatListModule, MatSlideToggleModule } from '@angular/material';
 
 import { PartyChoosingRestaurantComponent } from './party-choosing-restaurant.component';
-import { FormsModule } from '@angular/forms';
-import { Component, EventEmitter, Input, Output, SimpleChange } from '@angular/core';
 import { Restaurant } from '../../types/restaurant';
 import { PartyState } from '../../types/party';
-import {MatButtonModule, MatDividerModule, MatExpansionModule, MatListModule, MatSlideToggleModule} from '@angular/material';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 const anotherMockUser = { id: 2, email: '@.', username: 'a' };
@@ -34,8 +35,8 @@ const mockPartyState2: PartyState = {
 class MockAddVoteObjectComponent {
   @Input() restaurants: Restaurant[];
   @Input() loggedInUserId: number;
-  @Output() clickRestaurant: EventEmitter<number>;
-  @Output() cancel: EventEmitter<void>;
+  @Input() isConfirmMode: boolean;
+  @Output() clickRestaurant: EventEmitter<number> = new EventEmitter();
 }
 
 describe('PartyChoosingRestaurantComponent', () => {
@@ -46,6 +47,7 @@ describe('PartyChoosingRestaurantComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
+        BrowserAnimationsModule,
         MatExpansionModule,
         MatListModule,
         MatButtonModule,
@@ -63,12 +65,14 @@ describe('PartyChoosingRestaurantComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PartyChoosingRestaurantComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
 
     component.party = mockParty;
     component.partyState = mockPartyState1;
     component.user = mockUser;
     component.restaurants = [mockRestaurant1];
+
+    fixture.detectChanges();
+
     component.ngOnChanges({
       party: new SimpleChange(undefined, mockParty, true),
       partyState: new SimpleChange(undefined, mockPartyState1, true),

@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonModule } from '@angular/material';
 
 import { UserItemComponent } from './user-item.component';
 
@@ -6,12 +8,15 @@ describe('UserItemComponent', () => {
   let component: UserItemComponent;
   let fixture: ComponentFixture<UserItemComponent>;
 
-  beforeEach(async((MatButtonComponent) => {
+  beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UserItemComponent ],
-      imports: [MatButtonComponent],
+      declarations: [UserItemComponent],
+      imports: [
+        BrowserAnimationsModule,
+        MatButtonModule,
+      ],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
