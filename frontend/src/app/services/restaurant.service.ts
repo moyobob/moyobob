@@ -64,8 +64,4 @@ export class RestaurantService {
     const menu = Deserialize(json, Menu);
     return menu;
   }
-
-  async getMenu(id: number): Promise<Menu> {
-    return await this.http.get<Menu>(`${environment.apiUrl}menu/${id}/`).toPromise();
-  }
 }
