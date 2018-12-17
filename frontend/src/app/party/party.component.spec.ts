@@ -82,6 +82,8 @@ export class MockPartyOrderingComponent {
 export class MockPartyOrderedComponent {
   @Input() party: Party;
   @Input() user: User;
+  @Input() menuEntries: MenuEntry[];
+  @Input() menus: Menu[];
   @Input() members: User[];
 }
 
