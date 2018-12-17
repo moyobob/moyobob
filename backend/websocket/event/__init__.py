@@ -15,6 +15,12 @@ def party_leave(user_id: int):
     }
 
 
+def party_delete():
+    return {
+        'type': 'party.delete',
+    }
+
+
 def restaurant_vote(user_id: int, restaurant_id: int):
     return {
         'type': 'restaurant.vote',
@@ -55,6 +61,20 @@ def menu_delete(menu_entry_id: int):
     return {
         'type': 'menu.delete',
         'menu_entry_id': menu_entry_id,
+    }
+
+
+def menu_confirm(user_id: int):
+    return {
+        'type': 'menu.confirm',
+        'user_id': user_id,
+    }
+
+
+def menu_unconfirm(user_id: int):
+    return {
+        'type': 'menu.unconfirm',
+        'user_id': user_id,
     }
 
 

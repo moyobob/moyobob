@@ -114,24 +114,58 @@ class RecordTestCase(TestCaseWithHttp):
         resp = self.get('/api/payments/')
         self.assertEqual(resp.status_code, 200)
         resp_json = resp.json()
-        self.assertEqual(
+
+        payments = record.payments.filter(user_id=self.user1.id).select_related(
+            'user', 'paid_user', 'menu').all()
+        self.assertListEqual(
             [payment['id'] for payment in resp_json],
-            [payment.id for payment in record.payments.filter(
-                user_id=self.user1.id).all()],
+            [payment.id for payment in payments],
+        )
+        self.assertListEqual(
+            [payment['user'] for payment in resp_json],
+            [payment.user.as_dict() for payment in payments],
+        )
+        self.assertListEqual(
+            [payment['paid_user'] for payment in resp_json],
+            [payment.paid_user.as_dict() for payment in payments],
+        )
+        self.assertListEqual(
+            [payment['menu'] for payment in resp_json],
+            [payment.menu.as_dict() for payment in payments],
         )
 
     def test_get_collections(self):
         record = make_record(self.state)
 
-        self.login()
+        super().login(email="pbzweihander@rustaceans.org", password="iluvrust2")
 
         resp = self.get('/api/collections/')
         self.assertEqual(resp.status_code, 200)
         resp_json = resp.json()
-        self.assertEqual(
-            [payment['id'] for payment in resp_json],
-            [payment.id for payment in record.payments.filter(
-                paid_user_id=self.user1.id).all()],
+
+        payments = record.payments.filter(paid_user_id=self.user2.id).select_related(
+            'user', 'paid_user', 'menu').all()
+        self.assertListEqual(
+            sorted([payment['id'] for payment in resp_json]),
+            sorted([payment.id for payment in payments]),
+        )
+        self.assertListEqual(
+            sorted([payment['user']
+                    for payment in resp_json], key=lambda u: u['id']),
+            sorted([payment.user.as_dict()
+                    for payment in payments], key=lambda u: u['id']),
+        )
+        self.assertListEqual(
+            sorted([payment['paid_user']
+                    for payment in resp_json], key=lambda u: u['id']),
+            sorted([payment.paid_user.as_dict()
+                    for payment in payments], key=lambda u: u['id']),
+        )
+        self.assertListEqual(
+            sorted([payment['menu']
+                    for payment in resp_json], key=lambda m: m['id']),
+            sorted([payment.menu.as_dict()
+                    for payment in payments], key=lambda m: m['id']),
         )
 
     def test_resolve_payment(self):

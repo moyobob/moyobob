@@ -9,7 +9,7 @@ from json.decoder import JSONDecodeError
 
 from .models import User, Party, PartyType, Restaurant, Menu, Payment
 from .decorator import allow_authenticated, allow_method
-from .decorator import get_menu, get_party, get_payment, get_restaurant
+from .decorator import get_user, get_menu, get_party, get_payment, get_restaurant
 from .util import make_record
 
 
@@ -69,6 +69,13 @@ def verify_session(request: HttpRequest):
     return JsonResponse(request.user.as_dict())
 
 
+@allow_method(['GET'])
+@allow_authenticated
+@get_user
+def user_detail(request: HttpRequest, user: User):
+    return JsonResponse(user.as_dict())
+
+
 @allow_method(['GET', 'POST'])
 @allow_authenticated
 def party(request: HttpRequest):
@@ -104,6 +111,7 @@ def party_detail(request: HttpRequest, party: Party):
         state = party.get_state()
         if state is not None:
             make_record(state)
+            state.delete()
         party.delete()
 
         return HttpResponse()
@@ -153,17 +161,33 @@ def party_records(request: HttpRequest):
 @allow_method(['GET'])
 @allow_authenticated
 def payments(request: HttpRequest):
-    payments = request.user.payments.filter(resolved=False).all()
+    payments = request.user.payments.filter(
+        resolved=False).select_related('user', 'paid_user', 'menu').all()
+    payment_jsons = []
+    for payment in payments:
+        payment_json = payment.as_dict()
+        payment_json['user'] = payment.user.as_dict()
+        payment_json['paid_user'] = payment.paid_user.as_dict()
+        payment_json['menu'] = payment.menu.as_dict()
+        payment_jsons.append(payment_json)
 
-    return JsonResponse([payment.as_dict() for payment in payments], safe=False)
+    return JsonResponse(payment_jsons, safe=False)
 
 
 @allow_method(['GET'])
 @allow_authenticated
 def collections(request: HttpRequest):
-    collections = request.user.collections.filter(resolved=False).all()
+    collections = request.user.collections.filter(
+        resolved=False).select_related('user', 'paid_user', 'menu').all()
+    payment_jsons = []
+    for payment in collections:
+        payment_json = payment.as_dict()
+        payment_json['user'] = payment.user.as_dict()
+        payment_json['paid_user'] = payment.paid_user.as_dict()
+        payment_json['menu'] = payment.menu.as_dict()
+        payment_jsons.append(payment_json)
 
-    return JsonResponse([payment.as_dict() for payment in collections], safe=False)
+    return JsonResponse(payment_jsons, safe=False)
 
 
 @allow_method(['GET'])
