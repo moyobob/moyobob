@@ -31,7 +31,7 @@ export class SelectMenuComponent implements OnInit {
       // TODO: showing error
     } else {
       this.request.next({
-        menuId: this.menuId,
+        menuId: +this.menuId,
         quantity: this.quantity,
         users: [this.loggedInUserId]
       });
