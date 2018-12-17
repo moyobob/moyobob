@@ -2,6 +2,7 @@ from django.core.cache import cache
 
 from . import TestCaseWithCache
 from api.models import Party, PartyType, User
+from websocket.models import PartyState
 from websocket.util import get_party, get_party_of_user
 from websocket.exception import NotJoinedError, InvalidPartyError
 
@@ -58,6 +59,8 @@ class UtilTestCase(TestCaseWithCache):
 
     def test_delete_invalid_party(self):
         self.state.delete()
+        Party.objects.get(id=self.party.id)
+        self.assertIsNone(PartyState.get(self.state.id))
 
         with self.assertRaises(InvalidPartyError):
             get_party(self.party.id)
@@ -66,8 +69,11 @@ class UtilTestCase(TestCaseWithCache):
 
     def test_delete_invalid_party_state(self):
         self.party.delete()
+        with self.assertRaises(Party.DoesNotExist):
+            Party.objects.get(id=self.party.id)
+        self.assertIsNotNone(PartyState.get(self.state.id))
 
         with self.assertRaises(InvalidPartyError):
             get_party(self.state.id)
 
-        self.assertIsNone(cache.get('party:{}'.format(self.state.id)))
+        self.assertIsNone(PartyState.get(self.state.id))
