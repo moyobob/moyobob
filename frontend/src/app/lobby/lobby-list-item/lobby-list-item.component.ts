@@ -19,10 +19,11 @@ export class LobbyListItemComponent implements OnInit {
   ngOnInit() { }
 
   joinPartyButton(partyId: number) {
-    this.joinParty.emit(partyId);
+    if (this.joinedPartyId === this.party.id) {
+      this.navigateToParty.emit();
+    } else {
+      this.joinParty.emit(partyId);
+    }
   }
 
-  navigateToPartyButton() {
-    this.navigateToParty.emit();
-  }
 }
