@@ -25,6 +25,18 @@ export class PaymentService {
       .then(json => Deserialize(json, Payment));
   }
 
+  async getPartyRecord(id: number): Promise<PartyRecord> {
+    return await this.http.get<any[]>(`${environment.apiUrl}party_records/`, httpOptions).toPromise()
+      .then(json => {
+        const partyRecordArray = json.filter(x => x['id'] === id);
+        if (partyRecordArray) {
+          return Deserialize(partyRecordArray[0], PartyRecord);
+        } else {
+          return undefined;
+        }
+      });
+  }
+
   async getPayments(): Promise<Payment[]> {
     return await this.http.get<any[]>(`${environment.apiUrl}payments/`, httpOptions).toPromise()
       .then(json => Deserialize(json, Payment));

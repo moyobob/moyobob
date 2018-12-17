@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { PaymentService } from '../services/payment.service';
 import { Payment } from '../types/payment';
+import { UserService } from '../services/user.service';
+import { RestaurantService } from '../services/restaurant.service';
 
 @Component({
   selector: 'app-payment',
@@ -10,70 +12,31 @@ import { Payment } from '../types/payment';
 export class PaymentComponent implements OnInit {
   payments: Payment[];
   collections: Payment[];
-  shouldPayList: [number, number][]; // receiverId(toWhom), totalCost
-  bePaidList: [number, number][]; // senderId(byWhom), totalCost
 
   constructor(
+    private userService: UserService,
+    private restaurantService: RestaurantService,
     private paymentService: PaymentService,
   ) { }
 
   ngOnInit() {
-    this.makeShouldPayList();
-    this.makeBePaidList();
-  }
-
-  makeShouldPayList(): void {
     this.paymentService.getPayments().then(payments => this.payments = payments);
-
-    for (const item of this.payments) {
-      const updateTarget = this.shouldPayList.filter(x => x[0] === item.paidUserId);
-      if (updateTarget.length) {
-        updateTarget[0][1] += item.price;
-      } else {
-        this.shouldPayList.push([item.paidUserId, item.price]);
-      }
-    }
-  }
-
-  makeBePaidList(): void {
     this.paymentService.getCollections().then(collections => this.collections = collections);
-
-    for (const item of this.collections) {
-      const updateTarget = this.bePaidList.filter(x => x[0] === item.userId);
-      if (updateTarget.length) {
-        updateTarget[0][1] += item.price;
-      } else {
-        this.bePaidList.push([item.userId, item.price]);
-      }
-    }
   }
 
-  getUserNameById(Id: number): string {
-    return 'NAME';
+  async getUserNameById(Id: number): Promise<string> {
+    const user = await this.userService.getUser(Id);
+    return user.username;
   }
 
-  getMeansById(Id: number): string {
-    return 'ACCOUNTS';
+  async getMenuNameById(id: number): Promise<string> {
+    const menu = await this.restaurantService.getMenu(id);
+    return menu.name;
   }
 
-  resolve(senderId: number): void {
-    let paymentCounts = 0;
-    const paymentsIds: number[] = [];
-
-    for (const item of this.collections) {
-      if (item.userId === senderId) {
-        paymentCounts++;
-        paymentsIds.push(item.id);
-      }
-    }
-
-    for (const paymentId of paymentsIds) {
-      this.paymentService.resolvePayment(paymentId).then( _ => {
-        paymentCounts--;
-        if (paymentCounts === 0) {
-          location.reload();
-        }
-      });
-    }
+  resolve(paymentId: number): void {
+    this.paymentService.resolvePayment(paymentId).then(_ => {
+      this.collections = this.collections.filter(p => p.id !== paymentId);
+    });
   }
 }

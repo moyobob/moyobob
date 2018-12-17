@@ -2,16 +2,17 @@
   <div>
     You Have To Pay
     <ul>
-      <li *ngFor="let shouldPayItem of shouldPayList">
-        totalCost:{{shouldPayItem[1]}} user:{{getUserNameById(shouldPayItem[0])}}
-         by:{{getMeansById(shouldPayItem[0])}}
+      <li *ngFor="let payment of payments">
+        price: {{payment.price}} toUser: {{getUserNameById(payment.paidUserId | async)}}
+        partyName: when: {{getWhenByPartyRecordId(payment.partyRecordId | async)}}
+        menuName:{{getMenuNameById(payment.menuId | async)}}
       </li>
     </ul>
   </div>
   <div>
     You Have To Get
     <ul>
-      <li *ngFor="let bePaidItem of bePaidList">
+      <li *ngFor="let collection of collections">
         totalCost:{{bePaidItem[1]}} user:{{getUserNameById(bePaidItem[0])}}
         <button (click)="resolve(bePaidItem[0])">RESOLVE</button>
       </li>
