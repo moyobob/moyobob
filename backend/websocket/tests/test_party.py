@@ -1,8 +1,9 @@
 from django.core.cache import cache
 
-from websocket import event
 from . import async_test, new_communicator
 from . import TestCaseWithSingleWebsocket, TestCaseWithDoubleWebsocket
+from websocket import event
+from websocket.models import PartyState
 from api.models import Party
 
 
@@ -216,3 +217,29 @@ class PartyTestCase2(TestCaseWithDoubleWebsocket):
 
         resp = await communicator.receive_json_from(1)
         self.assertDictEqual(resp, event.party_leave(self.user2.id))
+
+    @async_test
+    async def test_party_delete(self):
+        await self.join_both()
+
+        await self.communicator1.send_json_to({
+            'command': 'party.delete',
+        })
+        resp = await self.communicator1.receive_json_from(1)
+        self.assertDictEqual(resp, event.party_delete())
+        resp = await self.communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.party_delete())
+
+        with self.assertRaises(Party.DoesNotExist):
+            Party.objects.get(id=self.party.id)
+        self.assertIsNone(PartyState.get(self.state.id))
+
+    @async_test
+    async def test_party_delete_not_authorized(self):
+        await self.join_both()
+
+        await self.communicator2.send_json_to({
+            'command': 'party.delete',
+        })
+        resp = await self.communicator2.receive_json_from(1)
+        self.assertDictEqual(resp, event.error.not_authorized())
