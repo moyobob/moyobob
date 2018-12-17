@@ -202,96 +202,29 @@ export type Event
 
 export function deserializeEvent(json: any): Event {
   switch (json['type']) {
-    case 'error.invalid.command': {
-      return Deserialize(json, InvalidCommandError);
-      break;
-    }
-    case 'error.invalid.data': {
-      return Deserialize(json, InvalidDataError);
-      break;
-    }
-    case 'error.invalid.user': {
-      return Deserialize(json, InvalidUserError);
-      break;
-    }
-    case 'error.invalid.party': {
-      return Deserialize(json, InvalidPartyError);
-      break;
-    }
-    case 'error.invalid.restaurant': {
-      return Deserialize(json, InvalidRestaurantError);
-      break;
-    }
-    case 'error.invalid.menu': {
-      return Deserialize(json, InvalidMenuError);
-      break;
-    }
-    case 'error.invalid.menu.entry': {
-      return Deserialize(json, InvalidMenuEntryError);
-      break;
-    }
-    case 'error.not.joined': {
-      return Deserialize(json, NotJoinedError);
-      break;
-    }
-    case 'error.already.joined': {
-      return Deserialize(json, AlreadyJoinedError);
-      break;
-    }
-    case 'error.not.voted': {
-      return Deserialize(json, NotVotedError);
-      break;
-    }
-    case 'initial.not.joined': {
-      return Deserialize(json, InitiallyNotJoinedEvent);
-      break;
-    }
-    case 'party.join': {
-      return Deserialize(json, PartyJoinEvent);
-      break;
-    }
-    case 'party.leave': {
-      return Deserialize(json, PartyLeaveEvent);
-      break;
-    }
-    case 'restaurant.vote': {
-      return Deserialize(json, RestaurantVoteEvent);
-      break;
-    }
-    case 'restaurant.unvote': {
-      return Deserialize(json, RestaurantUnvoteEvent);
-      break;
-    }
-    case 'menu.create': {
-      return Deserialize(json, MenuCreateEvent);
-      break;
-    }
-    case 'menu.update': {
-      return Deserialize(json, MenuUpdateEvent);
-      break;
-    }
-    case 'menu.delete': {
-      return Deserialize(json, MenuDeleteEvent);
-      break;
-    }
-    case 'state.update': {
-      return Deserialize(json, StateUpdateEvent);
-      break;
-    }
-    case 'leader.change': {
-      return Deserialize(json, LeaderChangeEvent);
-      break;
-    }
-    case 'menu.confirm': {
-      return Deserialize(json, MenuConfirmEvent);
-      break;
-    }
-    case 'menu.unconfirm': {
-      return Deserialize(json, MenuUnconfirmEvent);
-      break;
-    }
-    default: {
-      return Nothing;
-    }
+    case 'error.invalid.command': return Deserialize(json, InvalidCommandError);
+    case 'error.invalid.data': return Deserialize(json, InvalidDataError);
+    case 'error.invalid.user': return Deserialize(json, InvalidUserError);
+    case 'error.invalid.party': return Deserialize(json, InvalidPartyError);
+    case 'error.invalid.restaurant': return Deserialize(json, InvalidRestaurantError);
+    case 'error.invalid.menu': return Deserialize(json, InvalidMenuError);
+    case 'error.invalid.menu.entry': return Deserialize(json, InvalidMenuEntryError);
+    case 'error.not.joined': return Deserialize(json, NotJoinedError);
+    case 'error.already.joined': return Deserialize(json, AlreadyJoinedError);
+    case 'error.not.voted': return Deserialize(json, NotVotedError);
+    case 'initial.not.joined': return Deserialize(json, InitiallyNotJoinedEvent);
+    case 'party.join': return Deserialize(json, PartyJoinEvent);
+    case 'party.leave': return Deserialize(json, PartyLeaveEvent);
+    case 'party.delete': return Deserialize(json, PartyDeleteEvent);
+    case 'restaurant.vote': return Deserialize(json, RestaurantVoteEvent);
+    case 'restaurant.unvote': return Deserialize(json, RestaurantUnvoteEvent);
+    case 'menu.create': return Deserialize(json, MenuCreateEvent);
+    case 'menu.update': return Deserialize(json, MenuUpdateEvent);
+    case 'menu.delete': return Deserialize(json, MenuDeleteEvent);
+    case 'state.update': return Deserialize(json, StateUpdateEvent);
+    case 'leader.change': return Deserialize(json, LeaderChangeEvent);
+    case 'menu.confirm': return Deserialize(json, MenuConfirmEvent);
+    case 'menu.unconfirm': return Deserialize(json, MenuUnconfirmEvent);
+    default: return Nothing;
   }
 }
