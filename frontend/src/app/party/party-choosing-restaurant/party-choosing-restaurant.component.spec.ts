@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Component, EventEmitter, Input, Output, SimpleChange } from '@angular/core';
 import { Restaurant } from '../../types/restaurant';
 import { PartyState } from '../../types/party';
+import {MatButtonModule, MatDividerModule, MatExpansionModule, MatListModule, MatSlideToggleModule} from '@angular/material';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 const anotherMockUser = { id: 2, email: '@.', username: 'a' };
@@ -45,6 +46,11 @@ describe('PartyChoosingRestaurantComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         FormsModule,
+        MatExpansionModule,
+        MatListModule,
+        MatButtonModule,
+        MatDividerModule,
+        MatSlideToggleModule,
       ],
       declarations: [
         PartyChoosingRestaurantComponent,
@@ -127,12 +133,6 @@ describe('PartyChoosingRestaurantComponent', () => {
     component.confirmMode = false;
     component.toggleConfirmMode();
     expect(component.confirmMode).toBeTruthy();
-  });
-
-  it('toggleAddObject should toggle showAddObjectDialog', () => {
-    component.showAddObjectDialog = false;
-    component.toggleAddObject();
-    expect(component.showAddObjectDialog).toBeTruthy();
   });
 
   it('if confirmMode, clickRestaurant should emit toNextState with same parameter', async((done) => {

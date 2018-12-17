@@ -4,6 +4,7 @@ import { Party, PartyType } from '../../types/party';
 
 import { PartyOrderedComponent } from './party-ordered.component';
 import { UserItemComponent } from './user-item/user-item.component';
+import {MatButtonModule, MatListModule} from '@angular/material';
 
 const mockParty: Party = {
   id: 3,
@@ -25,6 +26,11 @@ describe('PartyOrderedComponent', () => {
         PartyOrderedComponent,
         UserItemComponent,
       ],
+      imports: [
+        MatButtonModule,
+        MatListModule,
+
+      ]
     })
       .compileComponents();
   }));

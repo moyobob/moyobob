@@ -7,6 +7,7 @@ import { PartyChoosingMenuComponent } from './party-choosing-menu.component';
 
 import { Menu } from '../../types/menu';
 import { Party, PartyState, MenuEntryCreateRequest } from '../../types/party';
+import { MatButtonModule, MatDividerModule, MatExpansionModule, MatListModule, MatTabsModule } from '@angular/material';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 
@@ -46,6 +47,11 @@ describe('PartyChoosingMenuComponent', () => {
       ],
       imports: [
         HttpClientModule,
+        MatExpansionModule,
+        MatTabsModule,
+        MatListModule,
+        MatDividerModule,
+        MatButtonModule,
       ],
     })
       .compileComponents();

@@ -3,6 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { PartyPaymentComponent } from './party-payment.component';
 import { PartyState } from '../../types/party';
 import { SimpleChange } from '@angular/core';
+import {MatButtonModule, MatDividerModule, MatListModule} from '@angular/material';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 const mockParty = { id: 1, name: 'mockParty', type: 0, location: 'location1', leaderId: 1, since: '0000', memberCount: 2 };
@@ -30,7 +31,12 @@ describe('PartyPaymentComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PartyPaymentComponent ]
+      declarations: [ PartyPaymentComponent ],
+      imports: [
+        MatListModule,
+        MatDividerModule,
+        MatButtonModule
+      ]
     })
     .compileComponents();
   }));

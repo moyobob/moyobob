@@ -6,9 +6,10 @@ describe('UserItemComponent', () => {
   let component: UserItemComponent;
   let fixture: ComponentFixture<UserItemComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(async((MatButtonComponent) => {
     TestBed.configureTestingModule({
-      declarations: [ UserItemComponent ]
+      declarations: [ UserItemComponent ],
+      imports: [MatButtonComponent],
     })
     .compileComponents();
   }));

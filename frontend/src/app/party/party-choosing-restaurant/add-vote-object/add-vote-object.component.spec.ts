@@ -1,5 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { AddVoteObjectComponent } from './add-vote-object.component';
+import { MatButtonModule, MatRadioModule } from '@angular/material';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 const mockRestaurant1 = { id: 1, name: 'MockRestaurant1', menuIds: [1] };
 
@@ -9,7 +11,12 @@ describe('AddVoteObjectComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [AddVoteObjectComponent]
+      declarations: [AddVoteObjectComponent],
+      imports: [
+        MatRadioModule,
+        MatButtonModule,
+        BrowserAnimationsModule,
+      ]
     })
       .compileComponents();
   }));
@@ -31,13 +38,7 @@ describe('AddVoteObjectComponent', () => {
     component.clickRestaurant.subscribe(restaurantId => {
       expect(restaurantId).toEqual(1);
     });
-    component.onClickRestaurant(1);
+    component.onClickRestaurant();
   });
 
-  it('onCancelButtonClick emits event with no parameter', () => {
-    component.cancel.subscribe(_ => {
-      expect(_).toEqual(undefined);
-    });
-    component.onCancelButtonClick();
-  });
 });
