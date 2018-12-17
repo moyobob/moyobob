@@ -96,4 +96,9 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
       this.votingEvent.emit(restaurantId);
     }
   }
+
+  selectRestaurant(restaurantId: number): void {
+    this.clickRestaurant(restaurantId);
+    this.showAddObjectDialog = !this.showAddObjectDialog;
+  }
 }

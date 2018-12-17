@@ -5,6 +5,7 @@
     </mat-radio-button>
   </mat-radio-group>
   <div class="align">
-    <button mat-button color="primary" (click)="onClickRestaurant()">Add</button>
+    <button *ngIf="!isConfirmMode" mat-button color="primary" (click)="onClickRestaurant()">Vote</button>
+    <button *ngIf="isConfirmMode" mat-button color="accent" (click)="onClickRestaurant()">Confirm</button>
   </div>
 </div>

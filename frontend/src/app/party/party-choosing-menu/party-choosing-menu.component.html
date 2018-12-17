@@ -1,7 +1,8 @@
 <div class="margin">
   <mat-accordion>
     <mat-expansion-panel (opened)="showAddMenuDialog = true"
-                         (closed)="showAddMenuDialog = false">
+                         (closed)="showAddMenuDialog = false"
+                         [expanded]="showAddMenuDialog">
       <mat-expansion-panel-header>
         <mat-panel-title class="max-width">
           Add Menus

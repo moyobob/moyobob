@@ -9,6 +9,7 @@ import {Restaurant} from '../../../types/restaurant';
 export class AddVoteObjectComponent implements OnInit {
   @Input() restaurants: Restaurant[];
   @Input() loggedInUserId: number;
+  @Input() isConfirmMode: boolean;
   @Output() clickRestaurant: EventEmitter<number>;
   chosenRestaurant: Restaurant;
 

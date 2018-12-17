@@ -17,6 +17,7 @@ import {
   MatRadioModule,
   MatExpansionModule,
   MatTabsModule,
+  MatSlideToggleModule,
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -77,6 +78,7 @@ import { AddVoteObjectComponent } from './party/party-choosing-restaurant/add-vo
     MatRadioModule,
     MatExpansionModule,
     MatTabsModule,
+    MatSlideToggleModule,
   ],
   entryComponents: [
     PartyCreateComponent,
