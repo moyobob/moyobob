@@ -89,6 +89,8 @@ export class PartyService {
 
   async deleteParty(id: number): Promise<void> {
     await this.http.delete(`${environment.apiUrl}party/${id}/`, httpOptions).toPromise();
+    this.partyState = undefined;
+    this.partyStateUpdate.emit(undefined);
   }
 
   connectWebsocket(): void {

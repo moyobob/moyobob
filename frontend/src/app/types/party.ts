@@ -113,9 +113,9 @@ export class PartyState {
     for (const menuEntryId of Object.keys(json['menu_entries'])) {
       const [menuId, quantity, userIds] = json['menu_entries'][menuEntryId];
       const entry: MenuEntry = {
-        id: +menuEntryId,
-        menuId: +menuId,
-        quantity: +quantity,
+        id: parseInt(menuEntryId, 10),
+        menuId: parseInt(menuId, 10),
+        quantity: parseInt(quantity, 10),
         userIds: userIds.map(id => +id),
       };
 
