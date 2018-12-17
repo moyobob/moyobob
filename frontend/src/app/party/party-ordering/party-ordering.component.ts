@@ -37,8 +37,8 @@ export class PartyOrderingComponent implements OnInit {
     if (!menuEntries) {
       return [];
     }
-    let mergeList: [number, number][] = [];
-    for (let menuEntry of menuEntries) {
+    const mergeList: [number, number][] = [];
+    for (const menuEntry of menuEntries) {
       const mergeItem = mergeList.find(tuple => tuple[0] === menuEntry.menuId);
       if (mergeItem) {
         mergeItem[1] += menuEntry.quantity;
