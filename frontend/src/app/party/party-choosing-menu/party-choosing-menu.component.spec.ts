@@ -1,13 +1,13 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { Component, Input, Output, EventEmitter, SimpleChange } from '@angular/core';
 import { HttpClientModule } from '@angular/common/http';
+import { MatButtonModule, MatDividerModule, MatExpansionModule, MatListModule, MatTabsModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { PartyChoosingMenuComponent } from './party-choosing-menu.component';
 
 import { Menu } from '../../types/menu';
 import { Party, PartyState, MenuEntryCreateRequest } from '../../types/party';
-import { MatButtonModule, MatDividerModule, MatExpansionModule, MatListModule, MatTabsModule } from '@angular/material';
 
 const mockUser = { id: 1, email: 'ferris@rustaceans.org', username: 'ferris' };
 
@@ -31,8 +31,8 @@ const mockPartyState: PartyState = {
 class MockSelectMenuComponent {
   @Input() menus: Menu[];
   @Input() loggedInUserId: number;
-  @Output() request: EventEmitter<MenuEntryCreateRequest>;
-  @Output() cancel: EventEmitter<void>;
+  @Output() request: EventEmitter<MenuEntryCreateRequest> = new EventEmitter();
+  @Output() cancel: EventEmitter<void> = new EventEmitter();
 }
 
 describe('PartyChoosingMenuComponent', () => {
@@ -47,6 +47,7 @@ describe('PartyChoosingMenuComponent', () => {
       ],
       imports: [
         HttpClientModule,
+        BrowserAnimationsModule,
         MatExpansionModule,
         MatTabsModule,
         MatListModule,
