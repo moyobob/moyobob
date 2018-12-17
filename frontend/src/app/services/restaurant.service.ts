@@ -3,10 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Deserialize } from 'cerialize';
 
 import { environment } from '../../environments/environment';
-
 import { Menu } from '../types/menu';
 import { Restaurant } from '../types/restaurant';
-import {User} from "../types/user";
 
 @Injectable({
   providedIn: 'root'

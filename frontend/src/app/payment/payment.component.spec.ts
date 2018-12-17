@@ -1,9 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { PaymentComponent } from './payment.component';
-import {User} from "../types/user";
-import {Payment} from "../types/payment";
-
+import { User } from '../types/user';
 
 const mockUser: User = {
   id: 1,
@@ -12,10 +9,10 @@ const mockUser: User = {
 };
 
 const mockUser2: User = {
-  id:2,
-  email:'@.',
+  id: 2,
+  email: '@.',
   username: 'paidUser',
-}
+};
 
 describe('PaymentComponent', () => {
   let component: PaymentComponent;

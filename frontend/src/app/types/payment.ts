@@ -1,6 +1,6 @@
 import { deserialize, deserializeAs, serialize, serializeAs } from 'cerialize';
-import {User} from "./user";
-import {Menu} from "./menu";
+import { User } from './user';
+import { Menu } from './menu';
 
 export class Payment {
   @serialize
@@ -11,12 +11,12 @@ export class Payment {
   @deserialize
   user: User;
 
-  @serialize
-  @deserialize
+  @serializeAs('paid_user')
+  @deserializeAs('paid_user')
   paidUser: User;
 
-  @serialize
-  @deserialize
+  @serializeAs(Menu)
+  @deserializeAs(Menu)
   menu: Menu;
 
   @serialize

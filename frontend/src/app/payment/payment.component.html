@@ -3,18 +3,14 @@
     You Have To Pay
     <ul>
       <li *ngFor="let payment of payments">
-        price: {{payment.price}} toUser: {{payment.paidUser.username}}
-        <!--partyName: {{payment.partyName | async}} when: {{payment.when | async}}-->
-        menuName:{{payment.menu.name}}
+        price: {{payment.price}} toUser: {{payment.paidUser.username}} menuName:{{payment.menu.name}}
       </li>
     </ul>
   </div>
   <div>
     You Have To Get
     <ul><li *ngFor="let collection of collections">
-        price: {{collection.price}} toUser: {{collection.user.username}}
-        <!--partyName: {{collection.partyName | async}} when: {{collection.when | async}}-->
-        menuName:{{collection.menu.name}}
+        price: {{collection.price}} toUser: {{collection.user.username}} menuName:{{collection.menu.name}}
         <button (click)="resolve(collection.id)">RESOLVE</button>
       </li>
     </ul>
