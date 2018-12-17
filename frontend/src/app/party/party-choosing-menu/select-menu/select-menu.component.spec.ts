@@ -1,10 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MatButtonModule, MatRadioModule } from '@angular/material';
 
 import { SelectMenuComponent } from './select-menu.component';
-import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import { MatButtonModule, MatRadioModule } from '@angular/material';
+
+import { Menu } from 'src/app/types/menu';
 
 describe('SelectMenuComponent', () => {
   let component: SelectMenuComponent;
@@ -45,7 +46,7 @@ describe('SelectMenuComponent', () => {
   }));
 
   it('addRequest should emit request when food and quantity', async(() => {
-    component.chosenMenu.id = 1;
+    component.chosenMenu = new Menu(1, 'm', 2);
     component.quantity = 2;
     component.loggedInUserId = 3;
 
@@ -62,12 +63,12 @@ describe('SelectMenuComponent', () => {
   it('addRequest should not emit request without food or quantity', async(() => {
     component.request.subscribe(_ => expect(true).toBeFalsy());
 
-    component.chosenMenu.id = undefined;
+    component.chosenMenu = undefined;
     component.quantity = 2;
     component.loggedInUserId = 3;
     component.addRequest();
 
-    component.chosenMenu.id = 1;
+    component.chosenMenu = new Menu(1, 'm', 2);
     component.quantity = 0;
     component.loggedInUserId = 3;
     component.addRequest();
