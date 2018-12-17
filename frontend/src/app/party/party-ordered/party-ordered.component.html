@@ -1,13 +1,12 @@
-<div>
+<div class="flex">
   <h3>Ordered!</h3>
-  <button *ngIf="isPartyLeader" (click)="showFoodArrived();">Food Arrived</button>
-  <div *ngIf="foodArrived">
-    <ul>
-      <li *ngFor="let user of members">
-        <app-user-item [user]="user" (userSelected)="goNextState($event);">
-        </app-user-item>
-      </li>
-    </ul>
-    <button (click)="cancelFoodArrived();">Cancel</button>
-  </div>
+  <button mat-raised-button color="primary" *ngIf="isPartyLeader" (click)="showFoodArrived();">Food Arrived</button>
+  <mat-list *ngIf="foodArrived" class="center">
+    <mat-list-item *ngFor="let user of members; last as last">
+      <app-user-item [user]="user" (userSelected)="goNextState($event);" class="width">
+      </app-user-item>
+      <mat-divider [inset]="true" *ngIf="!last"></mat-divider>
+    </mat-list-item>
+    <button mat-raised-button color="primary" (click)="cancelFoodArrived();">Cancel</button>
+  </mat-list>
 </div>

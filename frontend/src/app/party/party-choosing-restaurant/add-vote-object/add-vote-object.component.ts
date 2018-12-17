@@ -10,22 +10,19 @@ export class AddVoteObjectComponent implements OnInit {
   @Input() restaurants: Restaurant[];
   @Input() loggedInUserId: number;
   @Output() clickRestaurant: EventEmitter<number>;
-  @Output() cancel: EventEmitter<void>;
+  chosenRestaurant: Restaurant;
 
   constructor() {
     this.clickRestaurant = new EventEmitter();
-    this.cancel = new EventEmitter();
   }
 
   ngOnInit() {
   }
 
-  onClickRestaurant(restaurantId: number): void {
-    this.clickRestaurant.emit(restaurantId);
-  }
-
-  onCancelButtonClick(): void {
-    this.cancel.emit();
+  onClickRestaurant(): void {
+    if (this.chosenRestaurant != null) {
+      this.clickRestaurant.emit(this.chosenRestaurant.id);
+    }
   }
 }
 

@@ -1,0 +1,47 @@
+.max-width {
+  width: 70vw;
+  max-width: 400px;
+}
+
+.margin {
+  margin-top: 10px;
+}
+
+.width {
+  width: 100%;
+}
+
+.align {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.big {
+  font-size: large;
+}
+
+.small {
+  margin-top: 3px;
+  margin-bottom: 3px;
+  font-size: small;
+}
+
+.confirm {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-assign {
+  margin-left: 10px;
+}

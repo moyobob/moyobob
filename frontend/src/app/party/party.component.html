@@ -1,14 +1,14 @@
 <div *ngIf="party" class="main">
-  <div style="width: 100%; text-align: center;">
-    <h2>{{party.name}}</h2>
-    <div class="party-info">
-      <span style="text-align: left;" class="party-info-item">{{party.location}}</span>
-      <div class="party-info-item right-align">
-        <div class="member-count right-align">
-          <mat-icon color="primary" class="right-align">account_circle</mat-icon>
-          <span class="right-align">{{party.memberCount}}</span>
-        </div>
+  <div class="container">
+    <div class="left">
+      <span id="party-name">{{party.name}}</span>
+    </div>
+    <div class="right">
+      <div class="member-count">
+        <mat-icon color="primary">account_circle</mat-icon>
+        <span id="party-member-count">{{party.memberCount}}</span>
       </div>
+      <span id="party-location">@{{party.location}}</span>
     </div>
   </div>
   <div [ngSwitch]="partyState.phase">
@@ -27,7 +27,7 @@
     </app-party-payment>
     <div *ngSwitchDefault></div>
   </div>
-  <div>
+  <div class="buttons">
     <button mat-raised-button color="primary" routerLink="/lobby/">Lobby</button>
     <button mat-raised-button color="primary" *ngIf="partyState.id === partyId" (click)="leaveParty();">Leave</button>
   </div>

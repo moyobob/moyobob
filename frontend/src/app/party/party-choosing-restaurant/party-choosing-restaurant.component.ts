@@ -89,10 +89,6 @@ export class PartyChoosingRestaurantComponent implements OnInit, OnChanges {
     this.confirmMode = !this.confirmMode;
   }
 
-  toggleAddObject(): void {
-    this.showAddObjectDialog = !this.showAddObjectDialog;
-  }
-
   clickRestaurant(restaurantId: number): void {
     if (this.confirmMode) {
       this.toNextState.emit(restaurantId);

@@ -1,38 +1,47 @@
 .main {
-  width: 70%;
+  width: 90%;
   max-width: 400px;
   margin: 0 auto;
-  margin-top: 50px;
+  margin-top: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   height: 100%;
 }
 
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.left {
+  margin-top: auto;
+  margin-bottom: auto;
+  margin-left: 0;
+  font-size: x-large;
+}
+
+.right {
+  max-width: 30%;
+}
+
 .member-count {
   display: flex;
   flex-direction: row;
+  justify-content: flex-end;
   align-items: center;
 }
 
-.right-align {
-  text-align: right;
-  margin-right: 0;
-  float: right;
-}
-
-.party-info {
-  width: 80%;
-  margin: 0 auto;
+.buttons {
+  width: 90%;
+  max-width: 400px;
   display: flex;
   flex-direction: row;
-  align-items: center;
-}
-
-.party-info-item {
-  flex: 1;
-}
-
-button {
-  margin: 5px 5px 0 5px;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
 }

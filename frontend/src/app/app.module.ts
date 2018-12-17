@@ -15,6 +15,8 @@ import {
   MatBadgeModule,
   MatDialogModule,
   MatRadioModule,
+  MatExpansionModule,
+  MatTabsModule,
 } from '@angular/material';
 
 import { AppComponent } from './app.component';
@@ -73,6 +75,8 @@ import { AddVoteObjectComponent } from './party/party-choosing-restaurant/add-vo
     MatBadgeModule,
     MatDialogModule,
     MatRadioModule,
+    MatExpansionModule,
+    MatTabsModule,
   ],
   entryComponents: [
     PartyCreateComponent,

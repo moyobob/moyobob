@@ -1,0 +1,9 @@
+.center {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+}
+
+.margin {
+  margin-top: 10px;
+}
