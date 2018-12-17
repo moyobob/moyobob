@@ -1,21 +1,23 @@
 import { deserialize, deserializeAs, serialize, serializeAs } from 'cerialize';
+import {User} from "./user";
+import {Menu} from "./menu";
 
 export class Payment {
   @serialize
   @deserialize
   id: number;
 
-  @serializeAs('user_id')
-  @deserializeAs('user_id')
-  userId: number;
+  @serialize
+  @deserialize
+  user: User;
 
-  @serializeAs('paid_user_id')
-  @deserializeAs('paid_user_id')
-  paidUserId: number;
+  @serialize
+  @deserialize
+  paidUser: User;
 
-  @serializeAs('menu_id')
-  @deserializeAs('menu_id')
-  menuId: number;
+  @serialize
+  @deserialize
+  menu: Menu;
 
   @serialize
   @deserialize
@@ -30,13 +32,13 @@ export class Payment {
   partyRecordId: number;
 
   constructor(
-    id: number, userId: number, paidUserId: number,
-    menuId: number, price: number, resolved: boolean, partyRecordId: number
+    id: number, user: User, paidUser: User,
+    menu: Menu, price: number, resolved: boolean, partyRecordId: number
   ) {
     this.id = id;
-    this.userId = userId;
-    this.paidUserId = paidUserId;
-    this.menuId = menuId;
+    this.user = user;
+    this.paidUser = paidUser;
+    this.menu = menu;
     this.price = price;
     this.resolved = resolved;
     this.partyRecordId = partyRecordId;
