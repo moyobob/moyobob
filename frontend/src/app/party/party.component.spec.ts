@@ -9,7 +9,10 @@ import { PartyService } from '../services/party.service';
 import { UserService } from '../services/user.service';
 import { RestaurantService } from '../services/restaurant.service';
 
-import { Party, PartyType, PartyState, MenuEntryCreateRequest, MenuEntryUpdateRequest } from '../types/party';
+import {
+  Party, PartyType, PartyState,
+  MenuEntry, MenuEntryCreateRequest, MenuEntryUpdateRequest
+} from '../types/party';
 import { User } from '../types/user';
 import { Menu } from '../types/menu';
 import { Restaurant } from '../types/restaurant';
