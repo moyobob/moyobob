@@ -5,4 +5,13 @@
 
 .radio-button {
   margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+.restaurants {
+  display: inline-flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  max-height: 40vh;
+  width: 100%;
 }
