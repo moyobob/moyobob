@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Deserialize } from 'cerialize';
 
 import { environment } from '../../environments/environment';
-
 import { Menu } from '../types/menu';
 import { Restaurant } from '../types/restaurant';
 
@@ -16,7 +15,8 @@ export class RestaurantService {
 
   constructor(
     private http: HttpClient,
-  ) { }
+  ) {
+  }
 
   async getRestaurants(): Promise<Restaurant[]> {
     const jsons = await this.http.get<any[]>(`${environment.apiUrl}restaurant/`).toPromise();
@@ -63,5 +63,9 @@ export class RestaurantService {
     const json = await this.http.get<any>(`${environment.apiUrl}menu/${menu_id}/`).toPromise();
     const menu = Deserialize(json, Menu);
     return menu;
+  }
+
+  async getMenu(id: number): Promise<Menu> {
+    return await this.http.get<Menu>(`${environment.apiUrl}menu/${id}/`).toPromise();
   }
 }

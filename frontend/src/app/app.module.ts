@@ -33,6 +33,7 @@ import { SelectMenuComponent } from './party/party-choosing-menu/select-menu/sel
 import { SignUpComponent } from './sign-up/sign-up.component';
 import { UserItemComponent } from './party/party-ordered/user-item/user-item.component';
 import { AddVoteObjectComponent } from './party/party-choosing-restaurant/add-vote-object/add-vote-object.component';
+import { PaymentComponent } from './payment/payment.component';
 
 
 @NgModule({
@@ -52,6 +53,7 @@ import { AddVoteObjectComponent } from './party/party-choosing-restaurant/add-vo
     SignUpComponent,
     UserItemComponent,
     AddVoteObjectComponent,
+    PaymentComponent,
   ],
   imports: [
     AppRoutingModule,
