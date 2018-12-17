@@ -161,17 +161,33 @@ def party_records(request: HttpRequest):
 @allow_method(['GET'])
 @allow_authenticated
 def payments(request: HttpRequest):
-    payments = request.user.payments.filter(resolved=False).all()
+    payments = request.user.payments.filter(
+        resolved=False).select_related('user', 'paid_user', 'menu').all()
+    payment_jsons = []
+    for payment in payments:
+        payment_json = payment.as_dict()
+        payment_json['user'] = payment.user.as_dict()
+        payment_json['paid_user'] = payment.paid_user.as_dict()
+        payment_json['menu'] = payment.menu.as_dict()
+        payment_jsons.append(payment_json)
 
-    return JsonResponse([payment.as_dict() for payment in payments], safe=False)
+    return JsonResponse(payment_jsons, safe=False)
 
 
 @allow_method(['GET'])
 @allow_authenticated
 def collections(request: HttpRequest):
-    collections = request.user.collections.filter(resolved=False).all()
+    collections = request.user.collections.filter(
+        resolved=False).select_related('user', 'paid_user', 'menu').all()
+    payment_jsons = []
+    for payment in collections:
+        payment_json = payment.as_dict()
+        payment_json['user'] = payment.user.as_dict()
+        payment_json['paid_user'] = payment.paid_user.as_dict()
+        payment_json['menu'] = payment.menu.as_dict()
+        payment_jsons.append(payment_json)
 
-    return JsonResponse([payment.as_dict() for payment in collections], safe=False)
+    return JsonResponse(payment_jsons, safe=False)
 
 
 @allow_method(['GET'])
