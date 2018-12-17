@@ -175,7 +175,7 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         await self.channel_layer.group_send(
             'party-{}'.format(party_id),
-            event.party_delete(state),
+            event.party_delete(),
         )
 
         make_record(state)
@@ -412,6 +412,11 @@ class WebsocketConsumer(AsyncJsonWebsocketConsumer):
 
         await self.send_json(
             event.party_leave(user_id)
+        )
+
+    async def party_delete(self, data):
+        await self.send_json(
+            event.party_delete()
         )
 
     async def restaurant_vote(self, data):
