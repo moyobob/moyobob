@@ -14,3 +14,18 @@
 [![Coverage Status](https://codecov.io/gh/swsnu/swpp18-team5/branch/master/graph/badge.svg)](https://codecov.io/gh/swsnu/swpp18-team5)
 
 Check out moyobob at https://www.moyobob.me
+
+<table>
+  <tr>
+    <th><img src="img/sign-in.png" /></th>
+    <th><img src="img/lobby.png" /></th>
+    <th><img src="img/create-party.png" /></th>
+    <th><img src="img/restaurant.png" /></th>
+  </tr>
+  <tr>
+    <th><img src="img/menu.png" /></th>
+    <th><img src="img/ordering.png" /></th>
+    <th><img src="img/ordered.png" /></th>
+    <th><img src="img/payment.png" /></th>
+  </tr>
+</table>
