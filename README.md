@@ -6,7 +6,7 @@
 
 [![신안재](https://badgen.net/badge/신안재/yuyupopo/green)](https://github.com/yuyupopo)
 [![추현석](https://badgen.net/badge/추현석/cngustjr1235/cyan)](https://github.com/cngustjr1235)
-[![김혜민](https://badgen.net/badge/김혜민/hyeminhaleykim/cyan)](https://github.com/hyeminhaleykim)
+[![김혜민](https://badgen.net/badge/김혜민/haydenkim01/cyan)](https://github.com/haydenkim01)
 [![김영현](https://badgen.net/badge/김영현/kipa00/cyan)](https://github.com/kipa00)
 [![이강욱](https://badgen.net/badge/이강욱/pbzweihander/cyan)](https://github.com/pbzweihander)
 
